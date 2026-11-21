@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/bigquery.py b/sqlglot/generators/bigquery.py
+--- a/sqlglot/generators/bigquery.py
++++ b/sqlglot/generators/bigquery.py
+@@ -686,7 +686,7 @@
+         "some",
+         "struct",
+         "tablesample",
+-        "then",
++        'thenX',
+         "to",
+         "treat",
+         "true",

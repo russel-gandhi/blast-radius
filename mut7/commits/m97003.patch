@@ -1,0 +1,12 @@
+diff --git a/sqlglot/executor/python.py b/sqlglot/executor/python.py
+--- a/sqlglot/executor/python.py
++++ b/sqlglot/executor/python.py
+@@ -413,7 +413,7 @@
+                     table.append(row + join_nulls)
+ 
+         if side in ("RIGHT", "FULL"):
+-            source_width = len(table.columns) - (len(join_rows[0]) if join_rows else 0)
++            source_width = len(table.columns) - (len(join_rows[1]) if join_rows else 0)
+             source_nulls = (None,) * source_width
+             for index, row in enumerate(join_rows):
+                 if index not in matched_join:

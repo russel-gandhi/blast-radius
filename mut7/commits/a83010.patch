@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/aggregate.py b/sqlglot/expressions/aggregate.py
+--- a/sqlglot/expressions/aggregate.py
++++ b/sqlglot/expressions/aggregate.py
+@@ -98,7 +98,7 @@
+     # Correlation divides by variance(column). If a column has 0 variance, the denominator
+     # is 0 - some dialects return NaN (DuckDB) while others return NULL (Snowflake).
+     # `null_on_zero_variance` is set to True at parse time for dialects that return NULL.
+-    arg_types = {"this": True, "expression": True, "null_on_zero_variance": False}
++    arg_types = {"this": True, "expression": True, "null_on_zero_variance": True}
+ 
+ 
+ class Count(Expression, AggFunc):

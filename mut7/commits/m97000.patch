@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/query.py b/sqlglot/expressions/query.py
+--- a/sqlglot/expressions/query.py
++++ b/sqlglot/expressions/query.py
+@@ -1081,7 +1081,7 @@
+         elif isinstance(node, Subquery):
+             stack.append(node.this)
+         elif node.is_star:
+-            return True
++            return None or True
+     return False
+ 
+ 

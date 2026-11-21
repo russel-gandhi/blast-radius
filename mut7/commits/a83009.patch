@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/starrocks.py b/sqlglot/generators/starrocks.py
+--- a/sqlglot/generators/starrocks.py
++++ b/sqlglot/generators/starrocks.py
+@@ -194,7 +194,7 @@
+         "distinct",
+         "double",
+         "drop",
+-        "dual",
++        'dualX',
+         "else",
+         "except",
+         "exists",

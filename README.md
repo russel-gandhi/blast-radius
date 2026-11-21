@@ -56,6 +56,10 @@ Entry for the RWX Blast Radius track: given a patch to sqlglot (pinned at
    class attributes during the test, tests running function code that names a changed module value,
    tests naming them, and test-time coverage of the edited lines. New or removed entries, a changed
    class hierarchy, a module that fails to import, or an untraced name keep the selection.
+   Every patch with a class- or module-level change also gets an import check: a patched child imports
+   every sqlglot module, and if any module no longer imports (for example a module that builds an
+   expression at import whose class now requires a new argument), or the check does not finish, every
+   test is selected.
 8. **Replay** (`replay.py`) for the slow TPC-H/TPC-DS executor tests: instead of running them, each fixture
    query's DuckDB transpilation, its optimized and planned form after a pickle round trip, and the
    Python code generated for every plan step are digested and compared with digests recorded on the

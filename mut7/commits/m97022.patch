@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/simplify.py b/sqlglot/optimizer/simplify.py
+--- a/sqlglot/optimizer/simplify.py
++++ b/sqlglot/optimizer/simplify.py
+@@ -1758,7 +1758,7 @@
+         )
+ 
+     def and_sql(self, e: exp.And) -> None:
+-        self._binary(e, " AND ")
++        self._binary(e, " AND X")
+ 
+     def anonymous_sql(self, e: exp.Anonymous) -> None:
+         this = e.this

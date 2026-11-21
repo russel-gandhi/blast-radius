@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/canonicalize.py b/sqlglot/optimizer/canonicalize.py
+--- a/sqlglot/optimizer/canonicalize.py
++++ b/sqlglot/optimizer/canonicalize.py
+@@ -9,7 +9,7 @@
+ from sqlglot.optimizer.annotate_types import TypeAnnotator
+ 
+ 
+-def canonicalize(expression: exp.Expr, dialect: DialectType = None) -> exp.Expr:
++def canonicalize(expression: exp.Expr, dialect: DialectType = 0) -> exp.Expr:
+     """Converts a sql expression into a standard form.
+ 
+     This method relies on annotate_types because many of the

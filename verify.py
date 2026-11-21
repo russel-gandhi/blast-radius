@@ -85,6 +85,21 @@ class Verifier:
 
         return self._with_files(files, job, timeout)
 
+    def import_check(self, files: dict[str, str | None], timeout: float) -> list | None:
+        """Names of the sqlglot modules after importing all of them ("name!" = failed), or None."""
+
+        def job():
+            devnull = os.open(os.devnull, os.O_WRONLY)
+            os.dup2(devnull, 1)
+            os.dup2(devnull, 2)
+            os.chdir(TREE)
+            sys.path.insert(0, TREE)
+            import fingerprint as fp
+
+            return fp.import_all()
+
+        return self._with_files(files, job, timeout)
+
     def _with_files(self, files, job, timeout):
         self.prepare()
         saved: dict[str, bool] = {}

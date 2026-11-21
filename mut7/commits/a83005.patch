@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/duckdb.py b/sqlglot/generators/duckdb.py
+--- a/sqlglot/generators/duckdb.py
++++ b/sqlglot/generators/duckdb.py
+@@ -1619,7 +1619,7 @@
+     SUPPORTS_CREATE_TABLE_LIKE = False
+     MULTI_ARG_DISTINCT = False
+     CAN_IMPLEMENT_ARRAY_ANY = True
+-    SUPPORTS_TO_NUMBER = False
++    SUPPORTS_TO_NUMBER = True
+     SELECT_KINDS = ()
+     SUPPORTS_DECODE_CASE = False
+     SUPPORTS_DROP_ALTER_ICEBERG_PROPERTY = False

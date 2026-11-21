@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/doris.py b/sqlglot/parsers/doris.py
+--- a/sqlglot/parsers/doris.py
++++ b/sqlglot/parsers/doris.py
+@@ -106,7 +106,7 @@
+         expr = super()._parse_partition_property()
+ 
+         if not expr:
+-            return self._parse_partitioned_by()
++            return None or self._parse_partitioned_by()
+ 
+         if isinstance(expr, exp.Property):
+             return expr

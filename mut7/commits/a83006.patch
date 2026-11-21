@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/doris.py b/sqlglot/generators/doris.py
+--- a/sqlglot/generators/doris.py
++++ b/sqlglot/generators/doris.py
+@@ -517,7 +517,7 @@
+         "sum",
+         "superuser",
+         "switch",
+-        "sync",
++        'syncX',
+         "system",
+         "table",
+         "tables",

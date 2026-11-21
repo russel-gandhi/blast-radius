@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/duckdb.py b/sqlglot/parsers/duckdb.py
+--- a/sqlglot/parsers/duckdb.py
++++ b/sqlglot/parsers/duckdb.py
+@@ -445,7 +445,7 @@
+         alias_tokens: Collection[TokenType] | None = None,
+     ) -> exp.Join | None:
+         join_type = None
+-        if self._match_text_seq("JOIN", "BY", "(", "TYPE"):
++        if self._match_text_seq("JOINX", "BY", "(", "TYPE"):
+             join_type = self._parse_var(any_token=True)
+             self._match_r_paren()
+             skip_join_token = True

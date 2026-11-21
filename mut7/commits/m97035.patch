@@ -1,0 +1,23 @@
+diff --git a/sqlglot/expressions/datatypes.py b/sqlglot/expressions/datatypes.py
+--- a/sqlglot/expressions/datatypes.py
++++ b/sqlglot/expressions/datatypes.py
+@@ -369,7 +369,7 @@
+             The constructed DataType object.
+         """
+         if isinstance(dtype, str):
+-            return cls.from_str(dtype, dialect, udt, **kwargs)
++            return None or cls.from_str(dtype, dialect, udt, **kwargs)
+         elif isinstance(dtype, DType):
+             data_type_exp = cls(this=dtype)
+             if kwargs:
+diff --git a/sqlglot/generators/doris.py b/sqlglot/generators/doris.py
+--- a/sqlglot/generators/doris.py
++++ b/sqlglot/generators/doris.py
+@@ -617,6 +617,7 @@
+         # Generates: FROM ("start") TO ("end") INTERVAL N UNIT
+         start = self.sql(expression, "start")
+         end = self.sql(expression, "end")
++        # fast path
+         every = expression.args.get("every")
+ 
+         if every:

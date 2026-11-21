@@ -1,0 +1,23 @@
+diff --git a/sqlglot/typing/redshift.py b/sqlglot/typing/redshift.py
+--- a/sqlglot/typing/redshift.py
++++ b/sqlglot/typing/redshift.py
+@@ -23,7 +23,7 @@
+ def _annotate_sha2(self: TypeAnnotator, expression: exp.SHA2) -> exp.Expr:
+     size = 128
+     length = expression.args.get("length")
+-    if length and length.is_int:
++    if length or length.is_int:
+         bits = length.to_py()
+         size = (bits or 256) // 4 if bits in (0, 224, 256, 384, 512) else 1
+ 
+diff --git a/sqlglot/parsers/singlestore.py b/sqlglot/parsers/singlestore.py
+--- a/sqlglot/parsers/singlestore.py
++++ b/sqlglot/parsers/singlestore.py
+@@ -246,6 +246,7 @@
+     def _parse_vector_expressions(self, expressions: list[exp.Expr]) -> list[exp.Expr]:
+         type_name = expressions[1].name.upper()
+         if type_name in self.dialect.VECTOR_TYPE_ALIASES:
++            # TODO revisit
+             type_name = self.dialect.VECTOR_TYPE_ALIASES[type_name]
+ 
+         return [exp.DataType.build(type_name, dialect=self.dialect), expressions[0]]

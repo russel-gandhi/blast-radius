@@ -962,6 +962,7 @@ class Selector:
         self.refine_intersect: set[str] = set()  # refinements that only narrow the coverage set
         self.touched_lines: dict[str, list[int]] = {}
         self.fp_path = None
+        self.fp_detect = False
         per_file: list[tuple[str, set[int]]] = []
         for fp in parse_patch(patch_text):
             try:
@@ -983,6 +984,9 @@ class Selector:
                     reasons.append(f"refined {path} -> {len(per_file[i][1])}")
         # one import-time code change with no finer rule: the import-time fingerprint can tell
         # which class attributes and module values it really changes (see fp_refine)
+        # any class/module-level change may break a module's import (a value built at import
+        # becomes invalid): such patches get an import check in a patched child
+        self.fp_detect = any(r.startswith(("import-time ", "import-run ", "def-header ")) for r in reasons)
         if len(self.code_changes) == 1 and self.refined.get(self.code_changes[0]) is None:
             path = self.code_changes[0]
             if path.startswith("sqlglot/") and any(
@@ -1168,40 +1172,67 @@ def main() -> None:
         replay_ok[patch.stem] = sel.replay_ok
         verify_ok[patch.stem] = sel.verify_ok
         weak[patch.stem] = sel.weak - chosen
-        if sel.fp_path:
+        if sel.fp_path or sel.fp_detect:
             fp_jobs[len(results) - 1] = (sel.fp_path, dict(sel.touched_lines))
     # import-time changes: ask a patched child which class attributes / module values changed,
     # against a pristine snapshot taken the same way (same parent, modules, hash seed, paths)
-    todo = [i for i in fp_jobs if sel.pack(results[i][1])[0] >= FP_MIN_SAVING * 1000]
+    todo = list(fp_jobs)
     if verifier is not None and todo:
-        base = None
+        base = None  # full pristine snapshot, taken on first need
+        base_mods = None
         noisy: set[str] = set()
         try:
             verifier.prepare()
             c0 = sum(os.times()[:4])
-            base = verifier.snapshot({}, timeout=20.0)
-            again = verifier.snapshot({}, timeout=20.0) if base else None
-            if base and again:
-                # entries that differ between two pristine imports (orders built from object ids)
-                # say nothing about a patch: drop them
-                for k in set(base) | set(again):
-                    if base.get(k) != again.get(k):
-                        base.pop(k, None)
-                        noisy.add(k)
-            else:
-                base = None
-            log(f"fingerprint base cpu {sum(os.times()[:4]) - c0:.2f}, noisy {len(noisy)}")
+            base_mods = verifier.import_check({}, timeout=20.0)
+            base_mods = sorted(base_mods) if base_mods else None
+            log(f"import check base cpu {sum(os.times()[:4]) - c0:.2f}")
         except Exception as exc:
-            log("fingerprint base failed", repr(exc))
-        for i in sorted(todo, key=lambda k: -sel.pack(results[k][1])[0]) if base else []:
+            log("import check base failed", repr(exc))
+
+        def full_base():
+            nonlocal base
+            if base is None:
+                c0 = sum(os.times()[:4])
+                a = verifier.snapshot({}, timeout=20.0)
+                b = verifier.snapshot({}, timeout=20.0) if a else None
+                if a and b:
+                    # entries that differ between two pristine imports (orders built from
+                    # object ids) say nothing about a patch: drop them
+                    for k in set(a) | set(b):
+                        if a.get(k) != b.get(k):
+                            a.pop(k, None)
+                            noisy.add(k)
+                    base = a
+                else:
+                    base = {}
+                log(f"fingerprint base cpu {sum(os.times()[:4]) - c0:.2f}, noisy {len(noisy)}")
+            return base or None
+
+        for i in sorted(todo, key=lambda k: -sel.pack(results[k][1])[0]) if base_mods else []:
             path, touched = fp_jobs[i]
             cid, chosen, reasons, files = results[i]
             left = budget - (time.monotonic() - start)
             if left < 20:
                 break
             c0 = sum(os.times()[:4])
-            snap = verifier.snapshot(files, timeout=min(20.0, left - 5))
-            diff = None if snap is None else _fp_diff(base, {k: v for k, v in snap.items() if k not in noisy})
+            refine = path is not None and sel.pack(chosen)[0] >= FP_MIN_SAVING * 1000 and full_base() is not None
+            if refine:
+                snap = verifier.snapshot(files, timeout=min(20.0, left - 5))
+                diff = None if snap is None else _fp_diff(base, {k: v for k, v in snap.items() if k not in noisy})
+            else:
+                # detection only: do all modules still import?
+                mods = verifier.import_check(files, timeout=min(20.0, left - 5))
+                diff = None if mods is None else {"changed": [] if sorted(mods) == base_mods else ["__modules__"]}
+                reasons.append(f"fp check cpu {sum(os.times()[:4]) - c0:.2f}")
+            if diff is None or "__modules__" in diff["changed"]:
+                # a module no longer imports (or the check itself did not finish): anything may fail
+                results[i] = (cid, set(sel.all), reasons, files)
+                reasons.append("fp: a module fails to import -> all")
+                continue
+            if not refine:
+                reasons.append("fp: imports ok")
+                continue
             sel.touched_lines = touched
             refined = sel.fp_refine(diff, path, reasons)
             reasons.append(f"fp cpu {sum(os.times()[:4]) - c0:.2f}")

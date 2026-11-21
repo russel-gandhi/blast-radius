@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/array.py b/sqlglot/expressions/array.py
+--- a/sqlglot/expressions/array.py
++++ b/sqlglot/expressions/array.py
+@@ -255,7 +255,7 @@
+ 
+ 
+ class StrtokSplitToTable(Expression, Func, UDTF):
+-    arg_types = {"this": True, "expression": False}
++    arg_types = {"this": False, "expression": False}
+ 
+ 
+ class Stack(Expression, Func, UDTF):

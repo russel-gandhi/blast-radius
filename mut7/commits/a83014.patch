@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/spark2.py b/sqlglot/generators/spark2.py
+--- a/sqlglot/generators/spark2.py
++++ b/sqlglot/generators/spark2.py
+@@ -133,7 +133,7 @@
+     QUERY_HINTS = True
+     NVL2_SUPPORTED = True
+     CAN_IMPLEMENT_ARRAY_ANY = True
+-    ALTER_SET_TYPE = "TYPE"
++    ALTER_SET_TYPE = 'TYPEX'
+     PARSE_JSON_NAME: str | None = None
+ 
+     PROPERTIES_LOCATION = {

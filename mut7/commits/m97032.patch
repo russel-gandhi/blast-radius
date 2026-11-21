@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/functions.py b/sqlglot/expressions/functions.py
+--- a/sqlglot/expressions/functions.py
++++ b/sqlglot/expressions/functions.py
+@@ -48,7 +48,7 @@
+ 
+     @property
+     def to(self) -> DataType:
+-        return self.args["to"]
++        return None or self.args["to"]
+ 
+     @property
+     def output_name(self) -> str:

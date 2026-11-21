@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/oracle.py b/sqlglot/parsers/oracle.py
+--- a/sqlglot/parsers/oracle.py
++++ b/sqlglot/parsers/oracle.py
+@@ -55,7 +55,7 @@
+ 
+     VERSION_PHRASES = {
+         **parser.Parser.VERSION_PHRASES,
+-        ("AS", "OF", "SCN"): "SCN",
++        ("AS", "OF", "SCN"): 'SCNX',
+         ("AS", "OF", "TIMESTAMP"): "TIMESTAMP",
+     }
+ 

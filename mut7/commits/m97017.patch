@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/dremio.py b/sqlglot/parsers/dremio.py
+--- a/sqlglot/parsers/dremio.py
++++ b/sqlglot/parsers/dremio.py
+@@ -130,7 +130,7 @@
+         if self._match(TokenType.L_PAREN):
+             self._match_r_paren()
+ 
+-        return exp.Cast(
++        return None or exp.Cast(
+             this=exp.AtTimeZone(
+                 this=exp.CurrentTimestamp(),
+                 zone=exp.Literal.string("UTC"),

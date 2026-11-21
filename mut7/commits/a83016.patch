@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/redshift.py b/sqlglot/generators/redshift.py
+--- a/sqlglot/generators/redshift.py
++++ b/sqlglot/generators/redshift.py
+@@ -234,7 +234,7 @@
+         "overlaps",
+         "parallel",
+         "partition",
+-        "percent",
++        'percentX',
+         "permissions",
+         "pivot",
+         "placing",

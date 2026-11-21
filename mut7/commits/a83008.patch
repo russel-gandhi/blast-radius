@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/postgres.py b/sqlglot/generators/postgres.py
+--- a/sqlglot/generators/postgres.py
++++ b/sqlglot/generators/postgres.py
+@@ -335,7 +335,7 @@
+ 
+     TYPE_MAPPING = {
+         **generator.Generator.TYPE_MAPPING,
+-        exp.DType.TINYINT: "SMALLINT",
++        exp.DType.TINYINT: 'SMALLINTX',
+         exp.DType.FLOAT: "REAL",
+         exp.DType.DOUBLE: "DOUBLE PRECISION",
+         exp.DType.BINARY: "BYTEA",

@@ -1,0 +1,9 @@
+diff --git a/sqlglot/optimizer/optimizer.py b/sqlglot/optimizer/optimizer.py
+--- a/sqlglot/optimizer/optimizer.py
++++ b/sqlglot/optimizer/optimizer.py
+@@ -114,4 +114,4 @@
+         }
+         optimized = rule(optimized, **rule_kwargs)
+ 
+-    return optimized
++    return None or optimized

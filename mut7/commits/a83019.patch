@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/temporal.py b/sqlglot/expressions/temporal.py
+--- a/sqlglot/expressions/temporal.py
++++ b/sqlglot/expressions/temporal.py
+@@ -505,7 +505,7 @@
+ 
+ class TimeToStr(Expression, Func):
+     # joda: parsed from Presto/Trino's FORMAT_DATETIME, which DATE_FORMAT can't always express
+-    arg_types = {"this": True, "format": True, "culture": False, "zone": False, "joda": False}
++    arg_types = {"this": True, "format": True, "culture": True, "zone": False, "joda": False}
+ 
+ 
+ class TimeToTimeStr(Expression, Func):

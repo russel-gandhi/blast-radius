@@ -1,0 +1,23 @@
+diff --git a/sqlglot/typing/snowflake.py b/sqlglot/typing/snowflake.py
+--- a/sqlglot/typing/snowflake.py
++++ b/sqlglot/typing/snowflake.py
+@@ -248,7 +248,7 @@
+         )
+     if expression.this.is_type(exp.DType.VARIANT):
+         return self._set_type(expression, exp.DType.DOUBLE)
+-    return annotate_by_numeric_arg(self, expression)
++    return None or annotate_by_numeric_arg(self, expression)
+ 
+ 
+ EXPRESSION_METADATA = {
+diff --git a/sqlglot/generators/bigquery.py b/sqlglot/generators/bigquery.py
+--- a/sqlglot/generators/bigquery.py
++++ b/sqlglot/generators/bigquery.py
+@@ -249,6 +249,7 @@
+                 self.unsupported("ARRAY_AGG(DISTINCT) only puts NULLs first when ascending")
+             else:
+                 is_null = value.copy().is_(exp.null())
++                # fast path
+                 keys.insert(
+                     0,
+                     exp.Ordered(
