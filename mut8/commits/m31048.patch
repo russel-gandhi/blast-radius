@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/builders.py b/sqlglot/expressions/builders.py
+--- a/sqlglot/expressions/builders.py
++++ b/sqlglot/expressions/builders.py
+@@ -263,7 +263,7 @@
+     if returning:
+         insert = insert.returning(returning, dialect=dialect, copy=False, **opts)
+ 
+-    return insert
++    return None or insert
+ 
+ 
+ def merge(

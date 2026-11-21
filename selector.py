@@ -1000,6 +1000,10 @@ class Selector:
         # any class/module-level change may break a module's import (a value built at import
         # becomes invalid): such patches get an import check in a patched child
         self.fp_detect = any(r.startswith(("import-time ", "import-run ", "def-header ")) for r in reasons)
+        if len(self.code_changes) == 1 and self.refined.get(self.code_changes[0]) is not None:
+            # narrowed by the table-entry or class-setting rules: those only accept values that
+            # are not read while modules import, so the edit cannot break an import
+            self.fp_detect = False
         if len(self.code_changes) == 1 and self.refined.get(self.code_changes[0]) is None:
             path = self.code_changes[0]
             if path.startswith("sqlglot/") and any(
@@ -1129,6 +1133,7 @@ VERIFY_FACTOR = float(os.environ.get("BR_VF", 1.2))  # margin over each test's m
 PREPARE_COST = 1.2  # one-off: copy the tree and import numpy/pandas/duckdb
 P_CODE = float(os.environ.get("BR_PCODE", 0.5))
 P_DATA = float(os.environ.get("BR_PDATA", 0.9))
+WIDE_REPLAY = os.environ.get("BR_WIDE_REPLAY", "0") == "1"
 FP_MIN_SAVING = 4.0  # s: fingerprint only selections costing more than this (child costs ~1 s)
 MARGIN = float(os.environ.get("BR_MARGIN", 0.4))
 
@@ -1220,7 +1225,9 @@ def main() -> None:
         chosen, reasons = sel.select(patch.read_text(encoding="utf-8"))
         results.append((patch.stem, chosen, reasons, dict(sel.files)))
         replay_ok[patch.stem] = sel.replay_ok and not sel.replay_fp
-        replay_pending[patch.stem] = sel.replay_ok and sel.replay_fp
+        # wider replay for class/module-level edits: cost CPU without saving anything on the
+        # practice board, so it is off unless asked for
+        replay_pending[patch.stem] = WIDE_REPLAY and sel.replay_ok and sel.replay_fp
         if not sel.replay_ok:
             reasons.append("noreplay:" + ",".join(sorted(sel.no_replay)))
         verify_ok[patch.stem] = sel.verify_ok

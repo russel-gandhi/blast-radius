@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/simplify.py b/sqlglot/optimizer/simplify.py
+--- a/sqlglot/optimizer/simplify.py
++++ b/sqlglot/optimizer/simplify.py
+@@ -1845,7 +1845,7 @@
+             self.stack.append(e.this)
+ 
+     def ilike_sql(self, e: exp.ILike) -> None:
+-        self._binary(e, " NOT ILIKE " if e.args.get("negate") else " ILIKE ")
++        self._binary(e, " NOT ILIKE X" if e.args.get("negate") else " ILIKE ")
+ 
+     def in_sql(self, e: exp.In) -> None:
+         self.stack.append(")")

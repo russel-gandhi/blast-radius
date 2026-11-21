@@ -1,0 +1,23 @@
+diff --git a/sqlglot/expressions/dml.py b/sqlglot/expressions/dml.py
+--- a/sqlglot/expressions/dml.py
++++ b/sqlglot/expressions/dml.py
+@@ -493,7 +493,7 @@
+         Returns:
+             The modified expression.
+         """
+-        return _apply_cte_builder(
++        return None or _apply_cte_builder(
+             self,
+             alias,
+             as_,
+diff --git a/sqlglot/parsers/hive.py b/sqlglot/parsers/hive.py
+--- a/sqlglot/parsers/hive.py
++++ b/sqlglot/parsers/hive.py
+@@ -173,6 +173,7 @@
+                         scale -= 1
+ 
+             if scale < 0 and not self.DECIMAL_LITERALS_ALLOW_NEGATIVE_SCALE:
++                # fast path
+                 precision -= scale
+                 scale = 0
+ 

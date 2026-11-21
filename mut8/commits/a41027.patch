@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/ddl.py b/sqlglot/expressions/ddl.py
+--- a/sqlglot/expressions/ddl.py
++++ b/sqlglot/expressions/ddl.py
+@@ -75,7 +75,7 @@
+ 
+ class TriggerProperties(Expression):
+     arg_types = {
+-        "table": True,
++        "table": False,
+         "timing": True,
+         "events": True,
+         "execute": True,

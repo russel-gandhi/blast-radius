@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -532,7 +532,7 @@
+     JSON_PATH_BRACKETED_KEY_SUPPORTED = True
+ 
+     # Whether to escape keys using single quotes in JSON paths
+-    JSON_PATH_SINGLE_QUOTE_ESCAPE = False
++    JSON_PATH_SINGLE_QUOTE_ESCAPE = True
+ 
+     # Whether a quoted JSON path key (e.g. from a quoted identifier or ['key'] bracket) must be
+     # rendered in bracket form to preserve its case-sensitivity, even if it would otherwise match

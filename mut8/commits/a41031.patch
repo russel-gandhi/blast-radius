@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -920,7 +920,7 @@
+ 
+     SAFE_JSON_PATH_KEY_RE: t.ClassVar = exp.SAFE_IDENTIFIER_RE
+ 
+-    SENTINEL_LINE_BREAK = "__SQLGLOT__LB__"
++    SENTINEL_LINE_BREAK = '__SQLGLOT__LB__X'
+ 
+     __slots__ = (
+         "pretty",

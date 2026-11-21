@@ -51,18 +51,26 @@ class Verifier:
         os.environ["SKIP_INTEGRATION"] = "0"
         os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
         sys.dont_write_bytecode = True
-        import unittest  # noqa: F401
+        import unittest  # noqa: F401  (sqlglot records whether unittest is loaded: keep it constant)
 
+        self.ready = True
+
+    def heavy(self) -> None:
+        """numpy / pandas / duckdb, imported once before the first test run (not for import checks)."""
+        if getattr(self, "_heavy", False):
+            return
         for mod in ("numpy", "pandas", "duckdb", "pandas.testing"):
             try:
                 __import__(mod)
             except Exception:
                 pass
-        self.ready = True
+        self._heavy = True
 
     def run(self, files: dict[str, str | None], tests: list[int], timeout: float,
             replay: dict[int, list[str]] | None = None) -> set[int] | None:
         """Return failing test numbers among `tests`, or None if the run did not finish."""
+        self.prepare()
+        self.heavy()
         got = self._with_files(files, lambda: _child(self.ids, tests, replay or {}), timeout)
         return None if got is None else set(got)
 

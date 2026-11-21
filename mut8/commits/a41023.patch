@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/functions.py b/sqlglot/expressions/functions.py
+--- a/sqlglot/expressions/functions.py
++++ b/sqlglot/expressions/functions.py
+@@ -395,7 +395,7 @@
+         "forecast_end_timestamp": False,
+         "confidence_level": False,
+         "output_historical_time_series": False,
+-        "context_window": False,
++        "context_window": True,
+     }
+ 
+ 

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -933,7 +933,7 @@
+         "max_unsupported",
+         "leading_comma",
+         "max_text_width",
+-        "comments",
++        'commentsX',
+         "dialect",
+         "unsupported_messages",
+         "_escaped_quote_end",

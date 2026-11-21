@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/dialect.py b/sqlglot/dialects/dialect.py
+--- a/sqlglot/dialects/dialect.py
++++ b/sqlglot/dialects/dialect.py
+@@ -520,7 +520,7 @@
+     HEX_LOWERCASE = False
+     """Whether the `HEX` function returns a lowercase hexadecimal string."""
+ 
+-    DATE_FORMAT = "'%Y-%m-%d'"
++    DATE_FORMAT = "'%Y-%m-%d'X"
+     DATEINT_FORMAT = "'%Y%m%d'"
+     TIME_FORMAT = "'%Y-%m-%d %H:%M:%S'"
+ 

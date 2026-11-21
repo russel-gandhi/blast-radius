@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/dialect.py b/sqlglot/dialects/dialect.py
+--- a/sqlglot/dialects/dialect.py
++++ b/sqlglot/dialects/dialect.py
+@@ -2910,7 +2910,7 @@
+ 
+ 
+ def explode_to_unnest_sql(
+-    self: Generator, expression: exp.Lateral, supports_left_join_unnest: bool = True
++    self: Generator, expression: exp.Lateral, supports_left_join_unnest: bool = False
+ ) -> str:
+     this = expression.this
+     alias = expression.args.get("alias")

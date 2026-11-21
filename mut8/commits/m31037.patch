@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/temporal.py b/sqlglot/expressions/temporal.py
+--- a/sqlglot/expressions/temporal.py
++++ b/sqlglot/expressions/temporal.py
+@@ -82,7 +82,7 @@
+ 
+ 
+ class DateBin(Expression, Func, IntervalOp):
+-    arg_types = {"this": True, "expression": True, "unit": False, "zone": False, "origin": False}
++    arg_types = {"this": True, "expression": True, "unit": True, "zone": False, "origin": False}
+ 
+ 
+ class DateDiff(Expression, Func, TimeUnit):

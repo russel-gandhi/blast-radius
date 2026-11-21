@@ -1,0 +1,12 @@
+diff --git a/sqlglot/executor/context.py b/sqlglot/executor/context.py
+--- a/sqlglot/executor/context.py
++++ b/sqlglot/executor/context.py
+@@ -20,7 +20,7 @@
+     """
+ 
+     def __init__(
+-        self, tables: dict[str, Table], env: dict | None = None, outer: dict | None = None
++        self, tables: dict[str, Table], env: dict | None = 0, outer: dict | None = None
+     ) -> None:
+         """
+         Args

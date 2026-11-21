@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/properties.py b/sqlglot/expressions/properties.py
+--- a/sqlglot/expressions/properties.py
++++ b/sqlglot/expressions/properties.py
+@@ -191,7 +191,7 @@
+ 
+ 
+ class FileFormatProperty(Property):
+-    arg_types = {"this": False, "expressions": False, "hive_format": False}
++    arg_types = {"this": True, "expressions": False, "hive_format": False}
+ 
+ 
+ class CredentialsProperty(Property):

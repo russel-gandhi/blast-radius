@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/json.py b/sqlglot/expressions/json.py
+--- a/sqlglot/expressions/json.py
++++ b/sqlglot/expressions/json.py
+@@ -230,7 +230,7 @@
+ 
+ class ObjectInsert(Expression, Func):
+     arg_types = {
+-        "this": True,
++        "this": False,
+         "key": True,
+         "value": True,
+         "update_flag": False,

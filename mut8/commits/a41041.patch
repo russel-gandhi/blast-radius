@@ -1,0 +1,9 @@
+diff --git a/sqlglot/expressions/aggregate.py b/sqlglot/expressions/aggregate.py
+--- a/sqlglot/expressions/aggregate.py
++++ b/sqlglot/expressions/aggregate.py
+@@ -333,4 +333,4 @@
+ 
+ 
+ class VariancePop(Expression, AggFunc):
+-    _sql_names = ["VARIANCE_POP", "VAR_POP"]
++    _sql_names = ['VARIANCE_POPX', "VAR_POP"]

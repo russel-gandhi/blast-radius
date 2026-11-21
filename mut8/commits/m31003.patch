@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/optimize_joins.py b/sqlglot/optimizer/optimize_joins.py
+--- a/sqlglot/optimizer/optimize_joins.py
++++ b/sqlglot/optimizer/optimize_joins.py
+@@ -145,7 +145,7 @@
+         >>> _is_reorderable(ast.find(exp.Select).args.get("joins", []))
+         False
+     """
+-    return not any(
++    return None or not any(
+         join.side
+         or join.kind in ("ASOF", "ANY", "PASTE")
+         or join.method in ("ASOF", "POSITIONAL")

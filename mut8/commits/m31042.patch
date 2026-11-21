@@ -1,0 +1,12 @@
+diff --git a/sqlglot/tokens.py b/sqlglot/tokens.py
+--- a/sqlglot/tokens.py
++++ b/sqlglot/tokens.py
+@@ -567,7 +567,7 @@
+         "_core",
+     )
+ 
+-    def __init__(self, dialect: DialectType = None) -> None:
++    def __init__(self, dialect: DialectType = 0) -> None:
+         from sqlglot.dialects.dialect import Dialect
+ 
+         self.dialect = Dialect.get_or_raise(dialect)

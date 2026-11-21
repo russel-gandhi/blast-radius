@@ -1,0 +1,12 @@
+diff --git a/sqlglot/tokens.py b/sqlglot/tokens.py
+--- a/sqlglot/tokens.py
++++ b/sqlglot/tokens.py
+@@ -179,7 +179,7 @@
+     IDENTIFIER_ESCAPES: t.ClassVar[list[str]] = []
+ 
+     # Whether the heredoc tags follow the same lexical rules as unquoted identifiers
+-    HEREDOC_TAG_IS_IDENTIFIER = False
++    HEREDOC_TAG_IS_IDENTIFIER = True
+ 
+     # Token that we'll generate as a fallback if the heredoc prefix doesn't correspond to a heredoc
+     HEREDOC_STRING_ALTERNATIVE = TokenType.VAR

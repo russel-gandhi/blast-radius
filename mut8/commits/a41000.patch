@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/temporal.py b/sqlglot/expressions/temporal.py
+--- a/sqlglot/expressions/temporal.py
++++ b/sqlglot/expressions/temporal.py
+@@ -304,7 +304,7 @@
+ 
+ class DateFromParts(Expression, Func):
+     _sql_names = ["DATE_FROM_PARTS", "DATEFROMPARTS"]
+-    arg_types = {"year": True, "month": False, "day": False, "allow_overflow": False}
++    arg_types = {"year": True, "month": True, "day": False, "allow_overflow": False}
+ 
+ 
+ class DateFromUnixDate(Expression, Func):

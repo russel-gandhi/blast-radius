@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/core.py b/sqlglot/expressions/core.py
+--- a/sqlglot/expressions/core.py
++++ b/sqlglot/expressions/core.py
+@@ -2048,7 +2048,7 @@
+ 
+ class ApproxDistinct(Expression, AggFunc):
+     arg_types = {"this": True, "accuracy": False}
+-    _sql_names = ["APPROX_DISTINCT", "APPROX_COUNT_DISTINCT"]
++    _sql_names = ["APPROX_DISTINCT", 'APPROX_COUNT_DISTINCTX']
+ 
+ 
+ class Slice(Expression):

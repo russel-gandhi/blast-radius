@@ -1,0 +1,12 @@
+diff --git a/sqlglot/executor/python.py b/sqlglot/executor/python.py
+--- a/sqlglot/executor/python.py
++++ b/sqlglot/executor/python.py
+@@ -254,7 +254,7 @@
+             if len(sink) >= step.offset + step.limit:
+                 break
+ 
+-            if condition and not context.eval(condition):
++            if condition and context.eval(condition):
+                 continue
+ 
+             if projections:
