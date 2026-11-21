@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/duckdb.py b/sqlglot/dialects/duckdb.py
+--- a/sqlglot/dialects/duckdb.py
++++ b/sqlglot/dialects/duckdb.py
+@@ -112,7 +112,7 @@
+             "ATTACH": TokenType.ATTACH,
+             "BINARY": TokenType.VARBINARY,
+             "BITSTRING": TokenType.BIT,
+-            "BPCHAR": TokenType.TEXT,
++            'BPCHARX': TokenType.TEXT,
+             "CHAR": TokenType.TEXT,
+             "CONNECT": TokenType.CONNECT,
+             "DATETIME": TokenType.TIMESTAMPNTZ,

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/tsql.py b/sqlglot/dialects/tsql.py
+--- a/sqlglot/dialects/tsql.py
++++ b/sqlglot/dialects/tsql.py
+@@ -190,7 +190,7 @@
+             "TINYINT": TokenType.UTINYINT,
+             "UNIQUEIDENTIFIER": TokenType.UUID,
+             "UPDATE STATISTICS": TokenType.COMMAND,
+-            "XML": TokenType.XML,
++            'XMLX': TokenType.XML,
+         }
+         KEYWORDS.pop("/*+")
+ 

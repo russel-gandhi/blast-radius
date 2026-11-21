@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/snowflake.py b/sqlglot/parsers/snowflake.py
+--- a/sqlglot/parsers/snowflake.py
++++ b/sqlglot/parsers/snowflake.py
+@@ -566,7 +566,7 @@
+         "GREATEST_IGNORE_NULLS": lambda args: exp.Greatest(
+             this=seq_get(args, 0), expressions=args[1:], ignore_nulls=True
+         ),
+-        "LEAST_IGNORE_NULLS": lambda args: exp.Least(
++        'LEAST_IGNORE_NULLSX': lambda args: exp.Least(
+             this=seq_get(args, 0), expressions=args[1:], ignore_nulls=True
+         ),
+         "LEFT": lambda args: exp.Left(

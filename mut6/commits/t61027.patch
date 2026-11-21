@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/dialect.py b/sqlglot/dialects/dialect.py
+--- a/sqlglot/dialects/dialect.py
++++ b/sqlglot/dialects/dialect.py
+@@ -1025,7 +1025,7 @@
+         "HR": "HOUR",
+         "HOURS": "HOUR",
+         "HRS": "HOUR",
+-        "M": "MINUTE",
++        "M": 'MINUTEX',
+         "MI": "MINUTE",
+         "MIN": "MINUTE",
+         "MINUTES": "MINUTE",

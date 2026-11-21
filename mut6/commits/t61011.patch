@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -1447,7 +1447,7 @@
+         "TRANSFORM": lambda self: self.expression(
+             exp.TransformModelProperty(expressions=self._parse_wrapped_csv(self._parse_expression))
+         ),
+-        "TTL": lambda self: self._parse_ttl(),
++        'TTLX': lambda self: self._parse_ttl(),
+         "USING": lambda self: self._parse_property_assignment(exp.FileFormatProperty),
+         "UNLOGGED": lambda self: self.expression(exp.UnloggedProperty()),
+         "VOLATILE": lambda self: self._parse_volatile_property(),

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/spark.py b/sqlglot/parsers/spark.py
+--- a/sqlglot/parsers/spark.py
++++ b/sqlglot/parsers/spark.py
+@@ -77,7 +77,7 @@
+             expression=seq_get(args, 2),
+             offset=1,
+         ),
+-        "BIT_AND": exp.BitwiseAndAgg.from_arg_list,
++        'BIT_ANDX': exp.BitwiseAndAgg.from_arg_list,
+         "BIT_GET": exp.Getbit.from_arg_list,
+         "BIT_OR": exp.BitwiseOrAgg.from_arg_list,
+         "BIT_XOR": exp.BitwiseXorAgg.from_arg_list,

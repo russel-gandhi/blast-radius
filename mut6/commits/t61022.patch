@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/hive.py b/sqlglot/dialects/hive.py
+--- a/sqlglot/dialects/hive.py
++++ b/sqlglot/dialects/hive.py
+@@ -72,7 +72,7 @@
+         "m": "%-M",
+         "ss": "%Sstrict",
+         "s": "%-S",
+-        "SSSSSS": "%f",
++        'SSSSSSX': "%f",
+         "SSS": "%f_three",
+         "a": "%p",
+         "DD": "%j",

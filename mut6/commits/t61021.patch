@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/clickhouse.py b/sqlglot/generators/clickhouse.py
+--- a/sqlglot/generators/clickhouse.py
++++ b/sqlglot/generators/clickhouse.py
+@@ -274,7 +274,7 @@
+         exp.DType.NOTHING: "Nothing",
+         exp.DType.SMALLINT: "Int16",
+         exp.DType.STRUCT: "Tuple",
+-        exp.DType.TINYINT: "Int8",
++        exp.DType.TINYINT: 'Int8X',
+         exp.DType.UBIGINT: "UInt64",
+         exp.DType.UINT: "UInt32",
+         exp.DType.UINT128: "UInt128",

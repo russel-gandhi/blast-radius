@@ -1,0 +1,10 @@
+diff --git a/sqlglot/dialects/athena.py b/sqlglot/dialects/athena.py
+--- a/sqlglot/dialects/athena.py
++++ b/sqlglot/dialects/athena.py
+@@ -154,5 +154,5 @@
+ class _TrinoTokenizer(Trino.Tokenizer):
+     KEYWORDS = {
+         **Trino.Tokenizer.KEYWORDS,
+-        "UNLOAD": TokenType.COMMAND,
++        'UNLOADX': TokenType.COMMAND,
+     }

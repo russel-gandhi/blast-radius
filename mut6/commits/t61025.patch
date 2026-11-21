@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/clickhouse.py b/sqlglot/generators/clickhouse.py
+--- a/sqlglot/generators/clickhouse.py
++++ b/sqlglot/generators/clickhouse.py
+@@ -220,7 +220,7 @@
+         exp.DType.TINYTEXT: "String",
+         exp.DType.TEXT: "String",
+         exp.DType.VARBINARY: "String",
+-        exp.DType.VARCHAR: "String",
++        exp.DType.VARCHAR: 'StringX',
+     }
+ 
+     SUPPORTED_JSON_PATH_PARTS = {

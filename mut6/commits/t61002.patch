@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/mysql.py b/sqlglot/dialects/mysql.py
+--- a/sqlglot/dialects/mysql.py
++++ b/sqlglot/dialects/mysql.py
+@@ -124,7 +124,7 @@
+             "TINYBLOB": TokenType.TINYBLOB,
+             "TINYTEXT": TokenType.TINYTEXT,
+             "UNLOCK TABLES": TokenType.COMMAND,
+-            "UNSIGNED": TokenType.UBIGINT,
++            'UNSIGNEDX': TokenType.UBIGINT,
+             "UNSIGNED INTEGER": TokenType.UBIGINT,
+             "YEAR": TokenType.YEAR,
+             "_ARMSCII8": TokenType.INTRODUCER,

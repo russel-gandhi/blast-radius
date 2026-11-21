@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/starrocks.py b/sqlglot/parsers/starrocks.py
+--- a/sqlglot/parsers/starrocks.py
++++ b/sqlglot/parsers/starrocks.py
+@@ -83,7 +83,7 @@
+ 
+     PROPERTY_PARSERS = {
+         **MySQLParser.PROPERTY_PARSERS,
+-        "PROPERTIES": lambda self: self._parse_wrapped_properties(),
++        'PROPERTIESX': lambda self: self._parse_wrapped_properties(),
+         "AGGREGATE": lambda self: self._parse_composite_key_property(exp.AggregateKeyProperty),
+         "UNIQUE": lambda self: self._parse_composite_key_property(exp.UniqueKeyProperty),
+         "ROLLUP": lambda self: self._parse_rollup_property(),

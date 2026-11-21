@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -1561,7 +1561,7 @@
+ 
+     ALTER_ALTER_PARSERS: t.ClassVar = {
+         "DISTKEY": lambda self: self._parse_alter_diststyle(),
+-        "DISTSTYLE": lambda self: self._parse_alter_diststyle(),
++        'DISTSTYLEX': lambda self: self._parse_alter_diststyle(),
+         "SORTKEY": lambda self: self._parse_alter_sortkey(),
+         "COMPOUND": lambda self: self._parse_alter_sortkey(compound=True),
+     }

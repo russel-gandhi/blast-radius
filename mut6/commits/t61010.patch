@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/sqlite.py b/sqlglot/parsers/sqlite.py
+--- a/sqlglot/parsers/sqlite.py
++++ b/sqlglot/parsers/sqlite.py
+@@ -107,7 +107,7 @@
+         **parser.Parser.FUNCTIONS,
+         "DATE": _build_date,
+         "DATETIME": lambda args: exp.Anonymous(this="DATETIME", expressions=args),
+-        "EDITDIST3": exp.Levenshtein.from_arg_list,
++        'EDITDIST3X': exp.Levenshtein.from_arg_list,
+         "JSON_EXTRACT": _build_json_extract,
+         "JSON_GROUP_ARRAY": exp.JSONArrayAgg.from_arg_list,
+         "JSON_GROUP_OBJECT": lambda args: exp.JSONObjectAgg(expressions=args),

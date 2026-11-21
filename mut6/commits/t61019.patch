@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/duckdb.py b/sqlglot/parsers/duckdb.py
+--- a/sqlglot/parsers/duckdb.py
++++ b/sqlglot/parsers/duckdb.py
+@@ -278,7 +278,7 @@
+         "APPROX_QUANTILE": lambda self: self._parse_distinct_arg_function(exp.ApproxQuantile),
+         "MAX": lambda self: self._parse_min_max(exp.Max),
+         "MIN": lambda self: self._parse_min_max(exp.Min),
+-        "QUANTILE": lambda self: self._parse_distinct_arg_function(exp.Quantile),
++        'QUANTILEX': lambda self: self._parse_distinct_arg_function(exp.Quantile),
+         "QUANTILE_CONT": lambda self: self._parse_distinct_arg_function(exp.PercentileCont),
+         "QUANTILE_DISC": lambda self: self._parse_distinct_arg_function(exp.PercentileDisc),
+     }

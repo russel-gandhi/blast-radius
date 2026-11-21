@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/bigquery.py b/sqlglot/parsers/bigquery.py
+--- a/sqlglot/parsers/bigquery.py
++++ b/sqlglot/parsers/bigquery.py
+@@ -282,7 +282,7 @@
+         "REGEXP_CONTAINS": exp.RegexpLike.from_arg_list,
+         "REGEXP_EXTRACT": _build_regexp_extract(exp.RegexpExtract),
+         "REGEXP_SUBSTR": _build_regexp_extract(exp.RegexpExtract),
+-        "REGEXP_EXTRACT_ALL": _build_regexp_extract(
++        'REGEXP_EXTRACT_ALLX': _build_regexp_extract(
+             exp.RegexpExtractAll, default_group=exp.Literal.number(0)
+         ),
+         "SHA256": lambda args: exp.SHA2Digest(

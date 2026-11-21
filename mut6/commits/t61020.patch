@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/oracle.py b/sqlglot/parsers/oracle.py
+--- a/sqlglot/parsers/oracle.py
++++ b/sqlglot/parsers/oracle.py
+@@ -70,7 +70,7 @@
+         "L2_DISTANCE": exp.EuclideanDistance.from_arg_list,
+         "NVL": lambda args: build_coalesce(args, is_nvl=True),
+         "SQUARE": lambda args: exp.Pow(this=seq_get(args, 0), expression=exp.Literal.number(2)),
+-        "TO_CHAR": build_timetostr_or_tochar,
++        'TO_CHARX': build_timetostr_or_tochar,
+         "TO_TIMESTAMP": _build_to_timestamp,
+         "TO_DATE": _build_str_to_time(exp.StrToDate),
+         "TRUNC": build_formatted_trunc,

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/teradata.py b/sqlglot/dialects/teradata.py
+--- a/sqlglot/dialects/teradata.py
++++ b/sqlglot/dialects/teradata.py
+@@ -39,7 +39,7 @@
+         "E3": "%a",
+         "E4": "%A",
+         "EEE": "%a",
+-        "EEEE": "%A",
++        "EEEE": '%AX',
+     }
+ 
+     class Tokenizer(tokens.Tokenizer):

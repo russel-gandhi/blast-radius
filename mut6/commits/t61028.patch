@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/starrocks.py b/sqlglot/parsers/starrocks.py
+--- a/sqlglot/parsers/starrocks.py
++++ b/sqlglot/parsers/starrocks.py
+@@ -70,7 +70,7 @@
+         ),
+         "ARRAY_FLATTEN": exp.Flatten.from_arg_list,
+         "LIKE": build_like(exp.Like),
+-        "TO_DAYS": exp.ToDays.from_arg_list,
++        'TO_DAYSX': exp.ToDays.from_arg_list,
+         "REGEXP": exp.RegexpLike.from_arg_list,
+         # StarRocks' MAP() is a variadic constructor: MAP(k1, v1, k2, v2, ...)
+         # https://docs.starrocks.io/docs/sql-reference/sql-functions/map-functions/map/

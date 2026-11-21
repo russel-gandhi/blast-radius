@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/tsql.py b/sqlglot/dialects/tsql.py
+--- a/sqlglot/dialects/tsql.py
++++ b/sqlglot/dialects/tsql.py
+@@ -121,7 +121,7 @@
+         "102": "%Y.%m.%d",
+         "103": "%d/%m/%Y",
+         "104": "%d.%m.%Y",
+-        "105": "%d-%m-%Y",
++        "105": '%d-%m-%YX',
+         "106": "%d %b %Y",
+         "107": "%b %d, %Y",
+         "108": "%H:%M:%S",

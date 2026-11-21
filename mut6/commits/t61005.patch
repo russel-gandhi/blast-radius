@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/clickhouse.py b/sqlglot/parsers/clickhouse.py
+--- a/sqlglot/parsers/clickhouse.py
++++ b/sqlglot/parsers/clickhouse.py
+@@ -359,7 +359,7 @@
+         "SHA512": lambda args: exp.SHA2Digest(
+             this=seq_get(args, 0), length=exp.Literal.number(512)
+         ),
+-        "SPLITBYCHAR": _build_split_by_char,
++        'SPLITBYCHARX': _build_split_by_char,
+         "SPLITBYREGEXP": _build_split(exp.RegexpSplit),
+         "SPLITBYSTRING": _build_split(exp.Split),
+         "SUBSTRINGINDEX": exp.SubstringIndex.from_arg_list,

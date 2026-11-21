@@ -1,0 +1,12 @@
+diff --git a/sqlglot/tokens.py b/sqlglot/tokens.py
+--- a/sqlglot/tokens.py
++++ b/sqlglot/tokens.py
+@@ -436,7 +436,7 @@
+         "INT16": TokenType.SMALLINT,
+         "SHORT": TokenType.SMALLINT,
+         "SMALLINT": TokenType.SMALLINT,
+-        "HUGEINT": TokenType.INT128,
++        'HUGEINTX': TokenType.INT128,
+         "UHUGEINT": TokenType.UINT128,
+         "INT2": TokenType.SMALLINT,
+         "INTEGER": TokenType.INT,

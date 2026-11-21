@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/snowflake.py b/sqlglot/parsers/snowflake.py
+--- a/sqlglot/parsers/snowflake.py
++++ b/sqlglot/parsers/snowflake.py
+@@ -868,7 +868,7 @@
+         "STAGES": _show_parser("STAGES"),
+         "COLUMNS": _show_parser("COLUMNS"),
+         "USERS": _show_parser("USERS"),
+-        "FILE FORMATS": _show_parser("FILE FORMATS"),
++        'FILE FORMATSX': _show_parser("FILE FORMATS"),
+         "FUNCTIONS": _show_parser("FUNCTIONS"),
+         "PROCEDURES": _show_parser("PROCEDURES"),
+         "WAREHOUSES": _show_parser("WAREHOUSES"),
