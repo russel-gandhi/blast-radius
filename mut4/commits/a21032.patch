@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -936,7 +936,7 @@
+         "comments",
+         "dialect",
+         "unsupported_messages",
+-        "_escaped_quote_end",
++        '_escaped_quote_endX',
+         "_escaped_byte_quote_end",
+         "_escaped_identifier_end",
+         "_identifier_escaped_sequences",

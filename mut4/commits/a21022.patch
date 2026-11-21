@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/bigquery.py b/sqlglot/dialects/bigquery.py
+--- a/sqlglot/dialects/bigquery.py
++++ b/sqlglot/dialects/bigquery.py
+@@ -57,7 +57,7 @@
+ 
+     # https://cloud.google.com/bigquery/docs/reference/standard-sql/format-elements#format_elements_date_time
+     TIME_MAPPING = {
+-        "%x": "%m/%d/%y",
++        "%x": '%m/%d/%yX',
+         "%D": "%m/%d/%y",
+         "%E6S": "%S.%f",
+         "%e": "%-d",

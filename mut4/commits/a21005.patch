@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/starrocks.py b/sqlglot/generators/starrocks.py
+--- a/sqlglot/generators/starrocks.py
++++ b/sqlglot/generators/starrocks.py
+@@ -242,7 +242,7 @@
+         "like",
+         "limit",
+         "load",
+-        "localtime",
++        'localtimeX',
+         "localtimestamp",
+         "maxvalue",
+         "minus",

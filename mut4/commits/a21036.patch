@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/json.py b/sqlglot/expressions/json.py
+--- a/sqlglot/expressions/json.py
++++ b/sqlglot/expressions/json.py
+@@ -42,7 +42,7 @@
+ 
+ class JSONArrayInsert(Expression, Func):
+     arg_types = {"this": True, "expressions": True}
+-    is_var_len_args = True
++    is_var_len_args = False
+     _sql_names = ["JSON_ARRAY_INSERT"]
+ 
+ 

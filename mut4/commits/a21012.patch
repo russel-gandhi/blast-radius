@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/query.py b/sqlglot/expressions/query.py
+--- a/sqlglot/expressions/query.py
++++ b/sqlglot/expressions/query.py
+@@ -621,7 +621,7 @@
+ 
+ class Fetch(Expression):
+     arg_types = {
+-        "direction": False,
++        "direction": True,
+         "count": False,
+         "limit_options": False,
+     }

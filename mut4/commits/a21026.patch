@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/postgres.py b/sqlglot/dialects/postgres.py
+--- a/sqlglot/dialects/postgres.py
++++ b/sqlglot/dialects/postgres.py
+@@ -63,7 +63,7 @@
+         "ss": "%S",  # zero padded second
+         "SS": "%S",  # zero padded second
+         "TMDay": "%A",  # TM is locale dependent
+-        "TMDy": "%a",
++        "TMDy": '%aX',
+         "TMMon": "%b",  # Sep
+         "TMMonth": "%B",  # September
+         "day": "%Aenlower",  # tuesday

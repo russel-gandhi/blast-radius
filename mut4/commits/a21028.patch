@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/dialect.py b/sqlglot/dialects/dialect.py
+--- a/sqlglot/dialects/dialect.py
++++ b/sqlglot/dialects/dialect.py
+@@ -98,7 +98,7 @@
+ class Dialects(str, Enum):
+     """Dialects supported by SQLGLot."""
+ 
+-    DIALECT = ""
++    DIALECT = 'X'
+ 
+     ATHENA = "athena"
+     BIGQUERY = "bigquery"

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/mysql.py b/sqlglot/generators/mysql.py
+--- a/sqlglot/generators/mysql.py
++++ b/sqlglot/generators/mysql.py
+@@ -589,7 +589,7 @@
+         "unique",
+         "unlock",
+         "unsigned",
+-        "update",
++        'updateX',
+         "usage",
+         "use",
+         "using",

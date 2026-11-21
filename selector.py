@@ -406,6 +406,8 @@ class Selector:
         self.code_changes.append(path)
         try:
             self.refined[path] = self.operand_refine(path, old_tree, new_tree, stmts)
+            if self.refined[path] is None:
+                self.refined[path] = self.attr_refine(path, old_tree, new_tree, reasons)
         except Exception as exc:  # refinement is optional: fall back to coverage
             self.refined[path] = None
             reasons.append(f"refine error {exc!r}")
@@ -468,7 +470,9 @@ class Selector:
                 if is_test_file:
                     got = set(self.by_file.get(path, []))
                 else:
-                    got = self.family_tests(path) | self.cover(path, rng)
+                    # a class-level value is used by whoever uses the class: tests that read any of
+                    # its settings during the test (creating, validating or generating its nodes)
+                    got = self.family_tests(path) | self.cover(path, rng) | self.class_users(path, old_tree, line)
                 sel |= got
                 reasons.append(f"import-time {path}:{line} -> {len(got)}")
                 continue
@@ -540,6 +544,109 @@ class Selector:
             except Exception:
                 cache[path] = None
         return cache[path]
+
+    def attrmap(self) -> dict | None:
+        if "_attrmap" not in self.__dict__:
+            p = Path(__file__).with_name("attrmap.json.gz")
+            try:
+                d = json.loads(gzip.decompress(p.read_bytes()))
+                d["early"] = set(d["early"])
+                d["dynamic"] = set(d["dynamic"])
+                self._attrmap = d
+            except Exception:
+                self._attrmap = None
+        return self._attrmap
+
+    def class_users(self, path: str, tree, line: int) -> set[int]:
+        """Tests that read any class-level setting owned by a class enclosing `line`."""
+        am = self.attrmap()
+        if am is None or not path.startswith("sqlglot/"):
+            return set()
+        if "_owner_users" not in self.__dict__:
+            users: dict[str, set[int]] = {}
+            for key, tests in am["reads"].items():
+                users.setdefault(key.split("|", 1)[0], set()).update(tests)
+            self._owner_users = users
+        module = path[:-3].replace("/", ".")
+        if module.endswith(".__init__"):
+            module = module[: -len(".__init__")]
+        res: set[int] = set()
+
+        def walk(node, quals):
+            for child in ast.iter_child_nodes(node):
+                if isinstance(child, ast.ClassDef):
+                    if child.lineno <= line <= (child.end_lineno or child.lineno):
+                        q = [*quals, child.name]
+                        res.update(self._owner_users.get(f"{module}.{'.'.join(q)}", ()))
+                        walk(child, q)
+                elif not isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    walk(child, quals)
+
+        walk(tree, [])
+        return {n for n in res if n < len(self.tests)}
+
+    def tests_mentioning(self, name: str) -> set[int]:
+        """Tests in test files whose source names `name` (test code reads are not traced)."""
+        res: set[int] = set()
+        for f, nums in self.by_file.items():
+            p = SRC / f
+            try:
+                if name in p.read_text(encoding="utf-8"):
+                    res.update(nums)
+            except OSError:
+                res.update(nums)
+        return res
+
+    def attr_refine(self, path: str, old_tree, new_tree, reasons) -> set[int] | None:
+        """Tests that read the one class-level setting a patch changes, or None.
+
+        Every `X.NAME` read in sqlglot was traced with each test in a fresh interpreter, keyed by
+        the class that owns NAME for X. Trusted only when the setting was never read while modules
+        were imported (its value may have been copied into derived data) and its name never
+        appears as a string in sqlglot (getattr / __dict__ reads are not traced).
+        """
+        am = self.attrmap()
+        if am is None or not path.startswith("sqlglot/"):
+            return None
+        diffs = ast_diffs(old_tree, new_tree, limit=8)
+        if not diffs or len(diffs) >= 8:
+            return None
+        stmt = None
+        quals = None
+        for old, new, parents in diffs:
+            chain = list(parents) + ([old] if isinstance(old, ast.stmt) else [])
+            # the statement directly inside the innermost class body
+            idx = max((i for i, p in enumerate(chain) if isinstance(p, ast.ClassDef)), default=None)
+            if idx is None or idx + 1 >= len(chain):
+                return None
+            if any(isinstance(p, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)) for p in chain[: idx + 2]):
+                return None
+            s = chain[idx + 1]
+            q = [p.name for p in chain[: idx + 1] if isinstance(p, ast.ClassDef)]
+            bases = [b.id if isinstance(b, ast.Name) else b.attr if isinstance(b, ast.Attribute) else "" for b in chain[idx].bases]
+            if any("Enum" in b or "AutoName" in b for b in bases):
+                return None  # enum members are found by value or iteration, not attribute reads
+            if stmt is None:
+                stmt, quals = s, q
+            elif s is not stmt:
+                return None
+        if isinstance(stmt, ast.Assign) and len(stmt.targets) == 1 and isinstance(stmt.targets[0], ast.Name):
+            name = stmt.targets[0].id
+        elif isinstance(stmt, ast.AnnAssign) and isinstance(stmt.target, ast.Name):
+            name = stmt.target.id
+        else:
+            return None
+        if name in am["dynamic"] or name.startswith("__"):
+            return None  # read by name somewhere, or used by Python itself (__slots__, ...)
+        module = path[:-3].replace("/", ".")
+        if module.endswith(".__init__"):
+            module = module[: -len(".__init__")]
+        key = f"{module}.{'.'.join(quals)}|{name}"
+        if key in am["early"]:
+            return None
+        got = {n for n in am["reads"].get(key, []) if n < len(self.tests)} | self.tests_mentioning(name)
+        reasons.append(f"attr {key} -> {len(got)}")
+        return got
 
     def operand_refine(self, path: str, old_tree, new_tree, stmts) -> set[int] | None:
         """Tests that can see a different result from a single edited comparison, or None."""

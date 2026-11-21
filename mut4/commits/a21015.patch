@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/bigquery.py b/sqlglot/generators/bigquery.py
+--- a/sqlglot/generators/bigquery.py
++++ b/sqlglot/generators/bigquery.py
+@@ -641,7 +641,7 @@
+         "full",
+         "group",
+         "grouping",
+-        "groups",
++        'groupsX',
+         "hash",
+         "having",
+         "if",

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -327,7 +327,7 @@
+     CREATE_FUNCTION_RETURN_AS = True
+ 
+     # Whether MERGE ... WHEN MATCHED BY SOURCE is allowed
+-    MATCHED_BY_SOURCE = True
++    MATCHED_BY_SOURCE = False
+ 
+     # Whether MERGE ... WHEN MATCHED/NOT MATCHED THEN UPDATE/INSERT ... WHERE is supported
+     SUPPORTS_MERGE_WHERE = False

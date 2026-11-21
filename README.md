@@ -34,7 +34,14 @@ Entry for the RWX Blast Radius track: given a patch to sqlglot (pinned at
    one comparison's operator or constant, only the tests whose recorded outcome would flip are kept.
    Overflowing sites, unknown alternatives, outcomes seen at import time, or several code changes in one
    patch keep the coverage selection.
-5. **Replay** (`replay.py`) for the slow TPC-H/TPC-DS executor tests: instead of running them, each fixture
+5. **Class-setting reads** (`attrmap.json.gz`, built by `tools/isoplug.py` with every test traced in its
+   own fresh interpreter, so no cached dialect or tokenizer hides a dependency): every `X.NAME` read of
+   a class-level setting in sqlglot is recorded per test with the class that owns it. A patch whose only
+   code change is one setting keeps the tests that read it, unless it was read while modules were
+   imported (its value may have been copied into derived data), its name appears as a string in
+   sqlglot (getattr / `__dict__` reads), it is a dunder, or the class is an enum. Any class-level change
+   also selects every test that read a setting of that class (its users).
+6. **Replay** (`replay.py`) for the slow TPC-H/TPC-DS executor tests: instead of running them, each fixture
    query's DuckDB transpilation, its optimized and planned form after a pickle round trip, and the
    Python code generated for every plan step are digested and compared with digests recorded on the
    pinned commit (`replay_ref.json`), stopping at the first difference. Replay is only trusted when

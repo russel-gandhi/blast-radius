@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/duckdb.py b/sqlglot/generators/duckdb.py
+--- a/sqlglot/generators/duckdb.py
++++ b/sqlglot/generators/duckdb.py
+@@ -1884,7 +1884,7 @@
+         exp.DType.NCHAR: "TEXT",
+         exp.DType.NVARCHAR: "TEXT",
+         exp.DType.UINT: "UINTEGER",
+-        exp.DType.VARBINARY: "BLOB",
++        exp.DType.VARBINARY: 'BLOBX',
+         exp.DType.ROWVERSION: "BLOB",
+         exp.DType.VARCHAR: "TEXT",
+         exp.DType.TIMESTAMPLTZ: "TIMESTAMPTZ",

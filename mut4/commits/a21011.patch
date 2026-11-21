@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/duckdb.py b/sqlglot/generators/duckdb.py
+--- a/sqlglot/generators/duckdb.py
++++ b/sqlglot/generators/duckdb.py
+@@ -1942,7 +1942,7 @@
+         "current_role",
+         "where",
+         "asc",
+-        "placing",
++        'placingX',
+         "desc",
+         "user",
+         "unique",

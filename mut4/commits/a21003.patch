@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/exasol.py b/sqlglot/generators/exasol.py
+--- a/sqlglot/generators/exasol.py
++++ b/sqlglot/generators/exasol.py
+@@ -723,7 +723,7 @@
+         "parquet",
+         "partial",
+         "path",
+-        "permission",
++        'permissionX',
+         "placing",
+         "plus",
+         "preceding",

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -336,7 +336,7 @@
+     MERGE_ALL_BY_NAME = False
+ 
+     # Whether the INTERVAL expression works only with values like '1 day'
+-    SINGLE_STRING_INTERVAL = False
++    SINGLE_STRING_INTERVAL = True
+ 
+     # Whether the plural form of date parts like day (i.e. "days") is supported in INTERVALs
+     INTERVAL_ALLOWS_PLURAL_FORM = True

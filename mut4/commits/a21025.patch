@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/properties.py b/sqlglot/expressions/properties.py
+--- a/sqlglot/expressions/properties.py
++++ b/sqlglot/expressions/properties.py
+@@ -130,7 +130,7 @@
+ 
+ 
+ class DefinerProperty(Property):
+-    arg_types = {"this": True}
++    arg_types = {"this": False}
+     _hash_raw_args = True
+ 
+ 

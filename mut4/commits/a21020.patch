@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/dialect.py b/sqlglot/dialects/dialect.py
+--- a/sqlglot/dialects/dialect.py
++++ b/sqlglot/dialects/dialect.py
+@@ -994,7 +994,7 @@
+         "MONS": "MONTH",
+         "MONTHS": "MONTH",
+         "D": "DAY",
+-        "DD": "DAY",
++        "DD": 'DAYX',
+         "DAYS": "DAY",
+         "DAYOFMONTH": "DAY",
+         "DAY OF WEEK": "DAYOFWEEK",

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/ddl.py b/sqlglot/expressions/ddl.py
+--- a/sqlglot/expressions/ddl.py
++++ b/sqlglot/expressions/ddl.py
+@@ -288,7 +288,7 @@
+         "file_format": False,
+         "copy_options": False,
+         "tag": False,
+-        "location": False,
++        "location": True,
+         "serde": False,
+     }
+ 

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/duckdb.py b/sqlglot/generators/duckdb.py
+--- a/sqlglot/generators/duckdb.py
++++ b/sqlglot/generators/duckdb.py
+@@ -1605,7 +1605,7 @@
+     MATCH_CONDITION_IN_ON = True
+     STRUCT_DELIMITER = ("(", ")")
+     RENAME_TABLE_WITH_DB = False
+-    NVL2_SUPPORTED = False
++    NVL2_SUPPORTED = True
+     SEMI_ANTI_JOIN_WITH_SIDE = False
+     CAST_TO_INT_ROUNDS = True
+     SAFE_INT_DIVISION = True

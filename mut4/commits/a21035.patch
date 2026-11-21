@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/dialect.py b/sqlglot/dialects/dialect.py
+--- a/sqlglot/dialects/dialect.py
++++ b/sqlglot/dialects/dialect.py
+@@ -1084,7 +1084,7 @@
+ 
+     # Determines the supported Dialect instance settings
+     SUPPORTED_SETTINGS = {
+-        "normalization_strategy",
++        'normalization_strategyX',
+         "version",
+     }
+ 

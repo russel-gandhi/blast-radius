@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/singlestore.py b/sqlglot/generators/singlestore.py
+--- a/sqlglot/generators/singlestore.py
++++ b/sqlglot/generators/singlestore.py
+@@ -348,7 +348,7 @@
+         exp.DType.DECIMAL64: "DECIMAL",
+         exp.DType.DECIMAL128: "DECIMAL",
+         exp.DType.DECIMAL256: "DECIMAL",
+-        exp.DType.ENUM8: "ENUM",
++        exp.DType.ENUM8: 'ENUMX',
+         exp.DType.ENUM16: "ENUM",
+         exp.DType.FIXEDSTRING: "TEXT",
+         exp.DType.GEOMETRY: "GEOGRAPHY",

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/snowflake.py b/sqlglot/dialects/snowflake.py
+--- a/sqlglot/dialects/snowflake.py
++++ b/sqlglot/dialects/snowflake.py
+@@ -107,7 +107,7 @@
+         #    to BIGINT to match Snowflake's integer behavior
+         # Without this override, EXTRACT(EPOCH_SECOND FROM ts) would be normalized
+         # to EXTRACT(EPOCH FROM ts) and lose the integer semantics.
+-        "EPOCH_SECOND": "EPOCH_SECOND",
++        "EPOCH_SECOND": 'EPOCH_SECONDX',
+         "EPOCH_SECONDS": "EPOCH_SECOND",
+     }
+ 

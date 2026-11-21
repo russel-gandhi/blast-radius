@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/string.py b/sqlglot/expressions/string.py
+--- a/sqlglot/expressions/string.py
++++ b/sqlglot/expressions/string.py
+@@ -508,7 +508,7 @@
+ 
+ 
+ class Compress(Expression, Func):
+-    arg_types = {"this": True, "method": False}
++    arg_types = {"this": False, "method": False}
+ 
+ 
+ class Decrypt(Expression, Func):

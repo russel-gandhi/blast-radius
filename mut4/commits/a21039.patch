@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/constraints.py b/sqlglot/expressions/constraints.py
+--- a/sqlglot/expressions/constraints.py
++++ b/sqlglot/expressions/constraints.py
+@@ -121,7 +121,7 @@
+ 
+ 
+ class GeneratedAsRowColumnConstraint(Expression, ColumnConstraintKind):
+-    arg_types = {"start": False, "hidden": False}
++    arg_types = {"start": True, "hidden": False}
+ 
+ 
+ class IndexColumnConstraint(Expression, ColumnConstraintKind):

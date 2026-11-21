@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/duckdb.py b/sqlglot/generators/duckdb.py
+--- a/sqlglot/generators/duckdb.py
++++ b/sqlglot/generators/duckdb.py
+@@ -1616,7 +1616,7 @@
+     IGNORE_NULLS_IN_FUNC = True
+     IGNORE_NULLS_BEFORE_ORDER = False
+     JSON_PATH_BRACKETED_KEY_SUPPORTED = False
+-    SUPPORTS_CREATE_TABLE_LIKE = False
++    SUPPORTS_CREATE_TABLE_LIKE = True
+     MULTI_ARG_DISTINCT = False
+     CAN_IMPLEMENT_ARRAY_ANY = True
+     SUPPORTS_TO_NUMBER = False

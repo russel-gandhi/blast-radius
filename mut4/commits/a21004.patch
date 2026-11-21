@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/materialize.py b/sqlglot/dialects/materialize.py
+--- a/sqlglot/dialects/materialize.py
++++ b/sqlglot/dialects/materialize.py
+@@ -8,7 +8,7 @@
+ class Materialize(Postgres):
+     NORMALIZE_NOT_NULL = True
+ 
+-    UNESCAPED_SEQUENCES = {"\\a": "a", "\\v": "v"}
++    UNESCAPED_SEQUENCES = {"\\a": 'aX', "\\v": "v"}
+ 
+     class Tokenizer(Postgres.Tokenizer):
+         NUMERIC_ESCAPES = {"u": (16, 4, 4, 0xFFFF), "U": (16, 8, 8, 0x10FFFF)}

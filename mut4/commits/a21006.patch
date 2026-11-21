@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/clickhouse.py b/sqlglot/generators/clickhouse.py
+--- a/sqlglot/generators/clickhouse.py
++++ b/sqlglot/generators/clickhouse.py
+@@ -284,7 +284,7 @@
+         exp.DType.IPV4: "IPv4",
+         exp.DType.IPV6: "IPv6",
+         exp.DType.POINT: "Point",
+-        exp.DType.RING: "Ring",
++        exp.DType.RING: 'RingX',
+         exp.DType.LINESTRING: "LineString",
+         exp.DType.MULTILINESTRING: "MultiLineString",
+         exp.DType.POLYGON: "Polygon",
