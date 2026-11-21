@@ -28,10 +28,14 @@ def _switch(ctx):
 def _line(code, line):
     fn = code.co_filename
     if fn.startswith(ROOT):
+        key = (fn[len(ROOT):], line)
         s = _lines.get(_ctx)
         if s is None:
             s = _lines[_ctx] = set()
-        s.add((fn[len(ROOT):], line))
+        s.add(key)
+        if _import_depth:
+            # also note it ran during an import: its effect is shared by later tests too
+            _lines.setdefault("import", set()).add(key)
     return mon.DISABLE
 
 
@@ -48,7 +52,8 @@ def _audit(event, args):
 
 # sqlglot loads dialect modules lazily, so a module body (and every function it calls, such as
 # metaclasses building dialect classes) runs inside whichever test imports it first, while every
-# later test depends on the result. Record those lines under "import", never under a test.
+# later test depends on the result. Those lines stay credited to the test that ran them (it may
+# itself be about importing) and are also recorded under "import".
 import importlib.abc as _iabc  # noqa: E402
 import importlib.machinery as _imach  # noqa: E402
 
@@ -69,14 +74,13 @@ class _ImportTracker(_iabc.MetaPathFinder):
             global _import_depth
             _import_depth += 1
             if _import_depth == 1:
-                _saved_ctx.append(_ctx)
-                _switch("import")
+                mon.restart_events()  # re-arm lines already seen in this test, to mark them
             try:
                 return _inner(module)
             finally:
                 _import_depth -= 1
                 if _import_depth == 0:
-                    _switch(_saved_ctx.pop())
+                    mon.restart_events()  # re-arm lines marked during the import for the test
 
         spec.loader.exec_module = exec_module
         return spec
