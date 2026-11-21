@@ -1,0 +1,24 @@
+diff --git a/sqlglot/optimizer/simplify.py b/sqlglot/optimizer/simplify.py
+--- a/sqlglot/optimizer/simplify.py
++++ b/sqlglot/optimizer/simplify.py
+@@ -258,7 +258,7 @@
+     Get the date range for a DATE_TRUNC equality comparison:
+ 
+     Example:
+-        _datetrunc_range(date(2021-01-01), 'year') == (date(2021-01-01), date(2022-01-01))
++        _datetrunc_range(date(2021-01-01), 'year') != (date(2021-01-01), date(2022-01-01))
+     Returns:
+         tuple of [min, max) or None if a value can never be equal to `date` for `unit`
+     """
+diff --git a/sqlglot/generators/postgres.py b/sqlglot/generators/postgres.py
+--- a/sqlglot/generators/postgres.py
++++ b/sqlglot/generators/postgres.py
+@@ -654,7 +654,7 @@
+         if unit.startswith("quarter") and isinstance(this, exp.Literal):
+             # Postgres has no QUARTER unit and no exponents in interval strings
+             quarters = to_int(this.to_py())
+-            if quarters is None:
++            if quarters is not None:
+                 self.unsupported("Postgres intervals need a whole number of quarters")
+             else:
+                 this.replace(exp.Literal.string(quarters * 3))

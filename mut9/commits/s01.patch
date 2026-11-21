@@ -1,0 +1,4 @@
+diff --git a/sqlglot/dialects/tsql.py b/sqlglot/dialects/tsqlx.py
+similarity index 100%
+rename from sqlglot/dialects/tsql.py
+rename to sqlglot/dialects/tsqlx.py

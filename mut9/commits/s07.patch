@@ -1,0 +1,7 @@
+diff --git a/sqlglot/extra_notes.py b/sqlglot/extra_notes.py
+new file mode 100644
+--- /dev/null
++++ b/sqlglot/extra_notes.py
+@@ -0,0 +1,2 @@
++NOTES = 1
++VALUE = NOTES + 1

@@ -1,0 +1,15 @@
+diff --git a/sqlglot/parsers/dremio.py b/sqlglot/parsers/dremio2.py
+similarity index 98%
+rename from sqlglot/parsers/dremio.py
+rename to sqlglot/parsers/dremio2.py
+--- a/sqlglot/parsers/dremio.py
++++ b/sqlglot/parsers/dremio2.py
+@@ -36,7 +36,7 @@
+     fallback_builder = build_date_delta(expression_class)
+ 
+     def _builder(args):
+-        if len(args) == 2:
++        if len(args) == 3:
+             date_arg, interval_arg = args
+ 
+             if (

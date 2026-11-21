@@ -503,6 +503,8 @@ class Selector:
             self.replay_ok = False; self.no_replay.add("delete/rename")
         if fp.new is None:  # deleted file
             reasons.append(f"delete {path}")
+            if path.startswith("tests/fixtures/") and not path.endswith(".py"):
+                return self.opened_by(path)  # a data file: only its readers can notice
             return self.opened_by(path) | self.importers(path)
         rename_extra: set[int] = set()
         if fp.old and fp.new and fp.old != fp.new:

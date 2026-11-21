@@ -1,0 +1,4 @@
+diff --git a/tests/fixtures/optimizer/simplify.sql b/tests/fixtures/optimizer/simplify_v2.sql
+similarity index 100%
+rename from tests/fixtures/optimizer/simplify.sql
+rename to tests/fixtures/optimizer/simplify_v2.sql

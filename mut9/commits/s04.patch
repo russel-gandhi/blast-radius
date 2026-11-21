@@ -1,0 +1,12 @@
+diff --git a/tests/helpers.py b/tests/helpers.py
+--- a/tests/helpers.py
++++ b/tests/helpers.py
+@@ -32,7 +32,7 @@
+ 
+ 
+ def load_sql_fixtures(filename):
+-    with open(os.path.join(FIXTURES_DIR, filename), encoding="utf-8") as f:
++    with open(os.path.join(FIXTURES_DIR, filename), encoding="latin-1") as f:
+         lines = []
+         for line in _filter_comments(f.read()).splitlines():
+             lines.append(line)
