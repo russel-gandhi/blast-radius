@@ -19,7 +19,13 @@ import json
 import os
 import re
 import sys
+import time
 from pathlib import Path
+
+try:
+    from verify import Verifier
+except Exception:  # pragma: no cover
+    Verifier = None
 
 DATA = Path(os.environ.get("BR_DATA", "/data"))
 SRC = Path(os.environ.get("BR_SRC", "/sqlglot"))
@@ -223,11 +229,16 @@ class Selector:
         src_path = SRC / (fp.old or fp.new)
         old_text = src_path.read_text(encoding="utf-8") if fp.old and src_path.exists() else ""
         new_text, removed, inserts = apply(fp, old_text)
+        if fp.old and fp.new and fp.old != fp.new:
+            self.files[fp.old] = None
+        self.files[fp.new or fp.old] = None if fp.new is None else new_text
         if fp.new is None:  # deleted file
             reasons.append(f"delete {path}")
             return self.opened_by(path) | self.importers(path)
         if path.endswith(".py"):
-            return self.select_py(path, old_text, new_text, removed, inserts, reasons)
+            changed = [l[1:] for _, body in fp.hunks for l in body if l[:1] in "+-"]
+            trivial = all(not c.strip() or c.lstrip().startswith("#") for c in changed)
+            return self.select_py(path, old_text, new_text, removed, inserts, reasons, trivial)
         # data files: whoever opened them
         sel = self.opened_by(path)
         reasons.append(f"data {path} -> {len(sel)}")
@@ -242,7 +253,7 @@ class Selector:
             return set(self.by_file.get(path, [])) or set(self.all)
         return set(self.all)
 
-    def select_py(self, path, old_text, new_text, removed, inserts, reasons) -> set[int]:
+    def select_py(self, path, old_text, new_text, removed, inserts, reasons, trivial=True) -> set[int]:
         try:
             new_tree = ast.parse(new_text)
         except SyntaxError:
@@ -252,10 +263,11 @@ class Selector:
             old_tree = ast.parse(old_text)
         except SyntaxError:
             old_tree = None
-        if old_tree is not None and ast.dump(old_tree) == ast.dump(new_tree):
-            sel = self.opened_by(path)
-            reasons.append(f"ast-equal {path} -> {len(sel)}")
-            return sel
+        # only comment/blank lines changed: the code is the same unless they sit inside a string
+        if trivial and old_tree is not None and ast.dump(old_tree) == ast.dump(new_tree):
+            # same code: comments/blank lines only (opens of .py files are just imports reading source)
+            reasons.append(f"ast-equal {path}")
+            return set()
         if old_tree is None:
             reasons.append(f"new file {path}")
             return self.importers(path)
@@ -337,6 +349,7 @@ class Selector:
     def select(self, patch_text: str) -> tuple[set[int], list[str]]:
         reasons: list[str] = []
         sel: set[int] = set()
+        self.files: dict[str, str | None] = {}
         for fp in parse_patch(patch_text):
             try:
                 sel |= self.select_file(fp, reasons)
@@ -366,13 +379,86 @@ class Selector:
         return best
 
 
+VERIFY_OVERHEAD = 0.30  # s of CPU per verified commit (fork + test module imports)
+VERIFY_FACTOR = 1.5  # CPU seconds per recorded test second when run here
+PREPARE_COST = 1.2  # one-off: copy the tree and import numpy/pandas/duckdb
+MARGIN = 0.4
+
+
+def plan_verify(sel: "Selector", chosen: set[int], p_fail: float) -> tuple[list[int], int]:
+    """Pick the cheapest tests to run here. Returns (tests to run, expected saving in ms).
+
+    Running tests only pays when they turn out to pass; if any fails we still pay for it.
+    p_fail is how likely the run finds a failure (fixture edits nearly always break their test).
+    """
+    blind = sel.pack(chosen)[0]
+    if not chosen:
+        return [], 0
+    order = sorted(chosen, key=lambda n: sel.ms[n])
+    best_k, best_cost = 0, blind
+    # candidate split points: every prefix for small sets, otherwise ~24 spread over the order
+    if len(order) <= 24:
+        ks = range(1, len(order) + 1)
+    else:
+        ks = sorted({max(1, round(len(order) * i / 24)) for i in range(1, 25)} | {len(order)})
+    prefix = [0]
+    for n in order:
+        prefix.append(prefix[-1] + sel.ms[n])
+    for k in ks:
+        cpu = VERIFY_OVERHEAD * 1000 + VERIFY_FACTOR * prefix[k]
+        if cpu >= best_cost:
+            break
+        cost = cpu + (1 - p_fail) * sel.pack(set(order[k:]))[0] + p_fail * blind
+        if cost < best_cost:
+            best_k, best_cost = k, cost
+    return order[:best_k], blind - best_cost
+
+
 def main() -> None:
+    start = time.monotonic()
     sel = Selector()
-    for patch in sorted((DATA / "commits").glob("*.patch")):
-        chosen, reasons = sel.select(patch.read_text())
+    patches = sorted((DATA / "commits").glob("*.patch"))
+    # whole batch: 3 min wall (4.5 in the final, ~1.5x commits). Keep a wide safety margin.
+    budget = float(os.environ.get("BR_BUDGET", 0.55 * 120 + 1.2 * len(patches)))
+    verifier = None
+    if Verifier is not None and os.environ.get("BR_VERIFY", "1") == "1" and hasattr(os, "fork"):
+        verifier = Verifier(str(SRC), [t["id"] for t in sel.tests])
+    results = []
+    for patch in patches:
+        chosen, reasons = sel.select(patch.read_text(encoding="utf-8"))
+        results.append((patch.stem, chosen, reasons, dict(sel.files)))
+    # verify where it pays, biggest expected saving first, within the time budget
+    plans = []
+    for i, (cid, chosen, reasons, files) in enumerate(results):
+        code_change = any(r.startswith(("line ", "import-time", "def-header", "syntax", "new file", "delete", "error")) for r in reasons)
+        run, saving = plan_verify(sel, chosen, 0.5 if code_change else 0.9)
+        if run and saving > MARGIN * 1000:
+            plans.append((saving, i, run))
+    plans.sort(reverse=True)
+    if verifier is not None and plans and sum(p[0] for p in plans) > (PREPARE_COST + 0.5) * 1000:
+        try:
+            verifier.prepare()
+        except Exception as exc:
+            log("prepare failed", repr(exc))
+            verifier = None
+        for saving, i, run in plans if verifier else []:
+            left = budget - (time.monotonic() - start)
+            est = VERIFY_OVERHEAD + VERIFY_FACTOR * sum(sel.ms[n] for n in run) / 1000
+            if left < est * 3 + 2:
+                continue
+            cid, chosen, reasons, files = results[i]
+            failed = verifier.run(files, run, timeout=min(left - 1, 3 * est + 2))
+            if failed is None:
+                reasons.append(f"verify {len(run)} -> unfinished, keep all")
+                continue
+            keep = (chosen - set(run)) | (failed & set(run))
+            reasons.append(f"verify {len(run)} -> {len(failed)} fail")
+            results[i] = (cid, keep, reasons, files)
+    for cid, chosen, reasons, files in results:
         cost, workers = sel.pack(chosen)
-        print(json.dumps({"commit": patch.stem, "workers": workers}))
-        log(patch.stem, len(chosen), round(cost / 1000, 2), "; ".join(reasons))
+        print(json.dumps({"commit": cid, "workers": workers}))
+        log(cid, len(chosen), round(cost / 1000, 2), "; ".join(reasons))
+    log(f"wall {time.monotonic() - start:.2f}s cpu {sum(os.times()[:4]):.2f}s")
 
 
 if __name__ == "__main__":
