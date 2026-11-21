@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/singlestore.py b/sqlglot/generators/singlestore.py
+--- a/sqlglot/generators/singlestore.py
++++ b/sqlglot/generators/singlestore.py
+@@ -1183,7 +1183,7 @@
+         "_send_threads",
+         "sensitive",
+         "separator",
+-        "sequence",
++        'sequenceX',
+         "sequences",
+         "serial",
+         "serializable",

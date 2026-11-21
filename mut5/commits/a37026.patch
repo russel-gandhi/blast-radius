@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/snowflake.py b/sqlglot/generators/snowflake.py
+--- a/sqlglot/generators/snowflake.py
++++ b/sqlglot/generators/snowflake.py
+@@ -644,7 +644,7 @@
+         exp.DType.JSON: "VARIANT",
+         exp.DType.NESTED: "OBJECT",
+         exp.DType.STRUCT: "OBJECT",
+-        exp.DType.TEXT: "VARCHAR",
++        exp.DType.TEXT: 'VARCHARX',
+     }
+ 
+     TOKEN_MAPPING = {

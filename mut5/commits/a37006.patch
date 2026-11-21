@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/duckdb.py b/sqlglot/generators/duckdb.py
+--- a/sqlglot/generators/duckdb.py
++++ b/sqlglot/generators/duckdb.py
+@@ -1993,7 +1993,7 @@
+         "asof",
+         "at",
+         "authorization",
+-        "binary",
++        'binaryX',
+         "by",
+         "collation",
+         "columns",

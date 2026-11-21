@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/starrocks.py b/sqlglot/generators/starrocks.py
+--- a/sqlglot/generators/starrocks.py
++++ b/sqlglot/generators/starrocks.py
+@@ -261,7 +261,7 @@
+         "primary",
+         "procedure",
+         "qualify",
+-        "range",
++        'rangeX',
+         "rank",
+         "read",
+         "regexp",

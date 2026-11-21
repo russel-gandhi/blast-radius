@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -1824,7 +1824,7 @@
+                 if isinstance(param_value, exp.Literal) and param_value.is_number
+                 else None
+             )
+-            if isinstance(value, (int, Decimal)) and value > bound:
++            if isinstance(value, (int, Decimal)) and value < bound:
+                 self.unsupported(
+                     f"{type_value.value} parameter {param_value.name} exceeds "
+                     f"{self.dialect.__class__.__name__}'s maximum of {bound}; capping"

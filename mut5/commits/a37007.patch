@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/string.py b/sqlglot/expressions/string.py
+--- a/sqlglot/expressions/string.py
++++ b/sqlglot/expressions/string.py
+@@ -259,7 +259,7 @@
+ 
+ 
+ class Upper(Expression, Func):
+-    _sql_names = ["UPPER", "UCASE"]
++    _sql_names = ['UPPERX', "UCASE"]
+ 
+ 
+ class WeightString(Expression, Func):

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/python.py b/sqlglot/generators/python.py
+--- a/sqlglot/generators/python.py
++++ b/sqlglot/generators/python.py
+@@ -93,7 +93,7 @@
+ def _distinct_sql(self, e: exp.Distinct) -> str:
+     this = self.expressions(e, flat=True)
+ 
+-    if len(e.expressions) == 1:
++    if len(e.expressions) is 1:
+         return f"set({this})"
+ 
+     return f"set(ZIPNOTNULL({this}))"

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -444,7 +444,7 @@
+     SUPPORTS_TABLE_COPY = True
+ 
+     # Whether parentheses are required around the table sample's expression
+-    TABLESAMPLE_REQUIRES_PARENS = True
++    TABLESAMPLE_REQUIRES_PARENS = False
+ 
+     # Whether a table sample clause's size needs to be followed by the ROWS keyword
+     TABLESAMPLE_SIZE_IS_ROWS = True

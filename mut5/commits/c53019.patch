@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/snowflake.py b/sqlglot/parsers/snowflake.py
+--- a/sqlglot/parsers/snowflake.py
++++ b/sqlglot/parsers/snowflake.py
+@@ -135,7 +135,7 @@
+     def _builder(args: list) -> B | exp.Anonymous:
+         if len(args) == 3:
+             # Special handling for bitwise operations with padside argument
+-            if expr_type in (exp.BitwiseAnd, exp.BitwiseOr, exp.BitwiseXor):
++            if expr_type not in (exp.BitwiseAnd, exp.BitwiseOr, exp.BitwiseXor):
+                 return expr_type(
+                     this=seq_get(args, 0), expression=seq_get(args, 1), padside=seq_get(args, 2)
+                 )

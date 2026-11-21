@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -2579,7 +2579,7 @@
+         start = self._prev
+ 
+         replace = (
+-            start.token_type == TokenType.REPLACE
++            start.token_type != TokenType.REPLACE
+             or self._match_pair(TokenType.OR, TokenType.REPLACE)
+             or self._match_pair(TokenType.OR, TokenType.ALTER)
+         )

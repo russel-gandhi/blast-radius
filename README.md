@@ -41,7 +41,13 @@ Entry for the RWX Blast Radius track: given a patch to sqlglot (pinned at
    imported (its value may have been copied into derived data), its name appears as a string in
    sqlglot (getattr / `__dict__` reads), it is a dunder, or the class is an enum. Any class-level change
    also selects every test that read a setting of that class (its users).
-6. **Replay** (`replay.py`) for the slow TPC-H/TPC-DS executor tests: instead of running them, each fixture
+6. **SQL-keyed table entries**: when a patch only changes entries of a `FUNCTIONS`, `KEYWORDS`,
+   `*_PARSERS`, `*_MAPPING` (string keys) or `TRANSFORMS` (`exp.Foo` keys) table, the coverage
+   selection is narrowed to tests whose method, class helpers, module code or SQL fixtures contain the
+   key or the old/new value text (case-insensitive, whole words), tests that ran a line inside a sqlglot
+   function containing that text, tests that name the table, and for class keys the users of that
+   expression class. The text index is built when the image is built (`--build-text-index`).
+7. **Replay** (`replay.py`) for the slow TPC-H/TPC-DS executor tests: instead of running them, each fixture
    query's DuckDB transpilation, its optimized and planned form after a pickle round trip, and the
    Python code generated for every plan step are digested and compared with digests recorded on the
    pinned commit (`replay_ref.json`), stopping at the first difference. Replay is only trusted when

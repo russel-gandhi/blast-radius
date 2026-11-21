@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/duckdb.py b/sqlglot/parsers/duckdb.py
+--- a/sqlglot/parsers/duckdb.py
++++ b/sqlglot/parsers/duckdb.py
+@@ -164,7 +164,7 @@
+         TokenType.DSTAR: exp.Pow,
+     }
+ 
+-    FUNCTIONS_WITH_ALIASED_ARGS = {*parser.Parser.FUNCTIONS_WITH_ALIASED_ARGS, "STRUCT_PACK"}
++    FUNCTIONS_WITH_ALIASED_ARGS = {*parser.Parser.FUNCTIONS_WITH_ALIASED_ARGS, 'STRUCT_PACKX'}
+ 
+     SHOW_PARSERS = {
+         "TABLES": _show_parser("TABLES"),

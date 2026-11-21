@@ -15,6 +15,6 @@ os.rename('/tmp/x/sqlglot-${SQLGLOT_SHA}', '/sqlglot')" \
  chmod -R a+rX /sqlglot
 COPY selector.py verify.py replay.py covmap.json.gz replay_ref.json runtime_lines.json pickle_lines.json testcost.json attrmap.json.gz /app/
 COPY opmap /app/opmap
-RUN python -m compileall -q /app && chmod -R a+rX /app
+RUN BR_SRC=/sqlglot python /app/selector.py --build-text-index /app/textindex.pkl.gz && python -m compileall -q /app && chmod -R a+rX /app
 ENV PYTHONDONTWRITEBYTECODE=1 SKIP_INTEGRATION=0
 CMD ["python", "/app/selector.py"]

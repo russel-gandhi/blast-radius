@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/drill.py b/sqlglot/dialects/drill.py
+--- a/sqlglot/dialects/drill.py
++++ b/sqlglot/dialects/drill.py
+@@ -22,7 +22,7 @@
+     TIME_MAPPING = {
+         "y": "%Y",
+         "Y": "%Y",
+-        "YYYY": "%Y",
++        "YYYY": '%YX',
+         "yyyy": "%Y",
+         "YY": "%y",
+         "yy": "%y",

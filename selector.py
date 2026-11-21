@@ -192,9 +192,31 @@ _POS = {"lineno", "col_offset", "end_lineno", "end_col_offset", "ctx", "type_com
 
 
 def _same(x, y) -> bool:
-    if isinstance(x, ast.AST) and isinstance(y, ast.AST):
-        return ast.dump(x) == ast.dump(y)
-    return type(x) is type(y) and x == y
+    """Structural equality of AST values, positions ignored (no string dumps: this runs a lot)."""
+    if type(x) is not type(y):
+        return False
+    if isinstance(x, ast.AST):
+        for f in x._fields:
+            if f in _POS:
+                continue
+            if not _same(getattr(x, f, None), getattr(y, f, None)):
+                return False
+        return True
+    if isinstance(x, list):
+        return len(x) == len(y) and all(_same(a, b) for a, b in zip(x, y))
+    return x == y
+
+
+_DIFF_CACHE: dict = {}
+
+
+def cached_diffs(old_tree, new_tree, limit=8):
+    """ast_diffs for a file pair, computed once per patch (both refinements use it)."""
+    key = (id(old_tree), id(new_tree))
+    if key not in _DIFF_CACHE:
+        _DIFF_CACHE.clear()
+        _DIFF_CACHE[key] = (old_tree, new_tree, ast_diffs(old_tree, new_tree, limit=limit))
+    return _DIFF_CACHE[key][2]
 
 
 def ast_diffs(a, b, parents=(), out=None, limit=3):
@@ -223,6 +245,84 @@ def ast_diffs(a, b, parents=(), out=None, limit=3):
             ast_diffs(va, vb, (*parents, a), out, limit)
         else:
             out.append((a, b, list(parents)))
+    return out
+
+
+def build_text_index(src: Path) -> dict:
+    """Texts searched for SQL keys: test methods, class helpers, module code, SQL fixtures,
+    sqlglot sources and the lines inside their functions."""
+    src = Path(src)
+    methods: dict[str, str] = {}
+    classes: dict[str, str] = {}
+    modules: dict[str, str] = {}
+    for p in sorted((src / "tests").rglob("test_*.py")):
+        rel = p.relative_to(src).as_posix()
+        try:
+            text = p.read_text(encoding="utf-8")
+            tree = ast.parse(text)
+        except Exception:
+            continue
+        lines = text.split("\n")
+
+        def seg(node):
+            start = min([node.lineno] + [d.lineno for d in getattr(node, "decorator_list", [])])
+            return "\n".join(lines[start - 1: node.end_lineno])
+
+        modules[rel] = "\n".join(seg(n) for n in tree.body if not isinstance(n, ast.ClassDef))
+        for cls in (n for n in tree.body if isinstance(n, ast.ClassDef)):
+            extra = []
+            for n in cls.body:
+                if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith("test"):
+                    methods[f"{rel}::{cls.name}::{n.name}"] = seg(n)
+                else:
+                    extra.append(seg(n))
+            classes[f"{rel}::{cls.name}"] = "\n".join(extra)
+    fixtures: dict[str, str] = {}
+    for p in (src / "tests" / "fixtures").rglob("*"):
+        if p.is_file() and p.suffix in (".sql", ".json", ".txt", ".yaml", ".yml"):
+            fixtures[p.relative_to(src).as_posix()] = p.read_text(encoding="utf-8", errors="replace")
+    srcs: dict[str, str] = {}
+    fnlines: dict[str, set[int]] = {}
+    for p in (src / "sqlglot").rglob("*.py"):
+        rel = p.relative_to(src).as_posix()
+        text = p.read_text(encoding="utf-8")
+        srcs[rel] = text
+        lines_in_fn: set[int] = set()
+        try:
+            for node in ast.walk(ast.parse(text)):
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    lines_in_fn.update(range(node.body[0].lineno, (node.end_lineno or node.lineno) + 1))
+                elif isinstance(node, ast.Lambda):
+                    lines_in_fn.update(range(node.lineno, (node.end_lineno or node.lineno) + 1))
+        except SyntaxError:
+            lines_in_fn = None
+        fnlines[rel] = lines_in_fn
+    return {"methods": methods, "classes": classes, "modules": modules, "fixtures": fixtures,
+            "src": srcs, "fnlines": fnlines}
+
+
+KEYTEXT_TABLE = re.compile(r"^(FUNCTIONS|KEYWORDS|TRANSFORMS|[A-Z_]*_(FUNCTIONS|PARSERS|MAPPING|KEYWORDS))$")
+
+
+def _dict_entries(d: ast.Dict):
+    """{key_id: (value_dump, value_strings)} for a dict literal, or None when a key is not usable.
+
+    key_id is ("str", text) for string keys and ("cls", Name) for `exp.Name` keys; anything else
+    (enum members, ** spreads, computed keys) makes the table unusable here.
+    """
+    out = {}
+    for k, v in zip(d.keys, d.values):
+        if k is None:
+            kid = ("spread", ast.dump(v))
+        elif isinstance(k, ast.Constant) and isinstance(k.value, str):
+            kid = ("str", k.value)
+        elif (isinstance(k, ast.Attribute) and isinstance(k.value, ast.Name) and k.value.id == "exp"
+              and k.attr[:1].isupper()):
+            kid = ("cls", k.attr)
+        else:
+            return None
+        strings = tuple(sorted({n.value for n in ast.walk(v) if isinstance(n, ast.Constant) and isinstance(n.value, str)}))
+        out[kid] = (ast.dump(v), strings)
     return out
 
 
@@ -557,6 +657,130 @@ class Selector:
                 self._attrmap = None
         return self._attrmap
 
+    # -- dictionary entries keyed by SQL text or expression classes ----------------
+
+    def keytext_refine(self, path, name, old_stmt, new_tree, quals, reasons) -> set[int] | None:
+        """Tests that can reach the changed entries of a SQL-text or class keyed table, or None.
+
+        A FUNCTIONS / KEYWORDS / *_PARSERS / *_MAPPING entry is only reached when SQL text
+        holding its key is tokenized, parsed or generated; a TRANSFORMS entry keyed by exp.Foo
+        only when an exp.Foo node exists. The result is intersected with the coverage selection.
+        """
+        new_stmt = None
+        for node in ast.walk(new_tree):
+            if (isinstance(node, (ast.Assign, ast.AnnAssign)) and node.lineno == old_stmt.lineno
+                    and type(node) is type(old_stmt)):
+                new_stmt = node
+        # statements before the edit keep their line numbers; fall back to matching by name
+        if new_stmt is None or not isinstance(new_stmt.value, ast.Dict):
+            return None
+        old_entries = _dict_entries(old_stmt.value)
+        new_entries = _dict_entries(new_stmt.value)
+        if old_entries is None or new_entries is None:
+            return None
+        changed = [k for k in set(old_entries) | set(new_entries) if old_entries.get(k) != new_entries.get(k)]
+        if not changed or len(changed) > 4:
+            return None
+        terms: set[str] = set()
+        classes: set[str] = set()
+        for kd in changed:
+            kind, text = kd
+            if kind == "str":
+                terms.add(text)
+            elif kind == "cls":
+                classes.add(text)
+            else:
+                return None
+            for side in (old_entries.get(kd), new_entries.get(kd)):
+                for s in side[1] if side else ():
+                    terms.add(s)
+        terms = {t for t in terms if t.strip()}
+        got: set[int] = set()
+        if terms:
+            got |= self.tests_with_text(terms)
+            got |= self.tests_running_text(terms, path, old_stmt)
+        if classes:
+            if "_owner_users" not in self.__dict__:
+                self.class_users(path, ast.Module(body=[], type_ignores=[]), 0)
+            for c in classes:
+                hit = [u for o, u in self._owner_users.items() if o.endswith("." + c)]
+                if not hit:
+                    return None
+                for u in hit:
+                    got |= u
+        got |= self.tests_mentioning(name)
+        reasons.append(f"keytext {name} {sorted(terms)[:3]}{sorted(classes)[:2]} -> {len(got)}")
+        return {n for n in got if n < len(self.tests)}
+
+    def _text_index(self):
+        """Text index (built at image build time by build_text_index, else built here)."""
+        if "_tidx" not in self.__dict__:
+            p = Path(__file__).with_name("textindex.pkl.gz")
+            idx = None
+            if p.exists():
+                try:
+                    import pickle
+
+                    idx = pickle.loads(gzip.decompress(p.read_bytes()))
+                except Exception:
+                    idx = None
+            self._tidx = idx or build_text_index(SRC)
+        return self._tidx
+
+    @staticmethod
+    def _pattern(terms):
+        """Case-insensitive match of any term as a whole word; spaces match any whitespace."""
+        parts = []
+        for t in terms:
+            p = r"\s+".join(re.escape(w) for w in t.split())
+            if t[:1].isalnum() or t[:1] == "_":
+                p = r"(?<![A-Za-z0-9_])" + p
+            if t[-1:].isalnum() or t[-1:] == "_":
+                p = p + r"(?![A-Za-z0-9_])"
+            parts.append(p)
+        return re.compile("|".join(parts), re.I)
+
+    def tests_with_text(self, terms) -> set[int]:
+        """Tests whose method, class helpers, module code or opened SQL fixtures hold the text."""
+        idx = self._text_index()
+        pat = self._pattern(terms)
+        got: set[int] = set()
+        by_class: dict[str, list[int]] = {}
+        for n, t in enumerate(self.tests):
+            f, cls, meth = t["id"].split("::")
+            by_class.setdefault(f"{f}::{cls}", []).append(n)
+            txt = idx["methods"].get(t["id"])
+            if txt is None or pat.search(txt):
+                got.add(n)
+        for key, txt in idx["classes"].items():
+            if pat.search(txt):
+                got.update(by_class.get(key, ()))
+        for f, txt in idx["modules"].items():
+            if pat.search(txt):
+                got.update(self.by_file.get(f, ()))
+        for f, txt in idx["fixtures"].items():
+            if pat.search(txt):
+                got |= self.opened_by(f)
+        return got
+
+    def tests_running_text(self, terms, path, stmt) -> set[int]:
+        """Tests that ran a line inside a sqlglot function holding the text (SQL built by sqlglot)."""
+        idx = self._text_index()
+        pat = self._pattern(terms)
+        got: set[int] = set()
+        for rel, text in idx["src"].items():
+            if not pat.search(text):
+                continue
+            fn_lines = idx["fnlines"].get(rel)
+            hits = {text.count("\n", 0, m.start()) + 1 for m in pat.finditer(text)}
+            if rel == path:
+                hits = {i for i in hits if not stmt.lineno <= i <= (stmt.end_lineno or stmt.lineno)}
+            # class and module level lines with the same text are other tables' definitions
+            keep = sorted(hits if fn_lines is None else hits & fn_lines)
+            if keep:
+                got |= self.cover(rel, keep)
+        return got
+
     def class_users(self, path: str, tree, line: int) -> set[int]:
         """Tests that read any class-level setting owned by a class enclosing `line`."""
         am = self.attrmap()
@@ -608,7 +832,7 @@ class Selector:
         am = self.attrmap()
         if am is None or not path.startswith("sqlglot/"):
             return None
-        diffs = ast_diffs(old_tree, new_tree, limit=8)
+        diffs = cached_diffs(old_tree, new_tree)
         if not diffs or len(diffs) >= 8:
             return None
         stmt = None
@@ -636,6 +860,11 @@ class Selector:
             name = stmt.target.id
         else:
             return None
+        if isinstance(stmt.value, ast.Dict) and KEYTEXT_TABLE.match(name):
+            got = self.keytext_refine(path, name, stmt, new_tree, quals, reasons)
+            if got is not None:
+                self.refine_intersect.add(path)
+                return got
         if name in am["dynamic"] or name.startswith("__"):
             return None  # read by name somewhere, or used by Python itself (__slots__, ...)
         module = path[:-3].replace("/", ".")
@@ -652,7 +881,7 @@ class Selector:
         """Tests that can see a different result from a single edited comparison, or None."""
         if not path.startswith("sqlglot/") or self.opmap(path) is None:
             return None
-        diffs = ast_diffs(old_tree, new_tree)
+        diffs = cached_diffs(old_tree, new_tree)
         if len(diffs) != 1:
             return None
         old, new, parents = diffs[0]
@@ -729,6 +958,7 @@ class Selector:
         self.verify_ok = True
         self.code_changes: list[str] = []
         self.refined: dict[str, set[int] | None] = {}
+        self.refine_intersect: set[str] = set()  # refinements that only narrow the coverage set
         per_file: list[tuple[str, set[int]]] = []
         for fp in parse_patch(patch_text):
             try:
@@ -746,8 +976,8 @@ class Selector:
             for i, (p, got) in enumerate(per_file):
                 if p == path:
                     self.weak |= got
-                    per_file[i] = (p, set(refined))
-            reasons.append(f"operands {path} -> {len(refined)}")
+                    per_file[i] = (p, got & refined if path in self.refine_intersect else set(refined))
+                    reasons.append(f"refined {path} -> {len(per_file[i][1])}")
         for _, got in per_file:
             sel |= got
         return sel, reasons
@@ -929,4 +1159,11 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    if sys.argv[1:2] == ["--build-text-index"]:
+        import pickle
+
+        data = gzip.compress(pickle.dumps(build_text_index(SRC)), compresslevel=6)
+        Path(sys.argv[2]).write_bytes(data)
+        print("text index", len(data))
+    else:
+        main()

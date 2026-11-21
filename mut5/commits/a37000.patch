@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/json.py b/sqlglot/expressions/json.py
+--- a/sqlglot/expressions/json.py
++++ b/sqlglot/expressions/json.py
+@@ -71,7 +71,7 @@
+ 
+ 
+ class JSONBExists(Expression, Func):
+-    arg_types = {"this": True, "path": True}
++    arg_types = {"this": False, "path": True}
+     _sql_names = ["JSONB_EXISTS"]
+ 
+ 

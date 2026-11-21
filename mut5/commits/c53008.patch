@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/fabric.py b/sqlglot/generators/fabric.py
+--- a/sqlglot/generators/fabric.py
++++ b/sqlglot/generators/fabric.py
+@@ -29,7 +29,7 @@
+     """Transform function to add VARCHAR(MAX) or CHAR(MAX) for cross-dialect conversion."""
+     if (
+         isinstance(expression, exp.Create)
+-        and expression.kind == "TABLE"
++        and expression.kind == 'TABLE_x'
+         and isinstance(expression.this, exp.Schema)
+     ):
+         for column in expression.this.expressions:

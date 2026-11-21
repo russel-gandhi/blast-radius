@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/exasol.py b/sqlglot/generators/exasol.py
+--- a/sqlglot/generators/exasol.py
++++ b/sqlglot/generators/exasol.py
+@@ -818,7 +818,7 @@
+         "sqlexception",
+         "sqlstate",
+         "sqlwarning",
+-        "start",
++        'startX',
+         "state",
+         "statement",
+         "static",

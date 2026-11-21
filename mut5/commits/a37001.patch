@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/string.py b/sqlglot/expressions/string.py
+--- a/sqlglot/expressions/string.py
++++ b/sqlglot/expressions/string.py
+@@ -27,7 +27,7 @@
+ 
+ 
+ class Concat(Expression, Func):
+-    arg_types = {"expressions": True, "safe": False, "coalesce": False}
++    arg_types = {"expressions": True, "safe": True, "coalesce": False}
+     is_var_len_args = True
+ 
+ 

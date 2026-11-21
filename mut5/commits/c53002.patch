@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/simplify.py b/sqlglot/optimizer/simplify.py
+--- a/sqlglot/optimizer/simplify.py
++++ b/sqlglot/optimizer/simplify.py
+@@ -1057,7 +1057,7 @@
+                             if isinstance(b, exp.GT):
+                                 return false if av <= bv else a
+                             if isinstance(b, exp.GTE):
+-                                return false if av < bv else a
++                                return false if av > bv else a
+                             if isinstance(b, exp.NEQ):
+                                 return false if av == bv else a
+         return None

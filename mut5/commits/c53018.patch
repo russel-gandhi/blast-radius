@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/simplify.py b/sqlglot/optimizer/simplify.py
+--- a/sqlglot/optimizer/simplify.py
++++ b/sqlglot/optimizer/simplify.py
+@@ -1161,7 +1161,7 @@
+ 
+                 if isinstance(a, exp.Not) and a.this.meta_get("nonnull") is True:
+                     pairs[frozenset((a.this, b))].append((op, b))
+-                if isinstance(b, exp.Not) and b.this.meta_get("nonnull") is True:
++                if isinstance(b, exp.Not) and b.this.meta_get("nonnull") == True:
+                     pairs[frozenset((a, b.this))].append((op, a))
+ 
+             for op in ops:

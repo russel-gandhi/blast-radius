@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/athena.py b/sqlglot/generators/athena.py
+--- a/sqlglot/generators/athena.py
++++ b/sqlglot/generators/athena.py
+@@ -132,7 +132,7 @@
+ 
+     AFTER_HAVING_MODIFIER_TRANSFORMS = generator.AFTER_HAVING_MODIFIER_TRANSFORMS
+ 
+-    __slots__ = ("_hive_generator", "_trino_generator")
++    __slots__ = ("_hive_generator", '_trino_generatorX')
+ 
+     def __init__(
+         self,

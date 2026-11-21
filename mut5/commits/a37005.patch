@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/bigquery.py b/sqlglot/generators/bigquery.py
+--- a/sqlglot/generators/bigquery.py
++++ b/sqlglot/generators/bigquery.py
+@@ -622,7 +622,7 @@
+         "cube",
+         "current",
+         "default",
+-        "define",
++        'defineX',
+         "desc",
+         "distinct",
+         "else",

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/ddl.py b/sqlglot/expressions/ddl.py
+--- a/sqlglot/expressions/ddl.py
++++ b/sqlglot/expressions/ddl.py
+@@ -251,7 +251,7 @@
+     arg_types = {
+         "this": True,
+         "dtype": False,
+-        "collate": False,
++        "collate": True,
+         "using": False,
+         "default": False,
+         "drop": False,

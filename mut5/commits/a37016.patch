@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/datatypes.py b/sqlglot/expressions/datatypes.py
+--- a/sqlglot/expressions/datatypes.py
++++ b/sqlglot/expressions/datatypes.py
+@@ -464,7 +464,7 @@
+ class Interval(_TimeUnit):
+     # fraction_in_string: a fractional amount was written with its unit in one string, e.g.
+     # INTERVAL '1.5 DAY', which differs from INTERVAL '1.5' DAY in e.g. DuckDB and Postgres
+-    arg_types = {"this": False, "unit": False, "fraction_in_string": False}
++    arg_types = {"this": True, "unit": False, "fraction_in_string": False}
+ 
+ 
+ DATA_TYPE = t.Union[str, Identifier, Dot, DataType, DType]

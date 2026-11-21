@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/bigquery.py b/sqlglot/generators/bigquery.py
+--- a/sqlglot/generators/bigquery.py
++++ b/sqlglot/generators/bigquery.py
+@@ -562,7 +562,7 @@
+     TYPE_MAPPING = {
+         **generator.Generator.TYPE_MAPPING,
+         exp.DType.BIGDECIMAL: "BIGNUMERIC",
+-        exp.DType.BIGINT: "INT64",
++        exp.DType.BIGINT: 'INT64X',
+         exp.DType.BINARY: "BYTES",
+         exp.DType.BLOB: "BYTES",
+         exp.DType.BOOLEAN: "BOOL",

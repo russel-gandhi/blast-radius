@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/bigquery.py b/sqlglot/parsers/bigquery.py
+--- a/sqlglot/parsers/bigquery.py
++++ b/sqlglot/parsers/bigquery.py
+@@ -138,7 +138,7 @@
+                     "null_if_no_match": dialect.REGEXP_EXTRACT_NO_MATCH_RETURNS_NULL,
+                     "empty_if_group_missing": dialect.REGEXP_EXTRACT_MISSING_GROUP_RETURNS_EMPTY,
+                 }
+-                if expr_type is exp.RegexpExtract
++                if expr_type is not exp.RegexpExtract
+                 else {}
+             ),
+         )

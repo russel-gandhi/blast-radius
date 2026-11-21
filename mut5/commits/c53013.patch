@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/dialect.py b/sqlglot/dialects/dialect.py
+--- a/sqlglot/dialects/dialect.py
++++ b/sqlglot/dialects/dialect.py
+@@ -2574,7 +2574,7 @@
+ def map_date_part(part, dialect: DialectType = Dialect):
+     mapped = (
+         Dialect.get_or_raise(dialect).DATE_PART_MAPPING.get(part.name.upper())
+-        if part and not (isinstance(part, exp.Column) and len(part.parts) != 1)
++        if part and not (isinstance(part, exp.Column) and len(part.parts) != 2)
+         else None
+     )
+     if mapped:

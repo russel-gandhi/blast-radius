@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/unnest_subqueries.py b/sqlglot/optimizer/unnest_subqueries.py
+--- a/sqlglot/optimizer/unnest_subqueries.py
++++ b/sqlglot/optimizer/unnest_subqueries.py
+@@ -415,7 +415,7 @@
+ 
+     # When the subquery is embedded inside a function (e.g. COALESCE, TRIM) in the SELECT list,
+     # the ancestor chain contains no Predicate node AND the subquery is not a direct projection.
+-    if parent_predicate is None and not is_subquery_projection:
++    if parent_predicate == None and not is_subquery_projection:
+         return
+ 
+     # if the value of the subquery is not an agg or a key, we need to collect it into an array

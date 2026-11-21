@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/mysql.py b/sqlglot/generators/mysql.py
+--- a/sqlglot/generators/mysql.py
++++ b/sqlglot/generators/mysql.py
+@@ -429,7 +429,7 @@
+         "force",
+         "foreign",
+         "from",
+-        "fulltext",
++        'fulltextX',
+         "function",
+         "generated",
+         "get",

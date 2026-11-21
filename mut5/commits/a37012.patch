@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/constraints.py b/sqlglot/expressions/constraints.py
+--- a/sqlglot/expressions/constraints.py
++++ b/sqlglot/expressions/constraints.py
+@@ -132,7 +132,7 @@
+         "index_type": False,
+         "options": False,
+         "expression": False,  # Clickhouse
+-        "granularity": False,
++        "granularity": True,
+     }
+ 
+ 

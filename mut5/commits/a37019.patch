@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/doris.py b/sqlglot/generators/doris.py
+--- a/sqlglot/generators/doris.py
++++ b/sqlglot/generators/doris.py
+@@ -209,7 +209,7 @@
+         "datetime",
+         "datetimev2",
+         "datev2",
+-        "datetimev1",
++        'datetimev1X',
+         "datev1",
+         "day",
+         "days_add",
