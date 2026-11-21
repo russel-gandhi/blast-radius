@@ -401,8 +401,11 @@ class Selector:
             self.replay_ref = json.loads((here / "replay_ref.json").read_text())
             self.runtime = {f: set(v) for f, v in json.loads((here / "runtime_lines.json").read_text()).items()}
             self.pickling = {f: set(v) for f, v in json.loads((here / "pickle_lines.json").read_text()).items()}
+            ra = here / "runtime_attrs.json"
+            self.runtime_attrs = set(json.loads(ra.read_text())) if ra.exists() else None
         except Exception:
             self.replay_ref, self.runtime, self.pickling = {}, {}, {}
+            self.runtime_attrs = None
         self.replay_tests = {self.by_id[t]: t for t in self.replay_ref if t in self.by_id}
         # tests touching each file at test time (any line)
         self._file_tests: dict[str, set[int]] = {}
@@ -446,7 +449,7 @@ class Selector:
         path = fp.path
         if not path.startswith("sqlglot/") or not path.endswith(".py"):
             # tests, fixtures, data: the executor tests' own inputs may change
-            self.replay_ok = False
+            self.replay_ok = False; self.no_replay.add("non-sqlglot-file")
         src_path = SRC / (fp.old or fp.new)
         old_text = src_path.read_text(encoding="utf-8") if fp.old and src_path.exists() else ""
         new_text, removed, inserts = apply(fp, old_text)
@@ -454,7 +457,7 @@ class Selector:
             self.files[fp.old] = None
         self.files[fp.new or fp.old] = None if fp.new is None else new_text
         if fp.new is None or (fp.old and fp.new and fp.old != fp.new):
-            self.replay_ok = False
+            self.replay_ok = False; self.no_replay.add("delete/rename")
         if fp.new is None:  # deleted file
             reasons.append(f"delete {path}")
             return self.opened_by(path) | self.importers(path)
@@ -480,7 +483,7 @@ class Selector:
         try:
             new_tree = ast.parse(new_text)
         except SyntaxError:
-            self.replay_ok = False
+            self.replay_ok = False; self.no_replay.add("syntax")
             reasons.append(f"syntax error {path}")
             return self.importers(path)
         try:
@@ -498,7 +501,7 @@ class Selector:
                 reasons.append(f"docstring-only {path}")
                 return set()
         if old_tree is None:
-            self.replay_ok = False
+            self.replay_ok = False; self.no_replay.add("new-file")
             reasons.append(f"new file {path}")
             return self.importers(path)
 
@@ -534,19 +537,27 @@ class Selector:
                     # builders, lazily loaded dialects): its effect is shared by every test using it
                     got = self.import_reach(path) | self.cover(path, range(s, span_end + 1))
                     sel |= got
-                    if not self.dialect_file(path):
-                        self.replay_ok = False
+                    rt = self.runtime.get(path) or ()
+                    pk = self.pickling.get(path) or ()
+                    if any(l in pk for l in range(s, span_end + 1)):
+                        self.verify_ok = self.replay_ok = False; self.no_replay.add("pickling")
+                    elif any(l in rt for l in range(s, span_end + 1)):
+                        self.replay_ok = False; self.no_replay.add("runtime-fn")
+                    elif not self.dialect_file(path):
+                        self.replay_fp = True  # replay decided by the import-time fingerprint
                     reasons.append(f"import-run {path}:{line} -> {len(got)}")
                     continue
             pk = self.pickling.get(path)
             if pk and (not in_func or any(l in pk for l in range(s, e + 1))):
                 # pickling code: real spawned pool children may break where an in-process run does not
-                self.verify_ok = self.replay_ok = False
+                self.verify_ok = self.replay_ok = False; self.no_replay.add("pickling")
             rt = self.runtime.get(path)
-            if rt and (not in_func or any(l in rt for l in range(s, e + 1))):
-                self.replay_ok = False  # executor runtime code or import-time data it may read
-            elif not in_func and not self.dialect_file(path):
-                self.replay_ok = False
+            if rt and in_func and any(l in rt for l in range(s, e + 1)):
+                self.replay_ok = False; self.no_replay.add("runtime-fn")  # code that runs during execution
+            elif not in_func and (rt or not self.dialect_file(path)):
+                # class / module level: replay is decided by the import-time fingerprint (what
+                # changed, and whether execution reads it)
+                self.replay_fp = True
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) or hasattr(node, "body") and isinstance(getattr(node, "body"), list):
                 # change in a compound statement's header
                 if line > header_end(node):
@@ -956,6 +967,8 @@ class Selector:
         self.files: dict[str, str | None] = {}
         self.weak: set[int] = set()
         self.replay_ok = True
+        self.replay_fp = False
+        self.no_replay: set[str] = set()
         self.verify_ok = True
         self.code_changes: list[str] = []
         self.refined: dict[str, set[int] | None] = {}
@@ -996,6 +1009,42 @@ class Selector:
         for _, got in per_file:
             sel |= got
         return sel, reasons
+
+    def replay_safe(self, diff: dict | None) -> bool:
+        """Can the executor tests be replayed for a patch with these import-time changes?
+
+        Replay re-derives parsing, optimizing, planning and code generation in the patched child.
+        Only values read while queries execute escape it: changed class attributes read in the
+        execution phase (runtime_attrs.json), module values named on execution-phase lines, or
+        anything this cannot classify.
+        """
+        if diff is None or self.runtime_attrs is None or diff.get("added") or diff.get("removed"):
+            return False
+        am = self.attrmap()
+        if am is None:
+            return False
+        if "_traced_names" not in self.__dict__:
+            self._traced_names = {k.split("|", 1)[1] for k in am["reads"]} | {k.split("|", 1)[1] for k in am["early"]}
+        if "_rt_text" not in self.__dict__:
+            src = self._text_index()["src"]
+            parts = []
+            for f, lines in self.runtime.items():
+                text = src.get(f, "").split(chr(10))
+                parts.extend(text[l - 1] for l in lines if 0 < l <= len(text))
+            self._rt_text = chr(10).join(parts)
+        for key in diff.get("changed", []):
+            if key == "__modules__" or "|" not in key:
+                return False
+            left, name = key.split("|", 1)
+            if name == "__mro__":
+                return False
+            mod_file = left.replace(".", "/")
+            if (SRC / f"{mod_file}.py").exists() or (SRC / mod_file / "__init__.py").exists():
+                if re.search(r"(?<![A-Za-z0-9_])" + re.escape(name) + r"(?![A-Za-z0-9_])", self._rt_text):
+                    return False
+            elif name not in self._traced_names or key in self.runtime_attrs:
+                return False
+        return True
 
     def fp_refine(self, diff: dict | None, path: str, reasons: list[str]) -> set[int] | None:
         """Tests that read what an import-time change really changed, or None (keep the selection).
@@ -1163,16 +1212,21 @@ def main() -> None:
         verifier = Verifier(str(SRC), [t["id"] for t in sel.tests])
     results = []
     fp_jobs: dict[int, tuple[str, dict]] = {}
+    replay_pending: dict[str, bool] = {}
     weak: dict[str, set[int]] = {}
     replay_ok: dict[str, bool] = {}
     verify_ok: dict[str, bool] = {}
     for patch in patches:
         chosen, reasons = sel.select(patch.read_text(encoding="utf-8"))
         results.append((patch.stem, chosen, reasons, dict(sel.files)))
-        replay_ok[patch.stem] = sel.replay_ok
+        replay_ok[patch.stem] = sel.replay_ok and not sel.replay_fp
+        replay_pending[patch.stem] = sel.replay_ok and sel.replay_fp
+        if not sel.replay_ok:
+            reasons.append("noreplay:" + ",".join(sorted(sel.no_replay)))
         verify_ok[patch.stem] = sel.verify_ok
         weak[patch.stem] = sel.weak - chosen
-        if sel.fp_path or sel.fp_detect:
+        pend = replay_pending[patch.stem] and any(n in sel.replay_tests for n in chosen)
+        if sel.fp_path or sel.fp_detect or pend:
             fp_jobs[len(results) - 1] = (sel.fp_path, dict(sel.touched_lines))
     # import-time changes: ask a patched child which class attributes / module values changed,
     # against a pristine snapshot taken the same way (same parent, modules, hash seed, paths)
@@ -1216,8 +1270,11 @@ def main() -> None:
             if left < 20:
                 break
             c0 = sum(os.times()[:4])
-            refine = path is not None and sel.pack(chosen)[0] >= FP_MIN_SAVING * 1000 and full_base() is not None
-            if refine:
+            refine = path is not None and sel.pack(chosen)[0] >= FP_MIN_SAVING * 1000
+            pend = replay_pending.get(cid) and any(n in sel.replay_tests for n in chosen)
+            full = (refine or pend) and full_base() is not None
+            refine = refine and full
+            if full:
                 snap = verifier.snapshot(files, timeout=min(20.0, left - 5))
                 diff = None if snap is None else _fp_diff(base, {k: v for k, v in snap.items() if k not in noisy})
             else:
@@ -1230,6 +1287,9 @@ def main() -> None:
                 results[i] = (cid, set(sel.all), reasons, files)
                 reasons.append("fp: a module fails to import -> all")
                 continue
+            if pend and full:
+                replay_ok[cid] = sel.replay_safe(diff)
+                reasons.append(f"fp replay {'ok' if replay_ok[cid] else 'no'}")
             if not refine:
                 reasons.append("fp: imports ok")
                 continue

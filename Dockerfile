@@ -13,7 +13,7 @@ os.rename('/tmp/x/sqlglot-${SQLGLOT_SHA}', '/sqlglot')" \
  && rm -rf /sqlglot/sqlglot-integration-tests /sqlglot/docs /sqlglot/posts /sqlglot/benchmarks /sqlglot/pdoc \
  && python -m compileall -q /usr/local/lib/python3.13 /sqlglot/sqlglot /sqlglot/tests > /dev/null; \
  chmod -R a+rX /sqlglot
-COPY selector.py verify.py replay.py fingerprint.py covmap.json.gz replay_ref.json runtime_lines.json pickle_lines.json testcost.json attrmap.json.gz /app/
+COPY selector.py verify.py replay.py fingerprint.py covmap.json.gz replay_ref.json runtime_lines.json runtime_attrs.json pickle_lines.json testcost.json attrmap.json.gz /app/
 COPY opmap /app/opmap
 RUN BR_SRC=/sqlglot python /app/selector.py --build-text-index /app/textindex.pkl.gz && python -m compileall -q /app && chmod -R a+rX /app
 ENV PYTHONDONTWRITEBYTECODE=1 SKIP_INTEGRATION=0
