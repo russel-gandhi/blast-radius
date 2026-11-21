@@ -668,11 +668,11 @@ class Selector:
 
 
 VERIFY_OVERHEAD = float(os.environ.get("BR_OVH", 0.35))  # s of CPU per verified commit (fork, patched modules, test module imports)
-VERIFY_FACTOR = float(os.environ.get("BR_VF", 1.2))  # margin over each test's measured CPU here (cold caches in a fresh child)
+VERIFY_FACTOR = float(os.environ.get("BR_VF", 1.0))  # margin over each test's measured CPU here (cold caches in a fresh child)
 PREPARE_COST = 1.2  # one-off: copy the tree and import numpy/pandas/duckdb
-P_CODE = float(os.environ.get("BR_PCODE", 0.5))
+P_CODE = float(os.environ.get("BR_PCODE", 0.05))
 P_DATA = float(os.environ.get("BR_PDATA", 0.9))
-MARGIN = float(os.environ.get("BR_MARGIN", 0.4))
+MARGIN = float(os.environ.get("BR_MARGIN", 0.0))
 
 
 REPLAY_COST = {  # CPU seconds to fingerprint instead of running
