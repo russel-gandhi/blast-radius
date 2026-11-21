@@ -47,6 +47,7 @@ class FilePatch:
         self.old = old
         self.new = new
         self.hunks: list[tuple[int, list[str]]] = []  # (old_start, lines with prefix)
+        self.binary = False
 
     @property
     def path(self) -> str:
@@ -57,10 +58,39 @@ def parse_patch(text: str) -> list[FilePatch]:
     files: list[FilePatch] = []
     cur: FilePatch | None = None
     lines = text.split("\n")
+    # git headers: a rename, mode change or binary change may come with no ---/+++ hunks at all
+    pending: dict | None = None
+
+    def flush():
+        if pending is not None and not pending["used"]:
+            fp = FilePatch(pending["old"], pending["new"])
+            fp.binary = pending["binary"]
+            files.append(fp)
+
     i = 0
     while i < len(lines):
         line = lines[i]
+        if line.startswith("diff --git "):
+            flush()
+            m = re.match(r"diff --git a/(.+?) b/(.+)$", line)
+            pending = {"old": m.group(1) if m else None, "new": m.group(2) if m else None,
+                       "used": False, "binary": False}
+            i += 1
+            continue
+        if pending is not None and not pending["used"]:
+            if line.startswith("rename from "):
+                pending["old"] = line[len("rename from "):].strip()
+            elif line.startswith("rename to "):
+                pending["new"] = line[len("rename to "):].strip()
+            elif line.startswith("deleted file mode"):
+                pending["new"] = None
+            elif line.startswith("new file mode"):
+                pending["old"] = None
+            elif line.startswith("Binary files ") or line.startswith("GIT binary patch"):
+                pending["binary"] = True
         if line.startswith("--- ") and i + 1 < len(lines) and lines[i + 1].startswith("+++ "):
+            if pending is not None:
+                pending["used"] = True
             old = line[4:].split("\t")[0].strip()
             new = lines[i + 1][4:].split("\t")[0].strip()
             old = None if old == "/dev/null" else old[2:] if old.startswith("a/") else old
@@ -100,6 +130,7 @@ def parse_patch(text: str) -> list[FilePatch]:
             cur.hunks.append((old_start, body))
             continue
         i += 1
+    flush()
     return files
 
 
@@ -447,6 +478,18 @@ class Selector:
 
     def select_file(self, fp: FilePatch, reasons: list[str]) -> set[int]:
         path = fp.path
+        if fp.binary:
+            # binary change: no text to analyse or to run tests against
+            paths = [p for p in (fp.old, fp.new) if p]
+            self.replay_ok = False; self.no_replay.add("binary")
+            self.verify_ok = False
+            self.code_changes.append("?binary")
+            if any(not p.startswith("tests/fixtures/") for p in paths):
+                reasons.append(f"binary {paths} -> all")
+                return set(self.all)
+            sel = set().union(*(self.opened_by(p) for p in paths))
+            reasons.append(f"binary data {paths} -> {len(sel)}")
+            return sel
         if not path.startswith("sqlglot/") or not path.endswith(".py"):
             # tests, fixtures, data: the executor tests' own inputs may change
             self.replay_ok = False; self.no_replay.add("non-sqlglot-file")
@@ -461,12 +504,18 @@ class Selector:
         if fp.new is None:  # deleted file
             reasons.append(f"delete {path}")
             return self.opened_by(path) | self.importers(path)
+        rename_extra: set[int] = set()
+        if fp.old and fp.new and fp.old != fp.new:
+            # the old path disappears: whoever opened or imported it can break
+            rename_extra = self.opened_by(fp.old) | (self.importers(fp.old) if fp.old.endswith(".py") else set())
+            self.code_changes.append("?rename")
+            reasons.append(f"rename {fp.old} -> {fp.new} -> {len(rename_extra)}")
         if path.endswith(".py"):
             changed = [l[1:] for _, body in fp.hunks for l in body if l[:1] in "+-"]
             trivial = all(not c.strip() or c.lstrip().startswith("#") for c in changed)
-            return self.select_py(path, old_text, new_text, removed, inserts, reasons, trivial)
+            return self.select_py(path, old_text, new_text, removed, inserts, reasons, trivial) | rename_extra
         # data files: whoever opened them
-        sel = self.opened_by(path)
+        sel = self.opened_by(path) | rename_extra
         reasons.append(f"data {path} -> {len(sel)}")
         return sel
 
