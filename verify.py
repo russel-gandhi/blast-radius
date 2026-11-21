@@ -38,9 +38,16 @@ class Verifier:
             return
         if os.path.exists(TREE):
             shutil.rmtree(TREE)
-        os.makedirs(TREE)
+        # symlink overlay: real directories, every file a link to the pinned original.
+        # Patched files replace their link with a real file for one run. Far cheaper than a copy,
+        # and precompiled .pyc files stay valid because stat() follows the links.
         for d in ("sqlglot", "tests"):
-            shutil.copytree(os.path.join(self.src, d), os.path.join(TREE, d), symlinks=False)
+            base = os.path.join(self.src, d)
+            for root, dirs, fs in os.walk(base):
+                rel = os.path.relpath(root, self.src)
+                os.makedirs(os.path.join(TREE, rel), exist_ok=True)
+                for f in fs:
+                    os.symlink(os.path.join(root, f), os.path.join(TREE, rel, f))
         os.environ["SKIP_INTEGRATION"] = "0"
         os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
         sys.dont_write_bytecode = True
@@ -53,42 +60,39 @@ class Verifier:
                 pass
         self.ready = True
 
-    def run(self, files: dict[str, str | None], tests: list[int], timeout: float) -> set[int] | None:
+    def run(self, files: dict[str, str | None], tests: list[int], timeout: float,
+            replay: dict[int, list[str]] | None = None) -> set[int] | None:
         """Return failing test numbers among `tests`, or None if the run did not finish."""
         self.prepare()
-        saved: dict[str, bytes | None] = {}
-        for rel, text in files.items():
-            p = os.path.join(TREE, rel)
-            saved[rel] = open(p, "rb").read() if os.path.exists(p) else None
+        saved: dict[str, bool] = {}
+        for rel in files:
+            saved[rel] = os.path.lexists(os.path.join(TREE, rel))
         try:
             for rel, text in files.items():
                 p = os.path.join(TREE, rel)
-                if text is None:
-                    if os.path.exists(p):
-                        os.remove(p)
-                else:
+                if os.path.lexists(p):
+                    os.remove(p)
+                if text is not None:
                     os.makedirs(os.path.dirname(p), exist_ok=True)
                     with open(p, "w", encoding="utf-8") as fh:
                         fh.write(text)
-            return self._fork(tests, timeout)
+            return self._fork(tests, timeout, replay or {})
         finally:
-            for rel, data in saved.items():
+            for rel, existed in saved.items():
                 p = os.path.join(TREE, rel)
-                if data is None:
-                    if os.path.exists(p):
-                        os.remove(p)
-                else:
-                    with open(p, "wb") as fh:
-                        fh.write(data)
+                if os.path.lexists(p):
+                    os.remove(p)
+                if existed:
+                    os.symlink(os.path.join(self.src, rel), p)
 
-    def _fork(self, tests: list[int], timeout: float) -> set[int] | None:
+    def _fork(self, tests: list[int], timeout: float, replay: dict[int, list[str]]) -> set[int] | None:
         r, w = os.pipe()
         pid = os.fork()
         if pid == 0:  # child
             os.close(r)
             code = 0
             try:
-                failed = _child(self.ids, tests)
+                failed = _child(self.ids, tests, replay)
                 os.write(w, json.dumps(sorted(failed)).encode())
             except BaseException:
                 code = 1
@@ -156,7 +160,7 @@ def _install_inprocess_pool():
     cf.ProcessPoolExecutor = InProcessPool
 
 
-def _child(ids: list[str], tests: list[int]) -> set[int]:
+def _child(ids: list[str], tests: list[int], replay: dict[int, list[str]]) -> set[int]:
     import io
     import unittest
 
@@ -170,6 +174,17 @@ def _child(ids: list[str], tests: list[int]) -> set[int]:
     _install_inprocess_pool()
 
     failed: set[int] = set()
+    # replayed tests: same fingerprints as on the pinned commit (where they pass) -> pass, else keep
+    if replay:
+        import replay as rp
+
+        for n, ref in replay.items():
+            try:
+                if not rp.matches(*rp.TESTS[ids[n]], ref):
+                    failed.add(n)
+            except BaseException:
+                failed.add(n)
+    tests = [n for n in tests if n not in replay]
     by_name: dict[str, int] = {}
     groups: dict[str, list[tuple[str, int]]] = {}
     for n in tests:
@@ -202,6 +217,11 @@ def _child(ids: list[str], tests: list[int]) -> set[int]:
             super().addSubTest(test, subtest, err)
             if err is not None:
                 self._mark(test)
+
+        def addSkip(self, test, reason):
+            # a skip here is not proof of a pass where the track runs it: keep the test
+            super().addSkip(test, reason)
+            self._mark(test)
 
         def addUnexpectedSuccess(self, test):
             super().addUnexpectedSuccess(test)

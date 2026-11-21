@@ -196,8 +196,26 @@ class Selector:
         # map id from our coverage map to tests.json numbers (they should be identical)
         self.remap = [self.by_id.get(tid) for tid in raw["tests"]]
         self.all = [t["number"] for t in self.tests]
+        here = Path(__file__).parent
+        try:
+            self.replay_ref = json.loads((here / "replay_ref.json").read_text())
+            self.runtime = {f: set(v) for f, v in json.loads((here / "runtime_lines.json").read_text()).items()}
+            self.pickling = {f: set(v) for f, v in json.loads((here / "pickle_lines.json").read_text()).items()}
+        except Exception:
+            self.replay_ref, self.runtime, self.pickling = {}, {}, {}
+        self.replay_tests = {self.by_id[t]: t for t in self.replay_ref if t in self.by_id}
         # tests touching each file at test time (any line)
         self._file_tests: dict[str, set[int]] = {}
+        try:  # measured CPU of each test under the verifier, and of each class's setup
+            tc = json.loads((here / "testcost.json").read_text())
+            self.tcost = {int(k): v for k, v in tc["tests"].items()}
+            self.csetup = tc["setup"]
+        except Exception:
+            self.tcost, self.csetup = {}, {}
+
+    def cls_key(self, n: int) -> str:
+        path, cls, _ = self.tests[n]["id"].split("::")
+        return path[:-3].replace("/", ".") + "." + cls
 
     def set_tests(self, sid: int) -> set[int]:
         return {self.remap[n] for n in self.sets[sid] if self.remap[n] is not None}
@@ -226,12 +244,17 @@ class Selector:
 
     def select_file(self, fp: FilePatch, reasons: list[str]) -> set[int]:
         path = fp.path
+        if not path.startswith("sqlglot/") or not path.endswith(".py"):
+            # tests, fixtures, data: the executor tests' own inputs may change
+            self.replay_ok = False
         src_path = SRC / (fp.old or fp.new)
         old_text = src_path.read_text(encoding="utf-8") if fp.old and src_path.exists() else ""
         new_text, removed, inserts = apply(fp, old_text)
         if fp.old and fp.new and fp.old != fp.new:
             self.files[fp.old] = None
         self.files[fp.new or fp.old] = None if fp.new is None else new_text
+        if fp.new is None or (fp.old and fp.new and fp.old != fp.new):
+            self.replay_ok = False
         if fp.new is None:  # deleted file
             reasons.append(f"delete {path}")
             return self.opened_by(path) | self.importers(path)
@@ -257,6 +280,7 @@ class Selector:
         try:
             new_tree = ast.parse(new_text)
         except SyntaxError:
+            self.replay_ok = False
             reasons.append(f"syntax error {path}")
             return self.importers(path)
         try:
@@ -269,6 +293,7 @@ class Selector:
             reasons.append(f"ast-equal {path}")
             return set()
         if old_tree is None:
+            self.replay_ok = False
             reasons.append(f"new file {path}")
             return self.importers(path)
 
@@ -288,6 +313,15 @@ class Selector:
                 # blank/comment line at module level next to an insertion: neighbour code
                 continue
             s, e, node, in_func = inner
+            pk = self.pickling.get(path)
+            if pk and (not in_func or any(l in pk for l in range(s, e + 1))):
+                # pickling code: real spawned pool children may break where an in-process run does not
+                self.verify_ok = self.replay_ok = False
+            rt = self.runtime.get(path)
+            if rt and (not in_func or any(l in rt for l in range(s, e + 1))):
+                self.replay_ok = False  # executor runtime code or import-time data it may read
+            elif not in_func and not self.dialect_file(path):
+                self.replay_ok = False
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) or hasattr(node, "body") and isinstance(getattr(node, "body"), list):
                 # change in a compound statement's header
                 if line > header_end(node):
@@ -317,8 +351,28 @@ class Selector:
                 continue
             got = self.cover(path, rng)
             sel |= got
+            fn = self.enclosing_def(stmts, line)
+            if fn is not None:
+                self.weak |= self.cover(path, range(fn.lineno, (fn.end_lineno or fn.lineno) + 1))
+            self.weak |= self.file_tests(path)
             reasons.append(f"line {path}:{line} [{s}-{rng[-1]}] -> {len(got)}")
         return sel
+
+    def dialect_file(self, path: str) -> bool:
+        parts = path.split("/")
+        return (
+            len(parts) == 3 and parts[1] in self.FAMILY_DIRS
+            and parts[2] not in ("__init__.py", "dialect.py", "python.py")
+        )
+
+    @staticmethod
+    def enclosing_def(stmts, line):
+        best = None
+        for s, e, node, _ in stmts:
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and s <= line <= e:
+                if best is None or e - s < (best.end_lineno or 0) - best.lineno:
+                    best = node
+        return best
 
     FAMILY_DIRS = ("dialects", "parsers", "generators", "tokenizers", "typing")
 
@@ -350,6 +404,9 @@ class Selector:
         reasons: list[str] = []
         sel: set[int] = set()
         self.files: dict[str, str | None] = {}
+        self.weak: set[int] = set()
+        self.replay_ok = True
+        self.verify_ok = True
         for fp in parse_patch(patch_text):
             try:
                 sel |= self.select_file(fp, reasons)
@@ -359,6 +416,27 @@ class Selector:
         return sel, reasons
 
     # -- packing -------------------------------------------------------------
+
+    def fill(self, workers: list[list[int]], extra) -> list[list[int]]:
+        """Add extra tests wherever they fit under the busiest worker: they cost nothing."""
+        if len(workers) < 2:
+            return workers
+        loads = [sum(self.ms[n] for n in w) for w in workers]
+        cap = max(loads)
+        have = {n for w in workers for n in w}
+        for n in extra:
+            if n in have:
+                continue
+            d = self.ms[n]
+            best = None
+            for i, l in enumerate(loads):
+                if l + d <= cap and (best is None or l + d > loads[best] + d):
+                    best = i
+            if best is not None:
+                workers[best].append(n)
+                loads[best] += d
+                have.add(n)
+        return workers
 
     def pack(self, sel: set[int]) -> tuple[int, list[list[int]]]:
         if not sel:
@@ -379,39 +457,71 @@ class Selector:
         return best
 
 
-VERIFY_OVERHEAD = 0.30  # s of CPU per verified commit (fork + test module imports)
-VERIFY_FACTOR = 1.5  # CPU seconds per recorded test second when run here
+VERIFY_OVERHEAD = 0.35  # s of CPU per verified commit (fork, patched modules, test module imports)
+VERIFY_FACTOR = 1.2  # margin over each test's measured CPU here (cold caches in a fresh child)
 PREPARE_COST = 1.2  # one-off: copy the tree and import numpy/pandas/duckdb
 MARGIN = 0.4
 
 
-def plan_verify(sel: "Selector", chosen: set[int], p_fail: float) -> tuple[list[int], int]:
-    """Pick the cheapest tests to run here. Returns (tests to run, expected saving in ms).
+REPLAY_COST = {  # CPU seconds to fingerprint instead of running
+    "tests/test_executor.py::TestExecutor::test_execute_tpcds": 4.5,
+    "tests/test_executor.py::TestExecutor::test_execute_tpch": 0.9,
+    "tests/test_executor.py::TestExecutor::test_optimized_tpch": 0.4,
+}
 
-    Running tests only pays when they turn out to pass; if any fails we still pay for it.
-    p_fail is how likely the run finds a failure (fixture edits nearly always break their test).
+
+def vcost(sel: "Selector", n: int, replay_ok: bool) -> float:
+    """ms of CPU to check test n here."""
+    if replay_ok and n in sel.replay_tests:
+        return REPLAY_COST.get(sel.replay_tests[n], 5.0) * 1000
+    return VERIFY_FACTOR * 1000 * sel.tcost.get(n, sel.ms[n] / 1000)
+
+
+def rep_ids(sel: "Selector", run, ok: bool) -> set[int]:
+    return {n for n in run if ok and n in sel.replay_tests}
+
+
+def plan_verify(sel: "Selector", chosen: set[int], p_fail: float, replay_ok: bool = False) -> tuple[list[int], int]:
+    """Choose which candidate tests to check here. Returns (tests to check, expected saving in ms).
+
+    Options: the k cheapest ordinary tests (k over ~24 split points) plus any subset of the
+    replayable heavy tests. Expected cost = CPU spent + pack(unchecked) + a small charge for
+    the failures a check may find (p_fail: fixture edits nearly always break their test).
     """
-    blind = sel.pack(chosen)[0]
     if not chosen:
         return [], 0
-    order = sorted(chosen, key=lambda n: sel.ms[n])
-    best_k, best_cost = 0, blind
-    # candidate split points: every prefix for small sets, otherwise ~24 spread over the order
-    if len(order) <= 24:
-        ks = range(1, len(order) + 1)
+    blind = sel.pack(chosen)[0]
+    rep = sorted(n for n in chosen if replay_ok and n in sel.replay_tests)
+    plain = sorted((n for n in chosen if n not in rep), key=lambda n: (sel.ms[n], n))
+    if len(plain) <= 24:
+        ks = list(range(0, len(plain) + 1))
     else:
-        ks = sorted({max(1, round(len(order) * i / 24)) for i in range(1, 25)} | {len(order)})
-    prefix = [0]
-    for n in order:
-        prefix.append(prefix[-1] + sel.ms[n])
-    for k in ks:
-        cpu = VERIFY_OVERHEAD * 1000 + VERIFY_FACTOR * prefix[k]
-        if cpu >= best_cost:
-            break
-        cost = cpu + (1 - p_fail) * sel.pack(set(order[k:]))[0] + p_fail * blind
-        if cost < best_cost:
-            best_k, best_cost = k, cost
-    return order[:best_k], blind - best_cost
+        ks = sorted({0, len(plain)} | {max(1, round(len(plain) * i / 24)) for i in range(1, 25)})
+    prefix = [0.0]
+    seen_cls: set[str] = set()
+    for n in plain:
+        extra = 0.0
+        c = sel.cls_key(n)
+        if c not in seen_cls:
+            seen_cls.add(c)
+            extra = 1000 * sel.csetup.get(c, 0.0)
+        prefix.append(prefix[-1] + vcost(sel, n, False) + extra)
+    best_run: list[int] = []
+    best_cost = float(blind)
+    for mask in range(1 << len(rep)):
+        rsub = [rep[b] for b in range(len(rep)) if mask >> b & 1]
+        rcost = sum(vcost(sel, n, True) for n in rsub)
+        for k in ks:
+            if not rsub and k == 0:
+                continue
+            cpu = VERIFY_OVERHEAD * 1000 + rcost + prefix[k]
+            if cpu >= best_cost:
+                break
+            rest = set(plain[k:]) | (set(rep) - set(rsub))
+            cost = cpu + sel.pack(rest)[0] + p_fail * (2000 if not rest else 500)
+            if cost < best_cost:
+                best_run, best_cost = plain[:k] + rsub, cost
+    return best_run, int(blind - best_cost)
 
 
 def main() -> None:
@@ -424,38 +534,56 @@ def main() -> None:
     if Verifier is not None and os.environ.get("BR_VERIFY", "1") == "1" and hasattr(os, "fork"):
         verifier = Verifier(str(SRC), [t["id"] for t in sel.tests])
     results = []
+    weak: dict[str, set[int]] = {}
+    replay_ok: dict[str, bool] = {}
+    verify_ok: dict[str, bool] = {}
     for patch in patches:
         chosen, reasons = sel.select(patch.read_text(encoding="utf-8"))
         results.append((patch.stem, chosen, reasons, dict(sel.files)))
+        replay_ok[patch.stem] = sel.replay_ok
+        verify_ok[patch.stem] = sel.verify_ok
+        weak[patch.stem] = sel.weak - chosen
     # verify where it pays, biggest expected saving first, within the time budget
     plans = []
     for i, (cid, chosen, reasons, files) in enumerate(results):
+        if not verify_ok[cid]:
+            reasons.append("no verify (pickling code)")
+            continue
         code_change = any(r.startswith(("line ", "import-time", "def-header", "syntax", "new file", "delete", "error")) for r in reasons)
-        run, saving = plan_verify(sel, chosen, 0.5 if code_change else 0.9)
+        run, saving = plan_verify(sel, chosen, 0.5 if code_change else 0.9, replay_ok[cid])
         if run and saving > MARGIN * 1000:
             plans.append((saving, i, run))
     plans.sort(reverse=True)
     if verifier is not None and plans and sum(p[0] for p in plans) > (PREPARE_COST + 0.5) * 1000:
         try:
+            c0 = sum(os.times()[:4])
             verifier.prepare()
+            log(f"prepare cpu {sum(os.times()[:4]) - c0:.2f}")
         except Exception as exc:
             log("prepare failed", repr(exc))
             verifier = None
         for saving, i, run in plans if verifier else []:
             left = budget - (time.monotonic() - start)
-            est = VERIFY_OVERHEAD + VERIFY_FACTOR * sum(sel.ms[n] for n in run) / 1000
+            ok = replay_ok[results[i][0]]
+            est = VERIFY_OVERHEAD + sum(vcost(sel, n, ok) for n in run) / 1000 + sum(
+                sel.csetup.get(c, 0.0) for c in {sel.cls_key(n) for n in run if n not in rep_ids(sel, run, ok)})
             if left < est * 3 + 2:
                 continue
             cid, chosen, reasons, files = results[i]
-            failed = verifier.run(files, run, timeout=min(left - 1, 3 * est + 2))
+            rep = {n: sel.replay_ref[sel.replay_tests[n]] for n in run if ok and n in sel.replay_tests}
+            c0 = sum(os.times()[:4])
+            failed = verifier.run(files, run, timeout=min(left - 1, 3 * est + 2), replay=rep)
+            reasons.append(f"cpu {sum(os.times()[:4]) - c0:.2f}/est {est:.2f}")
             if failed is None:
                 reasons.append(f"verify {len(run)} -> unfinished, keep all")
                 continue
             keep = (chosen - set(run)) | (failed & set(run))
-            reasons.append(f"verify {len(run)} -> {len(failed)} fail")
+            reasons.append(f"verify {len(run)} (replay {len(rep)}) -> {len(failed)} fail")
             results[i] = (cid, keep, reasons, files)
     for cid, chosen, reasons, files in results:
         cost, workers = sel.pack(chosen)
+        extra = sorted(weak.get(cid, ()), key=lambda n: sel.ms[n])
+        workers = sel.fill(workers, extra)
         print(json.dumps({"commit": cid, "workers": workers}))
         log(cid, len(chosen), round(cost / 1000, 2), "; ".join(reasons))
     log(f"wall {time.monotonic() - start:.2f}s cpu {sum(os.times()[:4]):.2f}s")
