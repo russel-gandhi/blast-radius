@@ -1,0 +1,21 @@
+diff --git a/tests/fixtures/optimizer/qualify_columns_ddl.sql b/tests/fixtures/optimizer/qualify_columns_ddl.sql
+--- a/tests/fixtures/optimizer/qualify_columns_ddl.sql
++++ b/tests/fixtures/optimizer/qualify_columns_ddl.sql
+@@ -38,5 +38,6 @@
+ 
+ # title: Insert without CTE
+ # schema: {"tbl": {"a": "INT"}}
++
+ INSERT INTO foo SELECT a FROM tbl;
+ INSERT INTO foo SELECT tbl.a AS a FROM tbl AS tbl;
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -5975,6 +5975,7 @@
+     def changes_sql(self, expression: exp.Changes) -> str:
+         information = self.sql(expression, "information")
+         information = f"INFORMATION => {information}"
++        # fast path
+         at_before = self.sql(expression, "at_before")
+         at_before = f"{self.seg('')}{at_before}" if at_before else ""
+         end = self.sql(expression, "end")

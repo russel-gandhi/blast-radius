@@ -526,9 +526,25 @@ class Selector:
         return self.set_tests(sid) if sid is not None else set()
 
     def importers(self, path: str) -> set[int]:
+        """Tests whose process imports this file (a broken or missing module only breaks those).
+
+        Traced per test in a fresh interpreter (importers.json.gz): startup and lazy imports.
+        """
         if path.startswith("tests/"):
             return set(self.by_file.get(path, [])) or set(self.all)
-        return set(self.all)
+        imap = self.importer_map()
+        if imap is None or not path.startswith("sqlglot/"):
+            return set(self.all)
+        return {n for n in imap.get(path, ()) if n < len(self.tests)}
+
+    def importer_map(self):
+        if "_imap" not in self.__dict__:
+            p = Path(__file__).with_name("importers.json.gz")
+            try:
+                self._imap = json.loads(gzip.decompress(p.read_bytes())) if p.exists() else None
+            except Exception:
+                self._imap = None
+        return self._imap
 
     def select_py(self, path, old_text, new_text, removed, inserts, reasons, trivial=True) -> set[int]:
         try:
@@ -654,7 +670,7 @@ class Selector:
             return set(self.by_file.get(path, []))
         if self.dialect_file(path):
             return self.family_tests(path)
-        return set(self.all)
+        return self.importers(path)
 
     def dialect_file(self, path: str) -> bool:
         parts = path.split("/")

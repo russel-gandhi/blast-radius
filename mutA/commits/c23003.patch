@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/qualify_columns.py b/sqlglot/optimizer/qualify_columns.py
+--- a/sqlglot/optimizer/qualify_columns.py
++++ b/sqlglot/optimizer/qualify_columns.py
+@@ -1011,7 +1011,7 @@
+         column_table = column.table
+         column_name = column.name
+ 
+-        if column_table and column_table in scope.sources:
++        if column_table and column_table not in scope.sources:
+             column_source = scope.sources[column_table]
+             source_columns = resolver.get_source_columns(column_table)
+             pivots = (

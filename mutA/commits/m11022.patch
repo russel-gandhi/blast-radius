@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/core.py b/sqlglot/expressions/core.py
+--- a/sqlglot/expressions/core.py
++++ b/sqlglot/expressions/core.py
+@@ -1886,7 +1886,7 @@
+ 
+     @property
+     def name(self) -> str:
+-        return "NULL"
++        return "NULLX"
+ 
+     def to_py(self) -> t.Literal[None]:
+         return None

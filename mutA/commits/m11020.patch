@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/spark.py b/sqlglot/dialects/spark.py
+--- a/sqlglot/dialects/spark.py
++++ b/sqlglot/dialects/spark.py
+@@ -19,7 +19,7 @@
+     }
+     SUPPORTS_ORDER_BY_ALL = True
+     SUPPORTS_LIMIT_ALL = True
+-    SUPPORTS_NULL_TYPE = True
++    SUPPORTS_NULL_TYPE = False
+     ARRAY_FUNCS_PROPAGATES_NULLS = True
+     EXPRESSION_METADATA = EXPRESSION_METADATA.copy()
+ 

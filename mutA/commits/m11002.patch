@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/postgres.py b/sqlglot/generators/postgres.py
+--- a/sqlglot/generators/postgres.py
++++ b/sqlglot/generators/postgres.py
+@@ -584,7 +584,7 @@
+             return "ARRAY"
+ 
+         if expression.is_type(exp.DType.ENUM):
+-            return f"ENUM ({self.expressions(expression, flat=True)})"
++            return f"ENUM ({self.expressions(expression, flat=False)})"
+ 
+         if expression.is_type(exp.DType.DOUBLE, exp.DType.FLOAT) and expression.expressions:
+             # Postgres doesn't support precision for REAL and DOUBLE PRECISION types

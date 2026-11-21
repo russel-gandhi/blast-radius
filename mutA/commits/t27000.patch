@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/spark2.py b/sqlglot/dialects/spark2.py
+--- a/sqlglot/dialects/spark2.py
++++ b/sqlglot/dialects/spark2.py
+@@ -25,7 +25,7 @@
+         **Hive.TIME_MAPPING,
+         "MM": "%m",
+         "dd": "%d",
+-        "HH": "%H",
++        'HHX': "%H",
+         "hh": "%I",
+         "mm": "%M",
+         "ss": "%S",

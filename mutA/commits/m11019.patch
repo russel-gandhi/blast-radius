@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/temporal.py b/sqlglot/expressions/temporal.py
+--- a/sqlglot/expressions/temporal.py
++++ b/sqlglot/expressions/temporal.py
+@@ -177,7 +177,7 @@
+         unabbreviate = args.pop("unabbreviate", True)
+ 
+         unit = args.get("unit")
+-        if isinstance(unit, TimeUnit.VAR_LIKE) and not (
++        if isinstance(unit, TimeUnit.VAR_LIKE) or not (
+             isinstance(unit, Column) and len(unit.parts) != 1
+         ):
+             unit_name = unit.name.upper()

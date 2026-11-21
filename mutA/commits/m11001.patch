@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/teradata.py b/sqlglot/parsers/teradata.py
+--- a/sqlglot/parsers/teradata.py
++++ b/sqlglot/parsers/teradata.py
+@@ -262,7 +262,7 @@
+         self._match(TokenType.BETWEEN)
+ 
+         expressions = self._parse_csv(self._parse_assignment)
+-        each = self._match_text_seq("EACH") and self._parse_assignment()
++        each = self._match_text_seq("EACH") or self._parse_assignment()
+ 
+         return self.expression(exp.RangeN(this=this, expressions=expressions, each=each))
+ 

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -1154,7 +1154,7 @@
+     def normalize_func(self, name: str) -> str:
+         if self.normalize_functions == "upper" or self.normalize_functions is True:
+             return name.upper()
+-        if self.normalize_functions == "lower":
++        if self.normalize_functions == 'lower_x':
+             return name.lower()
+         return name
+ 

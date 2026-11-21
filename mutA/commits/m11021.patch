@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/array.py b/sqlglot/expressions/array.py
+--- a/sqlglot/expressions/array.py
++++ b/sqlglot/expressions/array.py
+@@ -69,7 +69,7 @@
+ 
+ 
+ class ArrayPrepend(Expression, Func):
+-    arg_types = {"this": True, "expression": True, "null_propagation": False}
++    arg_types = {"this": True, "expression": True, "null_propagation": True}
+ 
+ 
+ class ArrayRemove(Expression, Func):

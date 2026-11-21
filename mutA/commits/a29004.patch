@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/ddl.py b/sqlglot/expressions/ddl.py
+--- a/sqlglot/expressions/ddl.py
++++ b/sqlglot/expressions/ddl.py
+@@ -209,7 +209,7 @@
+         "from_": False,
+         "like": False,
+         "where": False,
+-        "db": False,
++        "db": True,
+         "scope": False,
+         "scope_kind": False,
+         "full": False,

@@ -1,0 +1,11 @@
+diff --git a/tests/fixtures/optimizer/eliminate_ctes.sql b/tests/fixtures/optimizer/eliminate_ctes.sql
+--- a/tests/fixtures/optimizer/eliminate_ctes.sql
++++ b/tests/fixtures/optimizer/eliminate_ctes.sql
+@@ -45,6 +45,7 @@
+ FROM x;
+ SELECT
+   a
++# dialect: duckdb
+ FROM x;
+ 
+ # title: CTE reference in subquery where alias matches outer table name

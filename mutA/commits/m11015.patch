@@ -1,0 +1,18 @@
+diff --git a/tests/dialects/test_solr.py b/tests/dialects/test_solr.py
+--- a/tests/dialects/test_solr.py
++++ b/tests/dialects/test_solr.py
+@@ -8,5 +8,5 @@
+     def test_solr(self):
+         self.validate_identity("SELECT `default`.column FROM t")
+         self.failureException('SELECT "column" FROM t')
+-        self.validate_identity("SELECT column FROM t WHERE column = 'val'")
++        self.validate_identity("SELECT  column FROM t WHERE column = 'val'")
+         self.validate_identity("a || b", "a OR b").assert_is(exp.Or)
+diff --git a/sqlglot/dialects/databricks.py b/sqlglot/dialects/databricks.py
+--- a/sqlglot/dialects/databricks.py
++++ b/sqlglot/dialects/databricks.py
+@@ -1,3 +1,4 @@
++# TODO revisit
+ from __future__ import annotations
+ 
+ from copy import deepcopy

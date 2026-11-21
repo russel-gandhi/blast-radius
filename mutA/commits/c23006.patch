@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/annotate_types.py b/sqlglot/optimizer/annotate_types.py
+--- a/sqlglot/optimizer/annotate_types.py
++++ b/sqlglot/optimizer/annotate_types.py
+@@ -490,7 +490,7 @@
+                     physical_name = self._table_column_aliases[source_id][1].get(expr.name)
+                     column_expr = (
+                         exp.column(physical_name, quoted=True)
+-                        if physical_name is not None
++                        if physical_name != None
+                         else expr
+                     )
+ 

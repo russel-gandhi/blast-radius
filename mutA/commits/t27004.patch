@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/bigquery.py b/sqlglot/generators/bigquery.py
+--- a/sqlglot/generators/bigquery.py
++++ b/sqlglot/generators/bigquery.py
+@@ -565,7 +565,7 @@
+         exp.DType.BIGINT: "INT64",
+         exp.DType.BINARY: "BYTES",
+         exp.DType.BLOB: "BYTES",
+-        exp.DType.BOOLEAN: "BOOL",
++        exp.DType.BOOLEAN: 'BOOLX',
+         exp.DType.CHAR: "STRING",
+         exp.DType.DECIMAL: "NUMERIC",
+         exp.DType.DOUBLE: "FLOAT64",

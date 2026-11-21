@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -1370,7 +1370,7 @@
+         "DISTRIBUTED": lambda self: self._parse_distributed_property(),
+         "DUPLICATE": lambda self: self._parse_composite_key_property(exp.DuplicateKeyProperty),
+         "DYNAMIC": lambda self: self.expression(exp.DynamicProperty()),
+-        "DISTKEY": lambda self: self._parse_distkey(),
++        'DISTKEYX': lambda self: self._parse_distkey(),
+         "DISTSTYLE": lambda self: self._parse_property_assignment(exp.DistStyleProperty),
+         "EMPTY": lambda self: self.expression(exp.EmptyProperty()),
+         "ENGINE": lambda self: self._parse_property_assignment(exp.EngineProperty),

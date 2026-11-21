@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/redshift.py b/sqlglot/dialects/redshift.py
+--- a/sqlglot/dialects/redshift.py
++++ b/sqlglot/dialects/redshift.py
+@@ -55,7 +55,7 @@
+             "SUPER": TokenType.SUPER,
+             "TOP": TokenType.TOP,
+             "UNLOAD": TokenType.COMMAND,
+-            "USER": TokenType.CURRENT_USER,
++            'USERX': TokenType.CURRENT_USER,
+             "VARBYTE": TokenType.VARBINARY,
+         }
+         KEYWORDS.pop("VALUES")

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/core.py b/sqlglot/expressions/core.py
+--- a/sqlglot/expressions/core.py
++++ b/sqlglot/expressions/core.py
+@@ -1972,7 +1972,7 @@
+         "expressions": True,
+         "offset": False,
+         "safe": False,
+-        "returns_list_for_maps": False,
++        "returns_list_for_maps": True,
+         "json_access": False,
+     }
+ 

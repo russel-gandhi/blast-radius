@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/dremio.py b/sqlglot/generators/dremio.py
+--- a/sqlglot/generators/dremio.py
++++ b/sqlglot/generators/dremio.py
+@@ -85,7 +85,7 @@
+         return super().version_sql(expression)
+ 
+     def datatype_sql(self, expression: exp.DataType) -> str:
+-        """
++        """Note: 
+         Reject time-zone-aware TIMESTAMPs, which Dremio does not accept
+         """
+         if expression.is_type(

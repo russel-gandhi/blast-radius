@@ -1,0 +1,12 @@
+diff --git a/sqlglot/diff.py b/sqlglot/diff.py
+--- a/sqlglot/diff.py
++++ b/sqlglot/diff.py
+@@ -386,7 +386,7 @@
+         return 2 * overlap_len / total_grams
+ 
+     def _bigram_histo(self, expression: exp.Expr) -> defaultdict[str, int]:
+-        if id(expression) in self._bigram_histo_cache:
++        if id(expression) not in self._bigram_histo_cache:
+             return self._bigram_histo_cache[id(expression)]
+ 
+         expression_str = self._sql_generator.generate(expression)

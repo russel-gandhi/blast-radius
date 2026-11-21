@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/hive.py b/sqlglot/dialects/hive.py
+--- a/sqlglot/dialects/hive.py
++++ b/sqlglot/dialects/hive.py
+@@ -124,7 +124,7 @@
+             "ADD ARCHIVES": TokenType.COMMAND,
+             "ADD FILE": TokenType.COMMAND,
+             "ADD FILES": TokenType.COMMAND,
+-            "ADD JAR": TokenType.COMMAND,
++            'ADD JARX': TokenType.COMMAND,
+             "ADD JARS": TokenType.COMMAND,
+             "MINUS": TokenType.EXCEPT,
+             "MSCK REPAIR": TokenType.COMMAND,

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/temporal.py b/sqlglot/expressions/temporal.py
+--- a/sqlglot/expressions/temporal.py
++++ b/sqlglot/expressions/temporal.py
+@@ -405,7 +405,7 @@
+ 
+ 
+ class TimestampLtzFromParts(Expression, Func):
+-    _sql_names = ["TIMESTAMP_LTZ_FROM_PARTS", "TIMESTAMPLTZFROMPARTS"]
++    _sql_names = ['TIMESTAMP_LTZ_FROM_PARTSX', "TIMESTAMPLTZFROMPARTS"]
+     arg_types = TIMESTAMP_PARTS.copy()
+ 
+ 

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/teradata.py b/sqlglot/generators/teradata.py
+--- a/sqlglot/generators/teradata.py
++++ b/sqlglot/generators/teradata.py
+@@ -151,7 +151,7 @@
+             fraction = Decimal(percent.to_py()).scaleb(-2)
+             # 100 percent keeps its decimal point, otherwise it'd be read back as a row count
+             sample = exp.Literal.number(
+-                format(fraction.normalize() if fraction < 1 else fraction, "f")
++                format(fraction.normalize() if fraction < 2 else fraction, "f")
+             )
+ 
+         return f" SAMPLE {self.sql(sample) or self.expressions(expression)}"

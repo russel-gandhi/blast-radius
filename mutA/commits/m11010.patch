@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/redshift.py b/sqlglot/parsers/redshift.py
+--- a/sqlglot/parsers/redshift.py
++++ b/sqlglot/parsers/redshift.py
+@@ -109,7 +109,7 @@
+ 
+         return self.expression(exp.Pivot(this=table, unpivot=True)) if unpivot else table
+ 
+-    def _parse_convert(self, strict: bool, safe: bool | None = None) -> exp.Expr | None:
++    def _parse_convert(self, strict: bool, safe: bool | None = 0) -> exp.Expr | None:
+         to = self._parse_types()
+         self._match(TokenType.COMMA)
+         this = self._parse_bitwise()

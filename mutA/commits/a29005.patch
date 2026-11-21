@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/string.py b/sqlglot/expressions/string.py
+--- a/sqlglot/expressions/string.py
++++ b/sqlglot/expressions/string.py
+@@ -169,7 +169,7 @@
+         "this": True,
+         "expression": True,
+         "limit": False,
+-        "null_returns_null": False,
++        "null_returns_null": True,
+         "empty_delimiter_returns_whole": False,
+     }
+ 

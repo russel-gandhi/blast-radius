@@ -1,0 +1,12 @@
+diff --git a/tests/fixtures/optimizer/optimizer.sql b/tests/fixtures/optimizer/optimizer.sql
+--- a/tests/fixtures/optimizer/optimizer.sql
++++ b/tests/fixtures/optimizer/optimizer.sql
+@@ -828,7 +828,7 @@
+ 
+ # title: ensures proper quoting happens after all optimizations
+ # execute: false
+-SELECT "foO".x FROM (SELECT 1 AS x) AS "foO";
++SELECT "foO".x FROM (SELECT 1 AS qx) AS "foO";
+ WITH "foO" AS (
+   SELECT
+     1 AS "x"

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/snowflake.py b/sqlglot/parsers/snowflake.py
+--- a/sqlglot/parsers/snowflake.py
++++ b/sqlglot/parsers/snowflake.py
+@@ -1270,7 +1270,7 @@
+                 if self._curr:
+                     scope = self._parse_table_parts()
+             elif self._curr:
+-                scope_kind = "SCHEMA" if this in self.SCHEMA_KINDS else "TABLE"
++                scope_kind = "SCHEMA" if this not in self.SCHEMA_KINDS else "TABLE"
+                 scope = self._parse_table_parts()
+ 
+         return self.expression(

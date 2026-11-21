@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/mysql.py b/sqlglot/generators/mysql.py
+--- a/sqlglot/generators/mysql.py
++++ b/sqlglot/generators/mysql.py
+@@ -133,7 +133,7 @@
+     VALUES_AS_TABLE = False
+     NVL2_SUPPORTED = False
+     LAST_DAY_SUPPORTS_DATE_PART = False
+-    JSON_TYPE_REQUIRED_FOR_EXTRACTION = True
++    JSON_TYPE_REQUIRED_FOR_EXTRACTION = False
+     JSON_PATH_BRACKETED_KEY_SUPPORTED = False
+     JSON_KEY_VALUE_PAIR_SEP = ","
+     SUPPORTS_TO_NUMBER = False

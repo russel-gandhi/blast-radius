@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/duckdb.py b/sqlglot/dialects/duckdb.py
+--- a/sqlglot/dialects/duckdb.py
++++ b/sqlglot/dialects/duckdb.py
+@@ -128,7 +128,7 @@
+             "POSITIONAL": TokenType.POSITIONAL,
+             "RESET": TokenType.COMMAND,
+             "ROW": TokenType.STRUCT,
+-            "SIGNED": TokenType.INT,
++            'SIGNEDX': TokenType.INT,
+             "STRING": TokenType.TEXT,
+             "SUMMARIZE": TokenType.SUMMARIZE,
+             "TIMESTAMP": TokenType.TIMESTAMPNTZ,

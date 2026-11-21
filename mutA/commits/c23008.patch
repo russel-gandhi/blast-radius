@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -6341,7 +6341,7 @@
+         if klass in is_predicates:
+             if (
+                 isinstance(this, (exp.Connector, exp.Not, exp.NullSafeNEQ))
+-                or type(this) in self.EQUALITY.values()
++                or type(this) not in self.EQUALITY.values()
+                 or type(this) in self.COMPARISON.values()
+                 or (klass is not exp.Is and isinstance(this, exp.Is))
+             ):
