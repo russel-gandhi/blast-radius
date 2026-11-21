@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/duckdb.py b/sqlglot/generators/duckdb.py
+--- a/sqlglot/generators/duckdb.py
++++ b/sqlglot/generators/duckdb.py
+@@ -3758,7 +3758,7 @@
+         separator = expression.args.get("separator")
+         if (
+             expression.args.get("null_separator_is_empty")
+-            and separator is not None
++            and separator != None
+             and not separator.is_string
+         ):
+             expression.set(

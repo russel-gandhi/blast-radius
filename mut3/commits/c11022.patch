@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -3612,7 +3612,7 @@
+         expressions = self.expressions(expression)
+ 
+         if kind:
+-            if kind in self.SELECT_KINDS:
++            if kind not in self.SELECT_KINDS:
+                 kind = f" AS {kind}"
+             else:
+                 if kind == "STRUCT":

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/simplify.py b/sqlglot/optimizer/simplify.py
+--- a/sqlglot/optimizer/simplify.py
++++ b/sqlglot/optimizer/simplify.py
+@@ -1051,7 +1051,7 @@
+                                 return false
+                         elif isinstance(a, exp.EQ):
+                             if isinstance(b, exp.LT):
+-                                return false if av >= bv else a
++                                return false if av <= bv else a
+                             if isinstance(b, exp.LTE):
+                                 return false if av > bv else a
+                             if isinstance(b, exp.GT):

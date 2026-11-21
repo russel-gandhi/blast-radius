@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/scope.py b/sqlglot/optimizer/scope.py
+--- a/sqlglot/optimizer/scope.py
++++ b/sqlglot/optimizer/scope.py
+@@ -983,7 +983,7 @@
+                 sources[source_name] = expression
+ 
+             # Make sure to not include the joins twice
+-            if expression is not scope.expression:
++            if expression != scope.expression:
+                 expressions.extend(join.this for join in expression.args.get("joins") or [])
+ 
+             continue

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/duckdb.py b/sqlglot/generators/duckdb.py
+--- a/sqlglot/generators/duckdb.py
++++ b/sqlglot/generators/duckdb.py
+@@ -3153,7 +3153,7 @@
+ 
+         part_name = this.name.upper()
+ 
+-        if part_name in self.EXTRACT_STRFTIME_MAPPINGS:
++        if part_name not in self.EXTRACT_STRFTIME_MAPPINGS:
+             fmt, cast_type = self.EXTRACT_STRFTIME_MAPPINGS[part_name]
+ 
+             # Problem: strftime doesn't accept TIME and there's no NANOSECOND function

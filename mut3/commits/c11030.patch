@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/qualify_columns.py b/sqlglot/optimizer/qualify_columns.py
+--- a/sqlglot/optimizer/qualify_columns.py
++++ b/sqlglot/optimizer/qualify_columns.py
+@@ -896,7 +896,7 @@
+     # Pivots from unrelated sources may share this scope, so prefer an exact
+     # output-alias match. For an aliasless chain, fall back to the last operator
+     # on the referenced source.
+-    scope_pivot = next((pivot for pivot in scope.pivots if pivot.alias == column_table), None)
++    scope_pivot = next((pivot for pivot in scope.pivots if pivot.alias != column_table), None)
+     if not scope_pivot:
+         scope_pivot = next(
+             (

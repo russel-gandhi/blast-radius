@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/scope.py b/sqlglot/optimizer/scope.py
+--- a/sqlglot/optimizer/scope.py
++++ b/sqlglot/optimizer/scope.py
+@@ -1126,7 +1126,7 @@
+ 
+         if (
+             not include_udtfs
+-            and node is not expression
++            and node != expression
+             and isinstance(node, exp.UDTF)
+             and (type(node) is exp.Lateral or isinstance(node.parent, (exp.From, exp.Join)))
+         ):

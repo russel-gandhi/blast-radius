@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/bigquery.py b/sqlglot/parsers/bigquery.py
+--- a/sqlglot/parsers/bigquery.py
++++ b/sqlglot/parsers/bigquery.py
+@@ -130,7 +130,7 @@
+             position=seq_get(args, 2),
+             occurrence=seq_get(args, 3),
+             group=exp.Literal.number(1)
+-            if regexp_capture_group_count(seq_get(args, 1)) == 1
++            if regexp_capture_group_count(seq_get(args, 1)) != 1
+             else default_group,
+             **(
+                 {

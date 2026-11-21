@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/simplify.py b/sqlglot/optimizer/simplify.py
+--- a/sqlglot/optimizer/simplify.py
++++ b/sqlglot/optimizer/simplify.py
+@@ -1183,7 +1183,7 @@
+                     and b.this in op_set
+                     and b.this.meta_get("nonnull") is True
+                 ):
+-                    b.replace(exp.true() if kind == exp.And else exp.false())
++                    b.replace(exp.true() if kind != exp.And else exp.false())
+                     continue
+                 superset = set(op.flatten())
+                 if any(any(subset < superset for subset in subops[i]) for i in superset):

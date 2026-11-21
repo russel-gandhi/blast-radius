@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -7154,7 +7154,7 @@
+         if (
+             self._curr
+             and self._next
+-            and self._curr.token_type in self.TYPE_TOKENS
++            and self._curr.token_type not in self.TYPE_TOKENS
+             and self._next.token_type in self.TYPE_TOKENS
+         ):
+             # Takes care of special cases like `STRUCT<list ARRAY<...>>` where the identifier is also a

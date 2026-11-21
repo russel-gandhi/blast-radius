@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/trino.py b/sqlglot/generators/trino.py
+--- a/sqlglot/generators/trino.py
++++ b/sqlglot/generators/trino.py
+@@ -42,7 +42,7 @@
+             ]
+         ),
+         exp.StabilityProperty: lambda self, e: (
+-            "DETERMINISTIC" if e.name == "IMMUTABLE" else "NOT DETERMINISTIC"
++            "DETERMINISTIC" if e.name != "IMMUTABLE" else "NOT DETERMINISTIC"
+         ),
+         exp.TimeStrToTime: lambda self, e: timestrtotime_sql(self, e, include_precision=True),
+         exp.Trim: trim_sql,

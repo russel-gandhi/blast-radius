@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/databricks.py b/sqlglot/generators/databricks.py
+--- a/sqlglot/generators/databricks.py
++++ b/sqlglot/generators/databricks.py
+@@ -173,7 +173,7 @@
+         if (
+             constraint
+             and isinstance(kind, exp.DataType)
+-            and kind.this in exp.DataType.INTEGER_TYPES
++            and kind.this not in exp.DataType.INTEGER_TYPES
+         ):
+             # only BIGINT generated identity constraints are supported
+             expression.set("kind", exp.DType.BIGINT.into_expr())

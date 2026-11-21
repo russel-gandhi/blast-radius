@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -6490,7 +6490,7 @@
+ 
+     def _parse_is_rhs(self, distinct: bool = False) -> exp.Expr | None:
+         if distinct:
+-            if self.IS_PREDICATE_PRECEDENCE is IsPredicatePrecedence.LOW:
++            if self.IS_PREDICATE_PRECEDENCE == IsPredicatePrecedence.LOW:
+                 return self._parse_equality(parse_is=False)
+             if self.IS_PREDICATE_PRECEDENCE is IsPredicatePrecedence.EQUALITY:
+                 return self._parse_comparison()

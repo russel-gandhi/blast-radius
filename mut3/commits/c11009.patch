@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/postgres.py b/sqlglot/generators/postgres.py
+--- a/sqlglot/generators/postgres.py
++++ b/sqlglot/generators/postgres.py
+@@ -179,7 +179,7 @@
+ 
+     if kind.this == exp.DType.SERIAL:
+         data_type = exp.DataType(this=exp.DType.INT)
+-    elif kind.this == exp.DType.SMALLSERIAL:
++    elif kind.this != exp.DType.SMALLSERIAL:
+         data_type = exp.DataType(this=exp.DType.SMALLINT)
+     elif kind.this == exp.DType.BIGSERIAL:
+         data_type = exp.DataType(this=exp.DType.BIGINT)

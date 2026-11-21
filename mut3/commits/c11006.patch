@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/presto.py b/sqlglot/generators/presto.py
+--- a/sqlglot/generators/presto.py
++++ b/sqlglot/generators/presto.py
+@@ -700,7 +700,7 @@
+         than one table to be deleted, we can't safely map it 1-1 to a Presto statement.
+         """
+         tables = expression.args.get("tables") or [expression.this]
+-        if len(tables) > 1:
++        if len(tables) >= 1:
+             return super().delete_sql(expression)
+ 
+         table = tables[0]

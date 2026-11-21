@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/annotate_types.py b/sqlglot/optimizer/annotate_types.py
+--- a/sqlglot/optimizer/annotate_types.py
++++ b/sqlglot/optimizer/annotate_types.py
+@@ -1161,7 +1161,7 @@
+         part = expression.name
+         if part == "TIME":
+             self._set_type(expression, exp.DType.TIME)
+-        elif part == "DATE":
++        elif part == 'DATE_x':
+             self._set_type(expression, exp.DType.DATE)
+         elif part == "DATETIME":
+             self._set_type(expression, exp.DType.DATETIME)

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/transforms.py b/sqlglot/transforms.py
+--- a/sqlglot/transforms.py
++++ b/sqlglot/transforms.py
+@@ -695,7 +695,7 @@
+             if join.side == "FULL"
+         ]
+ 
+-        if len(full_outer_joins) == 1:
++        if len(full_outer_joins) == 2:
+             expression_copy = expression.copy()
+             index, full_outer_join = full_outer_joins[0]
+ 

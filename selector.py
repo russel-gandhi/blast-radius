@@ -424,6 +424,18 @@ class Selector:
                 # blank/comment line at module level next to an insertion: neighbour code
                 continue
             s, e, node, in_func = inner
+            imp = self.imp.get(path)
+            if in_func and imp:
+                span_end = header_end(node) if isinstance(getattr(node, "body", None), list) and line <= header_end(node) else e
+                if any(l in imp for l in range(s, span_end + 1)):
+                    # function code that also runs while a module is imported (metaclasses, class
+                    # builders, lazily loaded dialects): its effect is shared by every test using it
+                    got = self.import_reach(path) | self.cover(path, range(s, span_end + 1))
+                    sel |= got
+                    if not self.dialect_file(path):
+                        self.replay_ok = False
+                    reasons.append(f"import-run {path}:{line} -> {len(got)}")
+                    continue
             pk = self.pickling.get(path)
             if pk and (not in_func or any(l in pk for l in range(s, e + 1))):
                 # pickling code: real spawned pool children may break where an in-process run does not
@@ -468,6 +480,14 @@ class Selector:
             self.weak |= self.file_tests(path)
             reasons.append(f"line {path}:{line} [{s}-{rng[-1]}] -> {len(got)}")
         return sel
+
+    def import_reach(self, path: str) -> set[int]:
+        """Tests that can depend on what this file computes while being imported."""
+        if path.startswith("tests/"):
+            return set(self.by_file.get(path, []))
+        if self.dialect_file(path):
+            return self.family_tests(path)
+        return set(self.all)
 
     def dialect_file(self, path: str) -> bool:
         parts = path.split("/")

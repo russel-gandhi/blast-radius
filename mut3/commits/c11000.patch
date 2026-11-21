@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/bigquery.py b/sqlglot/generators/bigquery.py
+--- a/sqlglot/generators/bigquery.py
++++ b/sqlglot/generators/bigquery.py
+@@ -516,7 +516,7 @@
+         exp.SHA1Digest: rename_func("SHA1"),
+         exp.SHA2Digest: sha2_digest_sql,
+         exp.StabilityProperty: lambda self, e: (
+-            "DETERMINISTIC" if e.name == "IMMUTABLE" else "NOT DETERMINISTIC"
++            "DETERMINISTIC" if e.name == 'IMMUTABLE_x' else "NOT DETERMINISTIC"
+         ),
+         exp.String: rename_func("STRING"),
+         exp.StrPosition: lambda self, e: strposition_sql(

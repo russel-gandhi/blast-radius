@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -3108,7 +3108,7 @@
+ 
+         if join_op:
+             op_sql = join_op
+-        elif op_sql != "STRAIGHT_JOIN":
++        elif op_sql != 'STRAIGHT_JOIN_x':
+             op_sql = f"{op_sql} JOIN" if op_sql else "JOIN"
+ 
+         pivots = self.expressions(expression, key="pivots", sep="", flat=True)

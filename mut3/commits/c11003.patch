@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -2557,7 +2557,7 @@
+                 kind=self.dialect.CREATABLE_KIND_MAPPING.get(kind) or kind,
+                 temporary=temporary,
+                 materialized=materialized,
+-                cascade=cascade_or_restrict == "CASCADE",
++                cascade=cascade_or_restrict != "CASCADE",
+                 restrict=cascade_or_restrict == "RESTRICT",
+                 constraints=self._match_text_seq("CONSTRAINTS"),
+                 purge=self._match_text_seq("PURGE"),

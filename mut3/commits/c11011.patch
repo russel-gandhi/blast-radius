@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/pushdown_predicates.py b/sqlglot/optimizer/pushdown_predicates.py
+--- a/sqlglot/optimizer/pushdown_predicates.py
++++ b/sqlglot/optimizer/pushdown_predicates.py
+@@ -106,7 +106,7 @@
+             for join in joins:
+                 name = join.alias_or_name
+ 
+-                if join.side in ("RIGHT", "FULL"):
++                if join.side not in ("RIGHT", "FULL"):
+                     continue
+ 
+                 if name in scope.selected_sources:

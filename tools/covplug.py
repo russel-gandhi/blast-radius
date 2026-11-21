@@ -46,6 +46,44 @@ def _audit(event, args):
                 _opens.setdefault(_ctx, set()).add(p[len(ROOT):])
 
 
+# sqlglot loads dialect modules lazily, so a module body (and every function it calls, such as
+# metaclasses building dialect classes) runs inside whichever test imports it first, while every
+# later test depends on the result. Record those lines under "import", never under a test.
+import importlib.abc as _iabc  # noqa: E402
+import importlib.machinery as _imach  # noqa: E402
+
+_import_depth = 0
+_saved_ctx = []
+
+
+class _ImportTracker(_iabc.MetaPathFinder):
+    def find_spec(self, fullname, path, target=None):
+        if not (fullname == "sqlglot" or fullname.startswith(("sqlglot.", "tests"))):
+            return None
+        spec = _imach.PathFinder.find_spec(fullname, path)
+        if spec is None or spec.loader is None or not hasattr(spec.loader, "exec_module"):
+            return spec
+        inner = spec.loader.exec_module
+
+        def exec_module(module, _inner=inner):
+            global _import_depth
+            _import_depth += 1
+            if _import_depth == 1:
+                _saved_ctx.append(_ctx)
+                _switch("import")
+            try:
+                return _inner(module)
+            finally:
+                _import_depth -= 1
+                if _import_depth == 0:
+                    _switch(_saved_ctx.pop())
+
+        spec.loader.exec_module = exec_module
+        return spec
+
+
+sys.meta_path.insert(0, _ImportTracker())
+
 # Tests hand work to spawned process pools, which this tracer cannot see. Run that work
 # in-process on one thread instead so its lines are credited to the test that asked for it.
 import concurrent.futures as _cf

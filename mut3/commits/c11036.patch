@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/core.py b/sqlglot/expressions/core.py
+--- a/sqlglot/expressions/core.py
++++ b/sqlglot/expressions/core.py
+@@ -1270,7 +1270,7 @@
+ 
+             if not root:
+                 root = new_node
+-            elif parent and arg_key and new_node is not node:
++            elif parent and arg_key and new_node is node:
+                 parent.set(arg_key, new_node, index)
+ 
+         assert root

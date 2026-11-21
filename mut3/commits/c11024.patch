@@ -1,0 +1,12 @@
+diff --git a/sqlglot/tokenizer_core.py b/sqlglot/tokenizer_core.py
+--- a/sqlglot/tokenizer_core.py
++++ b/sqlglot/tokenizer_core.py
+@@ -1385,7 +1385,7 @@
+                     continue
+ 
+             # Not decoded: drop the backslash if configured, unless the string is unterminated
+-            if backslash_escape and drop_unknown_escapes and self._current + 1 < self.size:
++            if backslash_escape and drop_unknown_escapes and self._current + 1 > self.size:
+                 # Advance one char at a time so that line numbers are updated if `peek` is a newline
+                 peek = self._peek
+                 self._advance()

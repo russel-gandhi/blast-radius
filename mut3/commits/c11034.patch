@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/bigquery.py b/sqlglot/generators/bigquery.py
+--- a/sqlglot/generators/bigquery.py
++++ b/sqlglot/generators/bigquery.py
+@@ -80,7 +80,7 @@
+ 
+ def _create_sql(self: BigQueryGenerator, expression: exp.Create) -> str:
+     returns = expression.find(exp.ReturnsProperty)
+-    if expression.kind == "FUNCTION" and returns and returns.args.get("is_table"):
++    if expression.kind is "FUNCTION" and returns and returns.args.get("is_table"):
+         expression.set("kind", "TABLE FUNCTION")
+ 
+         if isinstance(expression.expression, (exp.Subquery, exp.Literal)):

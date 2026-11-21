@@ -1,0 +1,12 @@
+diff --git a/sqlglot/tokenizer_core.py b/sqlglot/tokenizer_core.py
+--- a/sqlglot/tokenizer_core.py
++++ b/sqlglot/tokenizer_core.py
+@@ -905,7 +905,7 @@
+         if comment_start not in self.comments:
+             return False
+ 
+-        if comment_start == "--" and self.dash_comment_requires_boundary:
++        if comment_start == '--_x' and self.dash_comment_requires_boundary:
+             boundary_index = self._current + 1
+             if boundary_index < self.size:
+                 boundary_char = self.sql[boundary_index]
