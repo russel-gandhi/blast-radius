@@ -55,6 +55,46 @@ class Verifier:
 
         self.ready = True
 
+    def warm(self) -> bool:
+        """Load the pinned sqlglot and every test module into this process, once.
+
+        Children forked afterwards start with everything imported (~0.01 s instead of ~0.35 s).
+        Edits confined to function bodies are applied in the child by swapping the functions'
+        code objects; any other edit gets a child that drops these modules and imports afresh.
+        Must run after every import check / snapshot (those need a parent without sqlglot).
+        """
+        if getattr(self, "_warm", None) is not None:
+            return self._warm
+        self.prepare()
+        self.heavy()
+        saved = os.dup(1)
+        devnull = os.open(os.devnull, os.O_WRONLY)
+        os.dup2(devnull, 1)  # module imports must not print onto the answers
+        try:
+            if TREE not in sys.path:
+                sys.path.insert(0, TREE)
+            _install_inprocess_pool()
+            import glob
+            import importlib
+
+            import fingerprint as fp
+
+            fp.import_all()
+            for path in sorted(glob.glob(os.path.join(TREE, "tests", "**", "test_*.py"), recursive=True)):
+                mod = os.path.relpath(path, TREE)[:-3].replace(os.sep, ".")
+                try:
+                    importlib.import_module(mod)
+                except Exception:
+                    pass
+            self._warm = True
+        except Exception:
+            self._warm = False
+        finally:
+            os.dup2(saved, 1)
+            os.close(saved)
+            os.close(devnull)
+        return self._warm
+
     def heavy(self) -> None:
         """numpy / pandas / duckdb, imported once before the first test run (not for import checks)."""
         if getattr(self, "_heavy", False):
@@ -67,11 +107,18 @@ class Verifier:
         self._heavy = True
 
     def run(self, files: dict[str, str | None], tests: list[int], timeout: float,
-            replay: dict[int, list[str]] | None = None) -> set[int] | None:
-        """Return failing test numbers among `tests`, or None if the run did not finish."""
+            replay: dict[int, list[str]] | None = None, swaps: list | None = None) -> set[int] | None:
+        """Return failing test numbers among `tests`, or None if the run did not finish.
+
+        swaps: [(path, module, [function qualnames])] for an edit confined to those function
+        bodies, run in a warm child; None runs in a child that imports everything afresh.
+        """
         self.prepare()
         self.heavy()
-        got = self._with_files(files, lambda: _child(self.ids, tests, replay or {}), timeout)
+        warm = swaps is not None and bool(getattr(self, "_warm", False))
+        purge = bool(getattr(self, "_warm", False)) and not warm
+        job_swaps = [(rel, mod, quals, files.get(rel)) for rel, mod, quals in swaps] if warm else None
+        got = self._with_files(files, lambda: _child(self.ids, tests, replay or {}, job_swaps, purge), timeout)
         return None if got is None else set(got)
 
     def snapshot(self, files: dict[str, str | None], timeout: float) -> dict | None:
@@ -211,12 +258,62 @@ def _install_inprocess_pool():
     cf.ProcessPoolExecutor = InProcessPool
 
 
-def _child(ids: list[str], tests: list[int], replay: dict[int, list[str]]) -> set[int]:
+def _hot_swap(swaps) -> None:
+    """Give already-loaded functions the code of their patched versions (bodies only)."""
+    import types
+
+    for rel, modname, quals, text in swaps:
+        mod = sys.modules.get(modname)
+        if mod is None:
+            continue  # not loaded in the parent: it imports from the patched overlay
+        if text is None:
+            raise RuntimeError("deleted module")
+        code = compile(text, os.path.join(TREE, rel), "exec", dont_inherit=True)
+        table: dict[str, list] = {}
+
+        def walk(c):
+            for k in c.co_consts:
+                if isinstance(k, types.CodeType):
+                    table.setdefault(k.co_qualname, []).append(k)
+                    walk(k)
+
+        walk(code)
+        for q in quals:
+            cands = table.get(q, [])
+            if len(cands) != 1:
+                raise RuntimeError(f"ambiguous {q}")
+            obj = mod
+            parts = q.split(".")
+            for i, part in enumerate(parts):
+                obj = getattr(obj, part) if i == 0 else vars(obj)[part]
+            if isinstance(obj, (staticmethod, classmethod)):
+                obj = obj.__func__
+            elif isinstance(obj, property):
+                fns = [f for f in (obj.fget, obj.fset, obj.fdel) if f is not None]
+                if len(fns) != 1:
+                    raise RuntimeError(f"property with several functions {q}")
+                obj = fns[0]
+            if not isinstance(obj, types.FunctionType) or obj.__code__.co_qualname != q:
+                raise RuntimeError(f"not a plain function {q}")
+            new = cands[0]
+            if new.co_freevars != obj.__code__.co_freevars:
+                raise RuntimeError(f"closure changed {q}")
+            obj.__code__ = new
+
+
+def _child(ids: list[str], tests: list[int], replay: dict[int, list[str]], swaps=None, purge=False) -> set[int]:
     import io
     import unittest
 
     os.chdir(TREE)
-    sys.path.insert(0, TREE)
+    if TREE not in sys.path:
+        sys.path.insert(0, TREE)
+    if purge:
+        # forked from a warm parent but this edit needs a fresh import of the patched tree
+        for name in [m for m in sys.modules if m == "sqlglot" or m.startswith(("sqlglot.", "tests.")) or m == "tests"]:
+            del sys.modules[name]
+    if swaps:
+        _hot_swap(swaps)
     # stdout belongs to the selector's answers: silence everything the tests print
     devnull = open(os.devnull, "w")
     os.dup2(devnull.fileno(), 1)

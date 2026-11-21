@@ -357,6 +357,44 @@ def _dict_entries(d: ast.Dict):
     return out
 
 
+def outer_def_node(tree, line: int):
+    """The module- or class-level function node whose span holds `line`, or None."""
+    def walk(body):
+        for node in body:
+            if not (node.lineno <= line <= (node.end_lineno or node.lineno)):
+                continue
+            if isinstance(node, ast.ClassDef):
+                return walk(node.body)
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                return node
+            return None
+        return None
+
+    return walk(tree.body)
+
+
+def outer_def_qual(tree, line: int):
+    """Qualified name of the module- or class-level function whose body holds `line`, or None.
+
+    None for lines outside any function, in a function's header (signature, decorators), or in a
+    lambda defined at module or class level (those cannot be found again by name).
+    """
+    def walk(body, quals):
+        for node in body:
+            if not (node.lineno <= line <= (node.end_lineno or node.lineno)):
+                continue
+            if isinstance(node, ast.ClassDef):
+                return walk(node.body, quals + [node.name])
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                if line < node.body[0].lineno:
+                    return None  # header: signature, defaults or decorators
+                return ".".join(quals + [node.name])
+            return None
+        return None
+
+    return walk(tree.body, [])
+
+
 def strip_docstrings(tree: ast.AST) -> ast.AST:
     import copy
 
@@ -646,6 +684,28 @@ class Selector:
             self.weak |= self.file_tests(path)
             reasons.append(f"line {path}:{line} [{s}-{rng[-1]}] -> {len(got)}")
         self.touched_lines[path] = sorted(touched)
+        # warm checks: an edit confined to function bodies can be hot-swapped into a child that
+        # already has everything imported (verify.py); anything else needs a fresh import
+        quals = set()
+        imp_lines = self.imp.get(path) or set()
+        for line in touched:
+            q = outer_def_qual(old_tree, line)
+            if q is None:
+                quals = None
+                break
+            fn = outer_def_node(old_tree, line)
+            if fn is not None and any(l in imp_lines for l in range(fn.lineno, (fn.end_lineno or fn.lineno) + 1)):
+                # the function (or something nested in it) ran at import: objects it built then,
+                # such as closures stored in class tables, keep the old code. Not swappable.
+                quals = None
+                break
+            quals.add(q)
+        if quals and not any(r.startswith((f"import-run {path}", f"import-time {path}", f"def-header {path}")) for r in reasons):
+            mod = path[:-3].replace("/", ".")
+            mod = mod[: -len(".__init__")] if mod.endswith(".__init__") else mod
+            self.swaps.append((path, mod, sorted(quals)))
+        else:
+            self.swap_ok = False
         return sel
 
     def import_reach(self, path: str) -> set[int]:
@@ -1024,6 +1084,8 @@ class Selector:
         self.code_changes: list[str] = []
         self.refined: dict[str, set[int] | None] = {}
         self.refine_intersect: set[str] = set()  # refinements that only narrow the coverage set
+        self.swaps: list = []
+        self.swap_ok = True
         self.touched_lines: dict[str, list[int]] = {}
         self.fp_path = None
         self.fp_detect = False
@@ -1185,6 +1247,8 @@ PREPARE_COST = 1.2  # one-off: copy the tree and import numpy/pandas/duckdb
 P_CODE = float(os.environ.get("BR_PCODE", 0.5))
 P_DATA = float(os.environ.get("BR_PDATA", 0.9))
 WIDE_REPLAY = os.environ.get("BR_WIDE_REPLAY", "0") == "1"
+WARM = os.environ.get("BR_WARM", "0") == "1"  # warm parent + hot-swapped function bodies
+WARM_OVERHEAD = 0.06  # s of CPU per warm check (fork ~0.01 s, plus slack)
 FP_MIN_SAVING = 4.0  # s: fingerprint only selections costing more than this (child costs ~1 s)
 MARGIN = float(os.environ.get("BR_MARGIN", 0.4))
 
@@ -1207,7 +1271,8 @@ def rep_ids(sel: "Selector", run, ok: bool) -> set[int]:
     return {n for n in run if ok and n in sel.replay_tests}
 
 
-def plan_verify(sel: "Selector", chosen: set[int], p_fail: float, replay_ok: bool = False) -> tuple[list[int], int]:
+def plan_verify(sel: "Selector", chosen: set[int], p_fail: float, replay_ok: bool = False,
+                overhead: float | None = None) -> tuple[list[int], int]:
     """Choose which candidate tests to check here. Returns (tests to check, expected saving in ms).
 
     Options: the k cheapest ordinary tests (k over ~24 split points) plus any subset of the
@@ -1240,7 +1305,7 @@ def plan_verify(sel: "Selector", chosen: set[int], p_fail: float, replay_ok: boo
         for k in ks:
             if not rsub and k == 0:
                 continue
-            cpu = VERIFY_OVERHEAD * 1000 + rcost + prefix[k]
+            cpu = (VERIFY_OVERHEAD if overhead is None else overhead) * 1000 + rcost + prefix[k]
             if cpu >= best_cost:
                 break
             rest = set(plain[k:]) | (set(rep) - set(rsub))
@@ -1268,6 +1333,7 @@ def main() -> None:
         verifier = Verifier(str(SRC), [t["id"] for t in sel.tests])
     results = []
     fp_jobs: dict[int, tuple[str, dict]] = {}
+    swaps_map: dict[str, list | None] = {}
     replay_pending: dict[str, bool] = {}
     weak: dict[str, set[int]] = {}
     replay_ok: dict[str, bool] = {}
@@ -1283,6 +1349,8 @@ def main() -> None:
             reasons.append("noreplay:" + ",".join(sorted(sel.no_replay)))
         verify_ok[patch.stem] = sel.verify_ok
         weak[patch.stem] = sel.weak - chosen
+        bad = ("syntax", "new file", "delete", "rename", "binary", "error", "import-run", "import-time", "def-header")
+        swaps_map[patch.stem] = list(sel.swaps) if WARM and sel.swap_ok and not any(r.startswith(bad) for r in reasons) else None
         pend = replay_pending[patch.stem] and any(n in sel.replay_tests for n in chosen)
         if sel.fp_path or sel.fp_detect or pend:
             fp_jobs[len(results) - 1] = (sel.fp_path, dict(sel.touched_lines))
@@ -1366,7 +1434,8 @@ def main() -> None:
             reasons.append("no verify (pickling code)")
             continue
         code_change = any(r.startswith(("line ", "import-time", "def-header", "syntax", "new file", "delete", "error")) for r in reasons)
-        run, saving = plan_verify(sel, chosen, P_CODE if code_change else P_DATA, replay_ok[cid])
+        ovh = WARM_OVERHEAD if swaps_map.get(cid) is not None else None
+        run, saving = plan_verify(sel, chosen, P_CODE if code_change else P_DATA, replay_ok[cid], ovh)
         if run and saving > MARGIN * 1000:
             plans.append((saving, i, run))
     plans.sort(reverse=True)
@@ -1388,7 +1457,16 @@ def main() -> None:
             cid, chosen, reasons, files = results[i]
             rep = {n: sel.replay_ref[sel.replay_tests[n]] for n in run if ok and n in sel.replay_tests}
             c0 = sum(os.times()[:4])
-            failed = verifier.run(files, run, timeout=min(left - 1, 3 * est + 2), replay=rep)
+            sw = swaps_map.get(cid)
+            if sw is not None and not verifier.warm():
+                sw = None
+            failed = verifier.run(files, run, timeout=min(left - 1, 3 * est + 2), replay=rep, swaps=sw)
+            if failed is None and sw is not None:
+                # the warm child could not apply the edit: try a fresh import once
+                left = budget - (time.monotonic() - start)
+                if left > est * 3 + 2:
+                    failed = verifier.run(files, run, timeout=min(left - 1, 3 * est + 2), replay=rep)
+                    reasons.append("warm failed, cold retry")
             reasons.append(f"cpu {sum(os.times()[:4]) - c0:.2f}/est {est:.2f}")
             if failed is None:
                 reasons.append(f"verify {len(run)} -> unfinished, keep all")
