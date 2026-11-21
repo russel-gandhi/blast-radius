@@ -14,6 +14,7 @@ os.rename('/tmp/x/sqlglot-${SQLGLOT_SHA}', '/sqlglot')" \
  && python -m compileall -q /usr/local/lib/python3.13 /sqlglot/sqlglot /sqlglot/tests > /dev/null; \
  chmod -R a+rX /sqlglot
 COPY selector.py verify.py replay.py covmap.json.gz replay_ref.json runtime_lines.json pickle_lines.json testcost.json /app/
+COPY opmap /app/opmap
 RUN python -m compileall -q /app && chmod -R a+rX /app
 ENV PYTHONDONTWRITEBYTECODE=1 SKIP_INTEGRATION=0
 CMD ["python", "/app/selector.py"]

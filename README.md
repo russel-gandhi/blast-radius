@@ -27,7 +27,14 @@ Entry for the RWX Blast Radius track: given a patch to sqlglot (pinned at
    import errors and timeouts are kept. `selector.py` plans this per commit from each test's measured
    CPU (`testcost.json`) and class setup cost, and only checks tests when the expected CI seconds saved
    beat the CPU spent, within a wall-clock budget for the batch.
-4. **Replay** (`replay.py`) for the slow TPC-H/TPC-DS executor tests: instead of running them, each fixture
+4. **Comparison outcomes** (`opmap/`, built by `tools/opplug.py`): on the pinned commit the suite runs
+   once (twice, with two hash seeds) with every single comparison inside a sqlglot function rewritten to
+   also record its outcome, what the related operators would have returned on the same operands, and
+   the operands themselves when they are small primitives, per test. When a patch's only code change is
+   one comparison's operator or constant, only the tests whose recorded outcome would flip are kept.
+   Overflowing sites, unknown alternatives, outcomes seen at import time, or several code changes in one
+   patch keep the coverage selection.
+5. **Replay** (`replay.py`) for the slow TPC-H/TPC-DS executor tests: instead of running them, each fixture
    query's DuckDB transpilation, its optimized and planned form after a pickle round trip, and the
    Python code generated for every plan step are digested and compared with digests recorded on the
    pinned commit (`replay_ref.json`), stopping at the first difference. Replay is only trusted when

@@ -139,6 +139,93 @@ def apply(fp: FilePatch, old_text: str) -> tuple[str, set[int], list[int]]:
 # ---------------------------------------------------------------- analysis helpers
 
 
+_CMP = {
+    "Eq": lambda a, b: a == b, "NotEq": lambda a, b: a != b, "Lt": lambda a, b: a < b,
+    "LtE": lambda a, b: a <= b, "Gt": lambda a, b: a > b, "GtE": lambda a, b: a >= b,
+    "Is": lambda a, b: a is b, "IsNot": lambda a, b: a is not b,
+    "In": lambda a, b: a in b, "NotIn": lambda a, b: a not in b,
+}
+_PRIM = {"NoneType", "bool", "int", "float", "str"}
+
+
+def _new_result(kind, op, new_op, r, alts, vals, old_const, new_const):
+    """Result of the edited comparison on one recorded evaluation, or None when unknown."""
+    if kind == "op":
+        if new_op == op:
+            return r
+        if alts is not None:
+            if op in ("Eq", "NotEq", "Is", "IsNot"):
+                is_, eq = alts
+                got = {"Is": is_, "IsNot": None if is_ is None else not is_,
+                       "Eq": eq, "NotEq": None if eq is None else not eq}.get(new_op)
+                if got is not None:
+                    return got
+            elif op in ("Lt", "LtE", "Gt", "GtE"):
+                lt, le, gt, ge, eq = alts
+                got = {"Lt": lt, "LtE": le, "Gt": gt, "GtE": ge,
+                       "Eq": eq, "NotEq": None if eq is None else not eq}.get(new_op)
+                if got is not None:
+                    return got
+    if vals is None:
+        return None
+    ta, a, tb, b = vals
+    if ta not in _PRIM or tb not in _PRIM:
+        return None  # enum members are recorded without their value
+    if kind == "left":
+        if a != old_const or type(a).__name__ != type(old_const).__name__:
+            return None
+        a = new_const
+    elif kind == "right":
+        if b != old_const or type(b).__name__ != type(old_const).__name__:
+            return None
+        b = new_const
+    if new_op in ("Is", "IsNot") and not (a is None or b is None or isinstance(a, bool) or isinstance(b, bool)):
+        return None  # identity of ints and strings depends on interning
+    try:
+        got = _CMP[new_op](a, b)
+    except Exception:
+        return None
+    return got if type(got) is bool else None
+
+
+_POS = {"lineno", "col_offset", "end_lineno", "end_col_offset", "ctx", "type_comment"}
+
+
+def _same(x, y) -> bool:
+    if isinstance(x, ast.AST) and isinstance(y, ast.AST):
+        return ast.dump(x) == ast.dump(y)
+    return type(x) is type(y) and x == y
+
+
+def ast_diffs(a, b, parents=(), out=None, limit=3):
+    """Minimal differing node pairs between two ASTs (positions ignored), with ancestors of a."""
+    if out is None:
+        out = []
+    if len(out) >= limit:
+        return out
+    if type(a) is not type(b) or not isinstance(a, ast.AST):
+        out.append((a, b, list(parents)))
+        return out
+    for f in a._fields:
+        if f in _POS:
+            continue
+        va, vb = getattr(a, f, None), getattr(b, f, None)
+        if _same(va, vb):
+            continue
+        if isinstance(va, list) and isinstance(vb, list) and len(va) == len(vb):
+            for x, y in zip(va, vb):
+                if not _same(x, y):
+                    if isinstance(x, ast.AST) and isinstance(y, ast.AST):
+                        ast_diffs(x, y, (*parents, a), out, limit)
+                    else:
+                        out.append((a, b, list(parents)))
+        elif isinstance(va, ast.AST) and isinstance(vb, ast.AST):
+            ast_diffs(va, vb, (*parents, a), out, limit)
+        else:
+            out.append((a, b, list(parents)))
+    return out
+
+
 def strip_docstrings(tree: ast.AST) -> ast.AST:
     import copy
 
@@ -316,6 +403,12 @@ class Selector:
             return self.importers(path)
 
         stmts = stmt_index(old_tree)
+        self.code_changes.append(path)
+        try:
+            self.refined[path] = self.operand_refine(path, old_tree, new_tree, stmts)
+        except Exception as exc:  # refinement is optional: fall back to coverage
+            self.refined[path] = None
+            reasons.append(f"refine error {exc!r}")
         old_n = old_text.count("\n") + 1
         sel: set[int] = set()
         touched: set[int] = set(removed)
@@ -416,6 +509,64 @@ class Selector:
                     best = node
         return best
 
+    # -- comparison outcomes (opmap) -------------------------------------------
+
+    def opmap(self, path: str) -> dict | None:
+        cache = self.__dict__.setdefault("_opmaps", {})
+        if path not in cache:
+            p = Path(__file__).with_name("opmap") / (path.replace("/", "__") + ".json.gz")
+            try:
+                cache[path] = json.loads(gzip.decompress(p.read_bytes())) if p.exists() else {}
+            except Exception:
+                cache[path] = None
+        return cache[path]
+
+    def operand_refine(self, path: str, old_tree, new_tree, stmts) -> set[int] | None:
+        """Tests that can see a different result from a single edited comparison, or None."""
+        if not path.startswith("sqlglot/") or self.opmap(path) is None:
+            return None
+        diffs = ast_diffs(old_tree, new_tree)
+        if len(diffs) != 1:
+            return None
+        old, new, parents = diffs[0]
+        cmp_old = None
+        kind = None
+        if isinstance(old, ast.cmpop) and isinstance(new, ast.cmpop):
+            cmp_old = parents[-1] if parents and isinstance(parents[-1], ast.Compare) else None
+            kind = "op"
+        elif isinstance(old, ast.Constant) and isinstance(new, ast.Constant):
+            par = parents[-1] if parents else None
+            if isinstance(par, ast.Compare) and (par.left is old or (par.comparators and par.comparators[0] is old)):
+                cmp_old = par
+                kind = "left" if par.left is old else "right"
+        if cmp_old is None or len(cmp_old.ops) != 1:
+            return None
+        # recorded sites are comparisons inside functions or lambdas only
+        if not any(isinstance(p, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)) for p in parents):
+            return None
+        site = f"{path}:{cmp_old.lineno}:{cmp_old.col_offset}:{cmp_old.end_lineno}:{cmp_old.end_col_offset}"
+        rec = self.opmap(path).get(site)
+        if rec is None:
+            # never evaluated in the traced suite; trust that only if no test ran the line either
+            if self.cover(path, range(cmp_old.lineno, (cmp_old.end_lineno or cmp_old.lineno) + 1)):
+                return None
+            return set()
+        if rec["ovf"]:
+            return None
+        old_op = type(cmp_old.ops[0]).__name__
+        new_op = type(new).__name__ if kind == "op" else old_op
+        hit: set[int] = set()
+        for key, tests, glob in rec["keys"]:
+            op, r, alts, vals = key
+            if op != old_op:
+                return None
+            nr = _new_result(kind, op, new_op, r, alts, vals, getattr(old, "value", None), getattr(new, "value", None))
+            if nr is None or nr != r:
+                if glob:
+                    return None  # changes at import time or outside a test: may reach anything
+                hit.update(tests)
+        return hit
+
     FAMILY_DIRS = ("dialects", "parsers", "generators", "tokenizers", "typing")
 
     def family_tests(self, path: str) -> set[int]:
@@ -449,12 +600,29 @@ class Selector:
         self.weak: set[int] = set()
         self.replay_ok = True
         self.verify_ok = True
+        self.code_changes: list[str] = []
+        self.refined: dict[str, set[int] | None] = {}
+        per_file: list[tuple[str, set[int]]] = []
         for fp in parse_patch(patch_text):
             try:
-                sel |= self.select_file(fp, reasons)
+                per_file.append((fp.path, self.select_file(fp, reasons)))
             except Exception as exc:  # never crash: fall back to everything
                 reasons.append(f"error {fp.path}: {exc!r}")
-                sel |= set(self.all)
+                per_file.append((fp.path, set(self.all)))
+                self.code_changes.append("?")
+        # One code change that is a single comparison edit: only the tests whose recorded
+        # comparison outcome flips can behave differently. Two code changes can interact, so
+        # they keep the coverage selection.
+        if len(self.code_changes) == 1 and self.refined.get(self.code_changes[0]) is not None:
+            path = self.code_changes[0]
+            refined = self.refined[path]
+            for i, (p, got) in enumerate(per_file):
+                if p == path:
+                    self.weak |= got
+                    per_file[i] = (p, set(refined))
+            reasons.append(f"operands {path} -> {len(refined)}")
+        for _, got in per_file:
+            sel |= got
         return sel, reasons
 
     # -- packing -------------------------------------------------------------
