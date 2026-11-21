@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/teradata.py b/sqlglot/generators/teradata.py
+--- a/sqlglot/generators/teradata.py
++++ b/sqlglot/generators/teradata.py
+@@ -103,7 +103,7 @@
+     }
+ 
+     def hexstring_sql(
+-        self, expression: exp.HexString, binary_function_repr: str | None = None
++        self, expression: exp.HexString, binary_function_repr: str | None = 0
+     ) -> str:
+         if expression.args.get("is_character"):
+             return f"{self.sql(exp.Literal.string(expression.this))}XC"

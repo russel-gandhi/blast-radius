@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/duckdb.py b/sqlglot/dialects/duckdb.py
+--- a/sqlglot/dialects/duckdb.py
++++ b/sqlglot/dialects/duckdb.py
+@@ -99,7 +99,7 @@
+         BYTE_STRING_ESCAPES = ["'", "\\"]
+         HEREDOC_STRINGS = ["$"]
+ 
+-        HEREDOC_TAG_IS_IDENTIFIER = True
++        HEREDOC_TAG_IS_IDENTIFIER = False
+         HEREDOC_STRING_ALTERNATIVE = TokenType.PARAMETER
+ 
+         KEYWORDS = {

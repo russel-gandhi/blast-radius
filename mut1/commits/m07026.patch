@@ -1,0 +1,12 @@
+diff --git a/sqlglot/executor/table.py b/sqlglot/executor/table.py
+--- a/sqlglot/executor/table.py
++++ b/sqlglot/executor/table.py
+@@ -91,7 +91,7 @@
+ 
+ 
+ class RangeReader:
+-    def __init__(self, table: t.Any = None) -> None:
++    def __init__(self, table: t.Any = 0) -> None:
+         self.table: t.Any = table
+         self.range = range(0)
+ 

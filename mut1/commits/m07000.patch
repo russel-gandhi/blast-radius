@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/merge_subqueries.py b/sqlglot/optimizer/merge_subqueries.py
+--- a/sqlglot/optimizer/merge_subqueries.py
++++ b/sqlglot/optimizer/merge_subqueries.py
+@@ -292,7 +292,7 @@
+         if not window_aliases:
+             return False
+ 
+-        if outer_args.get("where") or outer_args.get("joins"):
++        if outer_args.get("where") and outer_args.get("joins"):
+             return True
+ 
+         if is_implicit_group_by_all(t.cast(exp.Select, outer)):

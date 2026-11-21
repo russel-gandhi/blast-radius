@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/duckdb.py b/sqlglot/generators/duckdb.py
+--- a/sqlglot/generators/duckdb.py
++++ b/sqlglot/generators/duckdb.py
+@@ -3297,7 +3297,7 @@
+         this = expression.this
+         unit = expression.unit
+         if expression.args.get("fraction_in_string") and this and isinstance(unit, exp.Var):
+-            return f"INTERVAL '{this.name} {self.sql(unit)}'"
++            return f"INTERVAL  '{this.name} {self.sql(unit)}'"
+ 
+         return super().interval_sql(expression)
+ 

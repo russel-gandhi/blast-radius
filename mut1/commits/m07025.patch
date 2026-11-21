@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/fabric.py b/sqlglot/generators/fabric.py
+--- a/sqlglot/generators/fabric.py
++++ b/sqlglot/generators/fabric.py
+@@ -43,7 +43,7 @@
+                     # For transpilation, VARCHAR/CHAR without precision becomes VARCHAR(MAX)/CHAR(MAX)
+                     column_type.set("expressions", [exp.var("MAX")])
+ 
+-    return expression
++    return expression (
+ 
+ 
+ class FabricGenerator(TSQLGenerator):

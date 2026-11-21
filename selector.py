@@ -139,6 +139,19 @@ def apply(fp: FilePatch, old_text: str) -> tuple[str, set[int], list[int]]:
 # ---------------------------------------------------------------- analysis helpers
 
 
+def strip_docstrings(tree: ast.AST) -> ast.AST:
+    import copy
+
+    tree = copy.deepcopy(tree)
+    for node in [tree, *ast.walk(tree)]:
+        body = getattr(node, "body", None)
+        if isinstance(body, list) and body and isinstance(body[0], ast.Expr):
+            v = body[0].value
+            if isinstance(v, ast.Constant) and isinstance(v.value, str):
+                body[0] = ast.Pass()
+    return tree
+
+
 def stmt_index(tree: ast.AST):
     """List of (start, end, node, in_function) for every statement."""
     res = []
@@ -292,6 +305,11 @@ class Selector:
             # same code: comments/blank lines only (opens of .py files are just imports reading source)
             reasons.append(f"ast-equal {path}")
             return set()
+        if old_tree is not None and not trivial and self.docstring_only(old_tree, old_text, removed, inserts):
+            if ast.dump(strip_docstrings(old_tree)) == ast.dump(strip_docstrings(new_tree)):
+                # nothing in sqlglot or its tests reads __doc__
+                reasons.append(f"docstring-only {path}")
+                return set()
         if old_tree is None:
             self.replay_ok = False
             reasons.append(f"new file {path}")
@@ -364,6 +382,30 @@ class Selector:
             len(parts) == 3 and parts[1] in self.FAMILY_DIRS
             and parts[2] not in ("__init__.py", "dialect.py", "python.py")
         )
+
+    @staticmethod
+    def docstring_only(tree, text, removed, inserts) -> bool:
+        """Every changed old line (and insertion point) is inside a docstring, a comment or blank."""
+        ranges = []
+        for node in [tree, *ast.walk(tree)]:
+            body = getattr(node, "body", None)
+            if isinstance(body, list) and body and isinstance(body[0], ast.Expr):
+                v = body[0].value
+                if isinstance(v, ast.Constant) and isinstance(v.value, str):
+                    ranges.append((body[0].lineno, body[0].end_lineno or body[0].lineno))
+        if not ranges:
+            return False
+        lines = text.split("\n")
+
+        def ok(l, insert=False):
+            if any(a <= l <= b for a, b in ranges):
+                return True
+            if insert and any(a <= l + 1 <= b for a, b in ranges):
+                return True
+            src = lines[l - 1].strip() if 1 <= l <= len(lines) else ""
+            return not src or src.startswith("#")
+
+        return all(ok(l) for l in removed) and all(ok(k, True) for k in inserts)
 
     @staticmethod
     def enclosing_def(stmts, line):
@@ -457,16 +499,18 @@ class Selector:
         return best
 
 
-VERIFY_OVERHEAD = 0.35  # s of CPU per verified commit (fork, patched modules, test module imports)
-VERIFY_FACTOR = 1.2  # margin over each test's measured CPU here (cold caches in a fresh child)
+VERIFY_OVERHEAD = float(os.environ.get("BR_OVH", 0.35))  # s of CPU per verified commit (fork, patched modules, test module imports)
+VERIFY_FACTOR = float(os.environ.get("BR_VF", 1.2))  # margin over each test's measured CPU here (cold caches in a fresh child)
 PREPARE_COST = 1.2  # one-off: copy the tree and import numpy/pandas/duckdb
-MARGIN = 0.4
+P_CODE = float(os.environ.get("BR_PCODE", 0.5))
+P_DATA = float(os.environ.get("BR_PDATA", 0.9))
+MARGIN = float(os.environ.get("BR_MARGIN", 0.4))
 
 
 REPLAY_COST = {  # CPU seconds to fingerprint instead of running
-    "tests/test_executor.py::TestExecutor::test_execute_tpcds": 4.5,
-    "tests/test_executor.py::TestExecutor::test_execute_tpch": 0.9,
-    "tests/test_executor.py::TestExecutor::test_optimized_tpch": 0.4,
+    "tests/test_executor.py::TestExecutor::test_execute_tpcds": 7.8,  # measured 7.4-7.9 s
+    "tests/test_executor.py::TestExecutor::test_execute_tpch": 0.4,  # measured 0.27-0.34 s
+    "tests/test_executor.py::TestExecutor::test_optimized_tpch": 0.4,  # measured 0.31 s
 }
 
 
@@ -550,7 +594,7 @@ def main() -> None:
             reasons.append("no verify (pickling code)")
             continue
         code_change = any(r.startswith(("line ", "import-time", "def-header", "syntax", "new file", "delete", "error")) for r in reasons)
-        run, saving = plan_verify(sel, chosen, 0.5 if code_change else 0.9, replay_ok[cid])
+        run, saving = plan_verify(sel, chosen, P_CODE if code_change else P_DATA, replay_ok[cid])
         if run and saving > MARGIN * 1000:
             plans.append((saving, i, run))
     plans.sort(reverse=True)

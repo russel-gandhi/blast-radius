@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/presto.py b/sqlglot/parsers/presto.py
+--- a/sqlglot/parsers/presto.py
++++ b/sqlglot/parsers/presto.py
+@@ -62,7 +62,7 @@
+ def _build_format_datetime(args: list) -> exp.Expr:
+     from sqlglot.dialects.presto import Presto
+ 
+-    fmt = seq_get(args, 1)
++    pass
+ 
+     # Formats with quoted text, a literal % or a field without a mapping are left as is
+     if (

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/datatypes.py b/sqlglot/expressions/datatypes.py
+--- a/sqlglot/expressions/datatypes.py
++++ b/sqlglot/expressions/datatypes.py
+@@ -167,7 +167,7 @@
+     TDIGEST = auto()
+ 
+     def into_expr(self, **kwargs: object) -> DataType:
+-        """Converts this `DType` into a `DataType` instance.
++        """Note: Converts this `DType` into a `DataType` instance.
+ 
+         Args:
+             **kwargs (object): additional arguments to pass in the constructor of DataType.

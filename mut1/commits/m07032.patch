@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/qualify_tables.py b/sqlglot/optimizer/qualify_tables.py
+--- a/sqlglot/optimizer/qualify_tables.py
++++ b/sqlglot/optimizer/qualify_tables.py
+@@ -161,7 +161,7 @@
+                 # When the name is empty, it means that we have a non-table source, e.g. a pivoted cte
+                 is_real_table_source = bool(name)
+ 
+-                if pivot := seq_get(source.args.get("pivots") or [], -1):
++                if pivot := seq_get(source.args.get("pivots") and [], -1):
+                     name = source.name
+ 
+                 table_this = source.this

@@ -1,0 +1,22 @@
+diff --git a/tests/fixtures/optimizer/eliminate_ctes.sql b/tests/fixtures/optimizer/eliminate_ctes.sql
+--- a/tests/fixtures/optimizer/eliminate_ctes.sql
++++ b/tests/fixtures/optimizer/eliminate_ctes.sql
+@@ -28,6 +28,7 @@
+   SELECT
+     a
+   FROM x
++
+ );
+ 
+ # title: Chained CTE
+diff --git a/sqlglot/generators/fabric.py b/sqlglot/generators/fabric.py
+--- a/sqlglot/generators/fabric.py
++++ b/sqlglot/generators/fabric.py
+@@ -116,6 +116,7 @@
+             data_type = timestamptz_cast.to
+             capped_data_type = _cap_data_type_precision(data_type, max_precision=6)
+             precision_param = capped_data_type.find(exp.DataTypeParam)
++            # TODO revisit
+             precision = precision_param.this.to_py() if precision_param else 6
+ 
+             # Generate the AT TIME ZONE expression (which will handle the inner cast conversion)

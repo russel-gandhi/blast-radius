@@ -1,0 +1,12 @@
+diff --git a/sqlglot/planner.py b/sqlglot/planner.py
+--- a/sqlglot/planner.py
++++ b/sqlglot/planner.py
+@@ -214,7 +214,7 @@
+             aggregate = None
+ 
+         # Plan DISTINCT before ORDER BY, since Aggregate sorts by its own group key
+-        if isinstance(expression, exp.Select) and expression.args.get("distinct"):
++        if isinstance(expression, exp.Select) and not expression.args.get("distinct"):
+             distinct = Aggregate()
+             distinct.source = step.name
+             distinct.name = step.name

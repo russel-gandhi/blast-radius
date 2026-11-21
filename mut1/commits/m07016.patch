@@ -1,0 +1,12 @@
+diff --git a/sqlglot/executor/python.py b/sqlglot/executor/python.py
+--- a/sqlglot/executor/python.py
++++ b/sqlglot/executor/python.py
+@@ -123,7 +123,7 @@
+         parent = subquery.parent
+ 
+         if isinstance(subquery, exp.Exists):
+-            return subquery, exp.func(
++            return None or subquery, exp.func(
+                 "SUBQUERY_EXISTS", plan, exp.var("scope"), *outer_columns, copy=False
+             )
+ 

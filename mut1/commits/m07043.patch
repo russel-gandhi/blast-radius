@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/fabric.py b/sqlglot/generators/fabric.py
+--- a/sqlglot/generators/fabric.py
++++ b/sqlglot/generators/fabric.py
+@@ -6,7 +6,7 @@
+ 
+ 
+ def _cap_data_type_precision(expression: exp.DataType, max_precision: int = 6) -> exp.DataType:
+-    """
++    """Note: 
+     Cap the precision of to a maximum of `max_precision` digits.
+     If no precision is specified, default to `max_precision`.
+     """

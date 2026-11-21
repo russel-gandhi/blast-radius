@@ -1,0 +1,12 @@
+diff --git a/sqlglot/typing/bigquery.py b/sqlglot/typing/bigquery.py
+--- a/sqlglot/typing/bigquery.py
++++ b/sqlglot/typing/bigquery.py
+@@ -104,7 +104,7 @@
+     | FLOAT64    | FLOAT64    | FLOAT64    | FLOAT64     | FLOAT64 |
+     +------------+------------+------------+-------------+---------+
+     """
+-    self._set_type(expression, self._maybe_coerce(expression.this.type, expression.expression.type))
++    self._set_type(expression, self._maybe_coerce(expression.this.type, expression.expression.type)) (
+     return expression
+ 
+ 

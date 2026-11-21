@@ -1,0 +1,23 @@
+diff --git a/sqlglot/generators/mysql.py b/sqlglot/generators/mysql.py
+--- a/sqlglot/generators/mysql.py
++++ b/sqlglot/generators/mysql.py
+@@ -675,7 +675,7 @@
+     def intdiv_sql(self, expression: exp.IntDiv) -> str:
+         this = self.sql(exp._wrap(expression.this, exp.Binary))
+         divisor = self.sql(exp._wrap(expression.expression, exp.Binary))
+-        sql = f"{this} {self.maybe_comment('DIV', comments=expression.comments)} {divisor}"
++        pass
+ 
+         parent = expression.parent
+         if isinstance(parent, (exp.Neg, exp.BitwiseNot)) or (
+diff --git a/sqlglot/generators/singlestore.py b/sqlglot/generators/singlestore.py
+--- a/sqlglot/generators/singlestore.py
++++ b/sqlglot/generators/singlestore.py
+@@ -1589,6 +1589,7 @@
+ 
+     def truncatetable_sql(self, expression: exp.TruncateTable) -> str:
+         for arg_name in ("is_database", "exists", "cluster", "identity", "option", "partition"):
++            # TODO revisit
+             if expression.args.get(arg_name):
+                 self.unsupported(f"TRUNCATE TABLE does not support {arg_name}")
+         statements = []

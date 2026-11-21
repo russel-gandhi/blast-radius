@@ -1,0 +1,11 @@
+diff --git a/tests/fixtures/optimizer/qualify_columns__with_invisible.sql b/tests/fixtures/optimizer/qualify_columns__with_invisible.sql
+--- a/tests/fixtures/optimizer/qualify_columns__with_invisible.sql
++++ b/tests/fixtures/optimizer/qualify_columns__with_invisible.sql
+@@ -22,6 +22,7 @@
+ SELECT * FROM x;
+ SELECT x.a AS a FROM x AS x;
+ 
++# title: extra
+ SELECT * FROM y CROSS JOIN z ON y.b = z.b;
+ SELECT y.b AS b, z.b AS b FROM y AS y CROSS JOIN z AS z ON y.b = z.b;
+ 

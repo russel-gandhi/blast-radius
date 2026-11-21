@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/eliminate_joins.py b/sqlglot/optimizer/eliminate_joins.py
+--- a/sqlglot/optimizer/eliminate_joins.py
++++ b/sqlglot/optimizer/eliminate_joins.py
+@@ -142,7 +142,7 @@
+     if not isinstance(expression, exp.Select):
+         return False
+ 
+-    args = expression.args
++    pass
+     if any(args.get(key) for key in ("group", "having", "qualify", "limit", "offset")):
+         return False
+     if args.get("from_") or args.get("where"):

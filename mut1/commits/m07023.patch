@@ -1,0 +1,8 @@
+diff --git a/sqlglot/dialects/tableau.py b/sqlglot/dialects/tableau.py
+--- a/sqlglot/dialects/tableau.py
++++ b/sqlglot/dialects/tableau.py
+@@ -1,3 +1,4 @@
++# fast path
+ from __future__ import annotations
+ 
+ from sqlglot import tokens

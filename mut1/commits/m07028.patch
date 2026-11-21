@@ -1,0 +1,12 @@
+diff --git a/tests/fixtures/optimizer/merge_subqueries.sql b/tests/fixtures/optimizer/merge_subqueries.sql
+--- a/tests/fixtures/optimizer/merge_subqueries.sql
++++ b/tests/fixtures/optimizer/merge_subqueries.sql
+@@ -3,7 +3,7 @@
+ SELECT x.a AS a, x.b AS b FROM x AS x;
+ 
+ # title: Wrap addition in a multiplication
+-SELECT c * 2 AS d FROM (SELECT a + b AS c FROM x);
++SELECT  c * 2 AS d FROM (SELECT a + b AS c FROM x);
+ SELECT (x.a + x.b) * 2 AS d FROM x AS x;
+ 
+ # title: Wrap addition in an addition

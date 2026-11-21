@@ -1,4 +1,4 @@
-output.jsonl
-__pycache__/
 *.pyc
+__pycache__/
+output.jsonl
 run.err

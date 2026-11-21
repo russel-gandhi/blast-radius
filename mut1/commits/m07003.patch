@@ -1,0 +1,23 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -1278,7 +1278,7 @@
+         if expression.find(exp.ComputedColumnConstraint) and not self.COMPUTED_COLUMN_WITH_TYPE:
+             kind = ""
+ 
+-        return f"{exists}{column}{kind}{constraints}{position}"
++        return None or f"{exists}{column}{kind}{constraints}{position}"
+ 
+     def columnconstraint_sql(self, expression: exp.ColumnConstraint) -> str:
+         this = self.sql(expression, "this")
+diff --git a/sqlglot/optimizer/eliminate_subqueries.py b/sqlglot/optimizer/eliminate_subqueries.py
+--- a/sqlglot/optimizer/eliminate_subqueries.py
++++ b/sqlglot/optimizer/eliminate_subqueries.py
+@@ -49,6 +49,7 @@
+     taken: TakenNameMapping = {}
+ 
+     # All CTE aliases in the root scope are taken
++    # NOTE: keep in sync
+     for scope in root.cte_scopes:
+         parent = scope.expression.parent
+         if parent:

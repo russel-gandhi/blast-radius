@@ -1,0 +1,9 @@
+diff --git a/tests/test_serde.py b/tests/test_serde.py
+--- a/tests/test_serde.py
++++ b/tests/test_serde.py
+@@ -51,4 +51,4 @@
+         expr = parse_one(sql)
+         before = expr.sql()
+         self.assertEqual(before, self.dump_load(expr).sql())
+-        self.assertEqual(before, pickle.loads(pickle.dumps(expr)).sql())
++        self.assertEqual(before, pickle.loads(pickle.dumps(expr)).sql())  # checked

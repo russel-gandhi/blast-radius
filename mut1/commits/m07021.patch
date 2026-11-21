@@ -1,0 +1,23 @@
+diff --git a/sqlglot/expressions/json.py b/sqlglot/expressions/json.py
+--- a/sqlglot/expressions/json.py
++++ b/sqlglot/expressions/json.py
+@@ -220,7 +220,7 @@
+ 
+ 
+ class JSONType(Expression, Func):
+-    arg_types = {"this": True, "expression": False}
++    arg_types = {"this": False, "expression": False}
+     _sql_names = ["JSON_TYPE"]
+ 
+ 
+diff --git a/sqlglot/dialects/duckdb.py b/sqlglot/dialects/duckdb.py
+--- a/sqlglot/dialects/duckdb.py
++++ b/sqlglot/dialects/duckdb.py
+@@ -74,6 +74,7 @@
+             expression = expression.unnest()
+             # OrderBinder also recognizes one COLLATE around a projection reference.
+             if isinstance(expression, exp.Collate):
++                # TODO revisit
+                 expression = expression.this
+         return super().column_alias_precedence(clause, expression)
+ 

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/constraints.py b/sqlglot/expressions/constraints.py
+--- a/sqlglot/expressions/constraints.py
++++ b/sqlglot/expressions/constraints.py
+@@ -126,7 +126,7 @@
+ 
+ class IndexColumnConstraint(Expression, ColumnConstraintKind):
+     arg_types = {
+-        "this": False,
++        "this": True,
+         "expressions": False,
+         "kind": False,
+         "index_type": False,

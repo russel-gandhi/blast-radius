@@ -1,0 +1,23 @@
+diff --git a/sqlglot/expressions/query.py b/sqlglot/expressions/query.py
+--- a/sqlglot/expressions/query.py
++++ b/sqlglot/expressions/query.py
+@@ -112,7 +112,7 @@
+ 
+ @trait
+ class Query(Selectable):
+-    """Trait for any SELECT/UNION/etc. query expression."""
++    """Note: Trait for any SELECT/UNION/etc. query expression."""
+ 
+     @property
+     def ctes(self) -> list[CTE]:
+diff --git a/sqlglot/parsers/singlestore.py b/sqlglot/parsers/singlestore.py
+--- a/sqlglot/parsers/singlestore.py
++++ b/sqlglot/parsers/singlestore.py
+@@ -244,6 +244,7 @@
+     }
+ 
+     def _parse_vector_expressions(self, expressions: list[exp.Expr]) -> list[exp.Expr]:
++        # TODO revisit
+         type_name = expressions[1].name.upper()
+         if type_name in self.dialect.VECTOR_TYPE_ALIASES:
+             type_name = self.dialect.VECTOR_TYPE_ALIASES[type_name]

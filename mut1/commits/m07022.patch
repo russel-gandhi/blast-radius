@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/optimize_joins.py b/sqlglot/optimizer/optimize_joins.py
+--- a/sqlglot/optimizer/optimize_joins.py
++++ b/sqlglot/optimizer/optimize_joins.py
+@@ -111,7 +111,7 @@
+             else:
+                 join.set("on", None)
+         else:
+-            if join.kind in ("INNER", "OUTER"):
++            if join.kind in ("INNERX", "OUTER"):
+                 join.set("kind", None)
+ 
+             if not join.args.get("on") and not join.args.get("using"):

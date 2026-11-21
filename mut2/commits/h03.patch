@@ -1,0 +1,12 @@
+diff --git a/sqlglotc/setup.py b/sqlglotc/setup.py
+--- a/sqlglotc/setup.py
++++ b/sqlglotc/setup.py
+@@ -36,7 +36,7 @@
+         files = sorted(
+             f
+             for f in os.listdir(os.path.join(src_dir, subpkg))
+-            if f.endswith(".py") and f != "__init__.py"
++            if f.endswith(".py")
+         )
+     return [os.path.join(subpkg, f) for f in files]
+ 

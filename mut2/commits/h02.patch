@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -2198,7 +2198,7 @@
+ 
+     def validate_expression(self, expression: E, args: list | None = None) -> E:
+         if self.max_nodes > -1:
+-            self._node_count += 1
++            self._node_count += 2
+             if self._node_count > self.max_nodes:
+                 self.raise_error(f"Maximum number of AST nodes ({self.max_nodes}) exceeded")
+         if self.error_level != ErrorLevel.IGNORE:

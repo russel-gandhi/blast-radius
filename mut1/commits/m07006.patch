@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/risingwave.py b/sqlglot/parsers/risingwave.py
+--- a/sqlglot/parsers/risingwave.py
++++ b/sqlglot/parsers/risingwave.py
+@@ -53,7 +53,7 @@
+         return self.expression(exp.IncludeProperty(this=this, alias=alias, column_def=coldef))
+ 
+     def _parse_encode_property(self, key: bool | None = None) -> exp.EncodeProperty:
+-        self._match_text_seq("ENCODE")
++        self._match_text_seq("ENCODEX")
+         this = self._parse_var_or_string()
+ 
+         if self._match(TokenType.L_PAREN, advance=False):

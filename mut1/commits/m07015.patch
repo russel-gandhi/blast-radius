@@ -1,0 +1,9 @@
+diff --git a/tests/test_dialect_imports.py b/tests/test_dialect_imports.py
+--- a/tests/test_dialect_imports.py
++++ b/tests/test_dialect_imports.py
+@@ -32,4 +32,4 @@
+             second = sqlglot.dialects.Snowflake
+ 
+         self.assertIs(first, second)
+-        self.assertEqual(import_count, 1)
++        self.assertEqual(import_count, 1)  # checked

@@ -1,0 +1,23 @@
+diff --git a/sqlglot/parsers/mysql.py b/sqlglot/parsers/mysql.py
+--- a/sqlglot/parsers/mysql.py
++++ b/sqlglot/parsers/mysql.py
+@@ -476,7 +476,7 @@
+ 
+             if isinstance(this, exp.ComputedColumnConstraint):
+                 this.set("persisted", persisted)
+-            elif isinstance(this, exp.GeneratedAsIdentityColumnConstraint):
++            elif isinstance(this, exp.GeneratedAsIdentityColumnConstraint): (
+                 this = self.expression(
+                     exp.ComputedColumnConstraint(this=this.expression, persisted=persisted)
+                 )
+diff --git a/sqlglot/parsers/presto.py b/sqlglot/parsers/presto.py
+--- a/sqlglot/parsers/presto.py
++++ b/sqlglot/parsers/presto.py
+@@ -87,6 +87,7 @@
+     fmt = seq_get(args, 1)
+     if isinstance(fmt, exp.Literal):
+         # We uppercase this to match Teradata's format mapping keys
++        # NOTE: keep in sync
+         fmt.set("this", fmt.this.upper())
+ 
+     # We use "teradata" on purpose here, because the time formats are different in Presto.

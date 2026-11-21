@@ -18,7 +18,21 @@ Entry for the RWX Blast Radius track: given a patch to sqlglot (pinned at
      code from that file or its dialect siblings (`dialects/`, `parsers/`, `generators/`, ...);
    - syntax errors and unknown files fall back to every test that could import them;
    - data files select the tests that opened them;
-   - the selection is packed longest-first over the worker count (1-8) with the lowest simulated cost.
+   - the selection is packed longest-first over the worker count (1-8) with the lowest simulated cost,
+     and tests with weaker evidence (same function or file) fill spare time on the less busy workers,
+     which costs nothing.
+3. **Verification** (`verify.py`), when it pays: candidate tests are run against the patched tree
+   (a symlink overlay of the pinned checkout in `/tmp`) in a forked child that already has numpy,
+   pandas and duckdb imported. Tests that pass are dropped; failures, errors, failed subtests, skips,
+   import errors and timeouts are kept. `selector.py` plans this per commit from each test's measured
+   CPU (`testcost.json`) and class setup cost, and only checks tests when the expected CI seconds saved
+   beat the CPU spent, within a wall-clock budget for the batch.
+4. **Replay** (`replay.py`) for the slow TPC-H/TPC-DS executor tests: instead of running them, each fixture
+   query's DuckDB transpilation, its optimized and planned form after a pickle round trip, and the
+   Python code generated for every plan step are digested and compared with digests recorded on the
+   pinned commit (`replay_ref.json`), stopping at the first difference. Replay is only trusted when
+   the patch leaves alone the code that runs during execution (`runtime_lines.json`), the code that
+   runs while pickling expressions for process pools (`pickle_lines.json`), the tests and the data.
 
 No per-patch answers are stored: the only precomputed data is the coverage/open map of the pinned commit.
 
