@@ -583,6 +583,7 @@ class Selector:
                 self.weak |= self.cover(path, range(fn.lineno, (fn.end_lineno or fn.lineno) + 1))
             self.weak |= self.file_tests(path)
             reasons.append(f"line {path}:{line} [{s}-{rng[-1]}] -> {len(got)}")
+        self.touched_lines[path] = sorted(touched)
         return sel
 
     def import_reach(self, path: str) -> set[int]:
@@ -959,6 +960,8 @@ class Selector:
         self.code_changes: list[str] = []
         self.refined: dict[str, set[int] | None] = {}
         self.refine_intersect: set[str] = set()  # refinements that only narrow the coverage set
+        self.touched_lines: dict[str, list[int]] = {}
+        self.fp_path = None
         per_file: list[tuple[str, set[int]]] = []
         for fp in parse_patch(patch_text):
             try:
@@ -978,9 +981,53 @@ class Selector:
                     self.weak |= got
                     per_file[i] = (p, got & refined if path in self.refine_intersect else set(refined))
                     reasons.append(f"refined {path} -> {len(per_file[i][1])}")
+        # one import-time code change with no finer rule: the import-time fingerprint can tell
+        # which class attributes and module values it really changes (see fp_refine)
+        if len(self.code_changes) == 1 and self.refined.get(self.code_changes[0]) is None:
+            path = self.code_changes[0]
+            if path.startswith("sqlglot/") and any(
+                r.startswith((f"import-time {path}:", f"import-run {path}:")) for r in reasons
+            ):
+                self.fp_path = path
         for _, got in per_file:
             sel |= got
         return sel, reasons
+
+    def fp_refine(self, diff: dict | None, path: str, reasons: list[str]) -> set[int] | None:
+        """Tests that read what an import-time change really changed, or None (keep the selection).
+
+        `diff` lists the class attributes ("module.Class|NAME") and module values ("module|NAME")
+        whose import-time value differs from the pinned commit. A class attribute is reached by the
+        tests that read it during the test (traced per test, fresh interpreter); a module value by
+        the tests running function code that names it. Anything not covered by those maps
+        (new or removed entries, a changed class hierarchy, a module that no longer imports, a
+        name never traced, such as a method) keeps the coverage selection.
+        """
+        am = self.attrmap()
+        if diff is None or am is None or diff.get("added") or diff.get("removed"):
+            return None
+        if "_traced_names" not in self.__dict__:
+            self._traced_names = {k.split("|", 1)[1] for k in am["reads"]} | {k.split("|", 1)[1] for k in am["early"]}
+        got: set[int] = set()
+        for key in diff.get("changed", []):
+            if key == "__modules__" or "|" not in key:
+                return None
+            left, name = key.split("|", 1)
+            if name == "__mro__":
+                return None
+            mod_file = left.replace(".", "/")
+            if (SRC / f"{mod_file}.py").exists() or (SRC / mod_file / "__init__.py").exists():
+                got |= self.tests_running_text([name], path, ast.Pass(lineno=0, end_lineno=0))
+            else:
+                if name not in self._traced_names:
+                    return None
+                got |= {n for n in am["reads"].get(key, []) if n < len(self.tests)}
+                if name in am["dynamic"]:
+                    got |= self.tests_running_text([name], path, ast.Pass(lineno=0, end_lineno=0))
+            got |= self.tests_mentioning(name)
+        got |= self.cover(path, self.touched_lines.get(path, []))
+        reasons.append(f"fingerprint {len(diff.get('changed', []))} changed -> {len(got)}")
+        return got
 
     # -- packing -------------------------------------------------------------
 
@@ -1029,6 +1076,7 @@ VERIFY_FACTOR = float(os.environ.get("BR_VF", 1.2))  # margin over each test's m
 PREPARE_COST = 1.2  # one-off: copy the tree and import numpy/pandas/duckdb
 P_CODE = float(os.environ.get("BR_PCODE", 0.5))
 P_DATA = float(os.environ.get("BR_PDATA", 0.9))
+FP_MIN_SAVING = 4.0  # s: fingerprint only selections costing more than this (child costs ~1 s)
 MARGIN = float(os.environ.get("BR_MARGIN", 0.4))
 
 
@@ -1093,6 +1141,13 @@ def plan_verify(sel: "Selector", chosen: set[int], p_fail: float, replay_ok: boo
     return best_run, int(blind - best_cost)
 
 
+def _fp_diff(base: dict, snap: dict) -> dict:
+    changed = sorted(k for k in base if k in snap and snap[k] != base[k])
+    added = sorted(k for k in snap if k not in base)
+    removed = sorted(k for k in base if k not in snap)
+    return {"changed": changed, "added": added, "removed": removed}
+
+
 def main() -> None:
     start = time.monotonic()
     sel = Selector()
@@ -1103,6 +1158,7 @@ def main() -> None:
     if Verifier is not None and os.environ.get("BR_VERIFY", "1") == "1" and hasattr(os, "fork"):
         verifier = Verifier(str(SRC), [t["id"] for t in sel.tests])
     results = []
+    fp_jobs: dict[int, tuple[str, dict]] = {}
     weak: dict[str, set[int]] = {}
     replay_ok: dict[str, bool] = {}
     verify_ok: dict[str, bool] = {}
@@ -1112,6 +1168,48 @@ def main() -> None:
         replay_ok[patch.stem] = sel.replay_ok
         verify_ok[patch.stem] = sel.verify_ok
         weak[patch.stem] = sel.weak - chosen
+        if sel.fp_path:
+            fp_jobs[len(results) - 1] = (sel.fp_path, dict(sel.touched_lines))
+    # import-time changes: ask a patched child which class attributes / module values changed,
+    # against a pristine snapshot taken the same way (same parent, modules, hash seed, paths)
+    todo = [i for i in fp_jobs if sel.pack(results[i][1])[0] >= FP_MIN_SAVING * 1000]
+    if verifier is not None and todo:
+        base = None
+        noisy: set[str] = set()
+        try:
+            verifier.prepare()
+            c0 = sum(os.times()[:4])
+            base = verifier.snapshot({}, timeout=20.0)
+            again = verifier.snapshot({}, timeout=20.0) if base else None
+            if base and again:
+                # entries that differ between two pristine imports (orders built from object ids)
+                # say nothing about a patch: drop them
+                for k in set(base) | set(again):
+                    if base.get(k) != again.get(k):
+                        base.pop(k, None)
+                        noisy.add(k)
+            else:
+                base = None
+            log(f"fingerprint base cpu {sum(os.times()[:4]) - c0:.2f}, noisy {len(noisy)}")
+        except Exception as exc:
+            log("fingerprint base failed", repr(exc))
+        for i in sorted(todo, key=lambda k: -sel.pack(results[k][1])[0]) if base else []:
+            path, touched = fp_jobs[i]
+            cid, chosen, reasons, files = results[i]
+            left = budget - (time.monotonic() - start)
+            if left < 20:
+                break
+            c0 = sum(os.times()[:4])
+            snap = verifier.snapshot(files, timeout=min(20.0, left - 5))
+            diff = None if snap is None else _fp_diff(base, {k: v for k, v in snap.items() if k not in noisy})
+            sel.touched_lines = touched
+            refined = sel.fp_refine(diff, path, reasons)
+            reasons.append(f"fp cpu {sum(os.times()[:4]) - c0:.2f}")
+            if refined is not None:
+                narrowed = chosen & refined
+                weak[cid] |= chosen - narrowed
+                results[i] = (cid, narrowed, reasons, files)
+                reasons.append(f"fp {len(chosen)} -> {len(narrowed)}")
     # verify where it pays, biggest expected saving first, within the time budget
     plans = []
     for i, (cid, chosen, reasons, files) in enumerate(results):

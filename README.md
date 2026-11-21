@@ -47,7 +47,16 @@ Entry for the RWX Blast Radius track: given a patch to sqlglot (pinned at
    key or the old/new value text (case-insensitive, whole words), tests that ran a line inside a sqlglot
    function containing that text, tests that name the table, and for class keys the users of that
    expression class. The text index is built when the image is built (`--build-text-index`).
-7. **Replay** (`replay.py`) for the slow TPC-H/TPC-DS executor tests: instead of running them, each fixture
+7. **Import-time fingerprint** (`fingerprint.py`): when a patch's one code change is at class or module
+   level (or in code that runs at import) and the selection costs more than 4 s, a forked child imports
+   the patched sqlglot and hashes every class attribute and module value (containers recursively,
+   functions by name, defaults and closures). Compared with two pristine snapshots taken the same way
+   (entries that differ between those are ignored), this lists exactly what changed, including derived
+   values such as `required_args` or tokenizer tables. The selection narrows to tests that read those
+   class attributes during the test, tests running function code that names a changed module value,
+   tests naming them, and test-time coverage of the edited lines. New or removed entries, a changed
+   class hierarchy, a module that fails to import, or an untraced name keep the selection.
+8. **Replay** (`replay.py`) for the slow TPC-H/TPC-DS executor tests: instead of running them, each fixture
    query's DuckDB transpilation, its optimized and planned form after a pickle round trip, and the
    Python code generated for every plan step are digested and compared with digests recorded on the
    pinned commit (`replay_ref.json`), stopping at the first difference. Replay is only trusted when

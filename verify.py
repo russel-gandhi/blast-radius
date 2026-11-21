@@ -63,6 +63,29 @@ class Verifier:
     def run(self, files: dict[str, str | None], tests: list[int], timeout: float,
             replay: dict[int, list[str]] | None = None) -> set[int] | None:
         """Return failing test numbers among `tests`, or None if the run did not finish."""
+        got = self._with_files(files, lambda: _child(self.ids, tests, replay or {}), timeout)
+        return None if got is None else set(got)
+
+    def snapshot(self, files: dict[str, str | None], timeout: float) -> dict | None:
+        """Import-time snapshot (fingerprint.snapshot) of the tree with `files` applied, or None.
+
+        The pristine snapshot is taken the same way ({} files), so both come from children forked
+        from this parent: same loaded modules, same hash seed, same paths.
+        """
+
+        def job():
+            devnull = os.open(os.devnull, os.O_WRONLY)
+            os.dup2(devnull, 1)  # stdout carries the selector's answers: nothing else may print
+            os.dup2(devnull, 2)
+            os.chdir(TREE)
+            sys.path.insert(0, TREE)
+            import fingerprint as fp
+
+            return fp.snapshot()
+
+        return self._with_files(files, job, timeout)
+
+    def _with_files(self, files, job, timeout):
         self.prepare()
         saved: dict[str, bool] = {}
         for rel in files:
@@ -76,7 +99,7 @@ class Verifier:
                     os.makedirs(os.path.dirname(p), exist_ok=True)
                     with open(p, "w", encoding="utf-8") as fh:
                         fh.write(text)
-            return self._fork(tests, timeout, replay or {})
+            return self._fork(job, timeout)
         finally:
             for rel, existed in saved.items():
                 p = os.path.join(TREE, rel)
@@ -85,15 +108,20 @@ class Verifier:
                 if existed:
                     os.symlink(os.path.join(self.src, rel), p)
 
-    def _fork(self, tests: list[int], timeout: float, replay: dict[int, list[str]]) -> set[int] | None:
+    def _fork(self, job, timeout: float):
         r, w = os.pipe()
         pid = os.fork()
         if pid == 0:  # child
             os.close(r)
             code = 0
             try:
-                failed = _child(self.ids, tests, replay)
-                os.write(w, json.dumps(sorted(failed)).encode())
+                result = job()
+                if isinstance(result, set):
+                    result = sorted(result)
+                data = json.dumps(result).encode()
+                while data:
+                    n = os.write(w, data)
+                    data = data[n:]
             except BaseException:
                 code = 1
             finally:
@@ -130,7 +158,7 @@ class Verifier:
         os.close(r)
         if status != 0 or not chunks:
             return None
-        return set(json.loads(b"".join(chunks)))
+        return json.loads(b"".join(chunks))
 
 
 def _install_inprocess_pool():
