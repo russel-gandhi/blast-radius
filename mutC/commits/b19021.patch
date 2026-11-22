@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/solr.py b/sqlglot/generators/solr.py
+deleted file mode 100644
+--- a/sqlglot/generators/solr.py
++++ /dev/null
+@@ -1,7 +0,0 @@
+-from __future__ import annotations
+-
+-from sqlglot import generator
+-
+-
+-class SolrGenerator(generator.Generator):
+-    AFTER_HAVING_MODIFIER_TRANSFORMS = generator.AFTER_HAVING_MODIFIER_TRANSFORMS

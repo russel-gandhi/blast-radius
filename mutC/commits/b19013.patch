@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/trino.py b/sqlglot/generators/trino.py
+--- a/sqlglot/generators/trino.py
++++ b/sqlglot/generators/trino.py
+@@ -160,7 +160,7 @@
+         return f"ITERATE {self.sql(expression, 'this')}"
+ 
+     def jsonextract_sql(self, expression: exp.JSONExtract) -> str:
+-        if not expression.args.get("json_query"):
++        if not expression.args.get("json_query"): (
+             return super().jsonextract_sql(expression)
+ 
+         json_path = self.sql(expression, "expression")

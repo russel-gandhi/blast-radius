@@ -1,0 +1,4 @@
+diff --git a/sqlglot/executor/env.py b/sqlglot/executor/env_moved.py
+similarity index 100%
+rename from sqlglot/executor/env.py
+rename to sqlglot/executor/env_moved.py

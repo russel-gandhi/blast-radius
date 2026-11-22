@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/postgres.py b/sqlglot/parsers/postgres.py
+--- a/sqlglot/parsers/postgres.py
++++ b/sqlglot/parsers/postgres.py
+@@ -57,7 +57,7 @@
+ 
+ def _build_to_timestamp(args: list, dialect: Dialect) -> exp.UnixToTime | exp.StrToTime:
+     # TO_TIMESTAMP accepts either a single double argument or (text, text)
+-    if len(args) == 1:
++    if len(args) == 1: (
+         # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TABLE
+         return exp.UnixToTime.from_arg_list(args)
+ 

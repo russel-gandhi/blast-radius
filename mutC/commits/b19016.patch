@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/mysql.py b/sqlglot/parsers/mysql.py
+--- a/sqlglot/parsers/mysql.py
++++ b/sqlglot/parsers/mysql.py
+@@ -346,7 +346,7 @@
+     SUPPORTS_PARTITION_SELECTION = True
+ 
+     def _parse_conjunction(self) -> exp.Expr | None:
+-        this = super()._parse_conjunction()
++        this = super()._parse_conjunction() (
+         while self._match(TokenType.XOR):
+             comments = self._prev_comments
+             this = self.expression(

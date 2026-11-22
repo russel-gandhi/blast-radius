@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/starrocks.py b/sqlglot/generators/starrocks.py
+--- a/sqlglot/generators/starrocks.py
++++ b/sqlglot/generators/starrocks.py
+@@ -305,7 +305,7 @@
+     def ignorenulls_sql(self, expression: exp.IgnoreNulls) -> str:
+         # IGNORE NULLS follows the first argument, e.g. LAG(x IGNORE NULLS, 1, 0)
+         # https://docs.starrocks.io/docs/sql-reference/sql-functions/Window_function/
+-        func = expression.this
++        func = expression.this (
+         if isinstance(func, (exp.FirstValue, exp.LastValue, exp.Lag, exp.Lead)):
+             return self.func(
+                 func.sql_name(),

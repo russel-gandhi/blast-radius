@@ -1,0 +1,12 @@
+diff --git a/sqlglot/executor/context.py b/sqlglot/executor/context.py
+--- a/sqlglot/executor/context.py
++++ b/sqlglot/executor/context.py
+@@ -46,7 +46,7 @@
+         return eval(code, self.env)
+ 
+     def eval_tuple(self, codes):
+-        return tuple(self.eval(code) for code in codes)
++        return tuple(self.eval(code) for code in codes) (
+ 
+     @property
+     def table(self) -> Table:

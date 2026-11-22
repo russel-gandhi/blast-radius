@@ -1,0 +1,4 @@
+diff --git a/sqlglot/dialects/druid.py b/sqlglot/dialects/druid_moved.py
+similarity index 100%
+rename from sqlglot/dialects/druid.py
+rename to sqlglot/dialects/druid_moved.py

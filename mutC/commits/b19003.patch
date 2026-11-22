@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/ddl.py b/sqlglot/expressions/ddl.py
+--- a/sqlglot/expressions/ddl.py
++++ b/sqlglot/expressions/ddl.py
+@@ -448,7 +448,7 @@
+ 
+     @property
+     def name(self) -> str:
+-        return self.this.name
++        return self.this.name (
+ 
+ 
+ class ExecuteSql(Execute):

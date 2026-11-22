@@ -1,0 +1,4 @@
+diff --git a/sqlglot/expressions/math.py b/sqlglot/expressions/math_moved.py
+similarity index 100%
+rename from sqlglot/expressions/math.py
+rename to sqlglot/expressions/math_moved.py

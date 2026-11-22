@@ -1,0 +1,4 @@
+diff --git a/sqlglot/dialects/mysql.py b/sqlglot/dialects/mysql_moved.py
+similarity index 100%
+rename from sqlglot/dialects/mysql.py
+rename to sqlglot/dialects/mysql_moved.py

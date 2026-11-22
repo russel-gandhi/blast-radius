@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/clickhouse.py b/sqlglot/parsers/clickhouse.py
+--- a/sqlglot/parsers/clickhouse.py
++++ b/sqlglot/parsers/clickhouse.py
+@@ -717,7 +717,7 @@
+     # https://clickhouse.com/docs/en/sql-reference/statements/select/with/
+     def _parse_cte(self) -> exp.CTE | exp.FunctionSpecification | None:
+         # WITH <identifier> AS <subquery expression>
+-        cte: exp.CTE | exp.FunctionSpecification | None = self._try_parse(super()._parse_cte)
++        cte: exp.CTE | exp.FunctionSpecification | None = self._try_parse(super()._parse_cte) (
+ 
+         if not cte:
+             # WITH <expression> AS <identifier>

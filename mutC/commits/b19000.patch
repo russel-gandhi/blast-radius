@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/exasol.py b/sqlglot/generators/exasol.py
+--- a/sqlglot/generators/exasol.py
++++ b/sqlglot/generators/exasol.py
+@@ -943,7 +943,7 @@
+ 
+     @unsupported_args("flag")
+     def regexplike_sql(self, expression: exp.RegexpLike) -> str:
+-        if not expression.args.get("full_match"):
++        if not expression.args.get("full_match"): (
+             pattern = expression.expression
+             if pattern.is_string:
+                 expression.set("expression", exp.Literal.string(f".*{pattern.name}.*"))

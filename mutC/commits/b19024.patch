@@ -1,0 +1,4 @@
+diff --git a/sqlglot/typing/spark2.py b/sqlglot/typing/spark2_moved.py
+similarity index 100%
+rename from sqlglot/typing/spark2.py
+rename to sqlglot/typing/spark2_moved.py

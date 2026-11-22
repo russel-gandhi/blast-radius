@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/risingwave.py b/sqlglot/parsers/risingwave.py
+--- a/sqlglot/parsers/risingwave.py
++++ b/sqlglot/parsers/risingwave.py
+@@ -37,7 +37,7 @@
+         return None
+ 
+     def _parse_include_property(self) -> exp.Expr | None:
+-        header: exp.Expr | None = None
++        header: exp.Expr | None = None (
+         coldef: exp.Expr | None = None
+ 
+         this = self._parse_var_or_string()

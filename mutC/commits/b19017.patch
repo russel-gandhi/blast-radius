@@ -1,0 +1,12 @@
+diff --git a/sqlglot/typing/snowflake.py b/sqlglot/typing/snowflake.py
+--- a/sqlglot/typing/snowflake.py
++++ b/sqlglot/typing/snowflake.py
+@@ -109,7 +109,7 @@
+ 
+ 
+ def _annotate_median(self: TypeAnnotator, expression: exp.Median) -> exp.Median:
+-    """Annotate MEDIAN function with correct return type.
++    """Annotate MEDIAN function with correct return type. (
+ 
+     Based on Snowflake documentation:
+     - If the expr is FLOAT/DOUBLE -> annotate as DOUBLE (FLOAT is a synonym for DOUBLE)

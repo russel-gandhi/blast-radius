@@ -1,0 +1,4 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator_moved.py
+similarity index 100%
+rename from sqlglot/generator.py
+rename to sqlglot/generator_moved.py

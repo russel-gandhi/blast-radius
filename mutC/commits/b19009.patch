@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/qualify.py b/sqlglot/optimizer/qualify.py
+--- a/sqlglot/optimizer/qualify.py
++++ b/sqlglot/optimizer/qualify.py
+@@ -34,7 +34,7 @@
+     on_qualify: t.Callable[[exp.Table], None] | None = None,
+     sql: str | None = None,
+ ) -> E:
+-    """
++    """ (
+     Rewrite sqlglot AST to have normalized and qualified tables and columns.
+ 
+     This step is necessary for all further SQLGlot optimizations.
