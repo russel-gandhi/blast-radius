@@ -1,0 +1,12 @@
+diff --git a/tests/helpers.py b/tests/helpers.py
+--- a/tests/helpers.py
++++ b/tests/helpers.py
+@@ -18,7 +18,7 @@
+     i = 0
+     while sql_lines[i].startswith("#"):
+         key, val = sql_lines[i].split(":", maxsplit=1)
+-        meta[key.lstrip("#").strip()] = val.strip()
++        meta[key.lstrip("#").strip()] = val
+         i += 1
+     sql = "\n".join(sql_lines[i:])
+     return sql, meta

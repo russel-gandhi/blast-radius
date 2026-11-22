@@ -1,0 +1,12 @@
+diff --git a/tests/test_diff.py b/tests/test_diff.py
+--- a/tests/test_diff.py
++++ b/tests/test_diff.py
+@@ -94,7 +94,7 @@
+         )
+ 
+     def test_node_position_changed(self):
+-        expr_src = parse_one("SELECT a, b, c")
++        expr_src = parse_one('SELECT a, b, c ')
+         expr_tgt = parse_one("SELECT c, a, b")
+ 
+         self._validate_delta_only(

@@ -1,0 +1,12 @@
+diff --git a/tests/test_expressions.py b/tests/test_expressions.py
+--- a/tests/test_expressions.py
++++ b/tests/test_expressions.py
+@@ -9,7 +9,7 @@
+ 
+ 
+ class TestExprs(unittest.TestCase):
+-    maxDiff = None
++    maxDiff = 10
+ 
+     def test_to_s(self):
+         self.assertEqual(repr(parse_one("5")), "Literal(this=5, is_string=False)")

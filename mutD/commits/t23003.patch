@@ -1,0 +1,12 @@
+diff --git a/tests/dialects/test_hive.py b/tests/dialects/test_hive.py
+--- a/tests/dialects/test_hive.py
++++ b/tests/dialects/test_hive.py
+@@ -510,7 +510,7 @@
+         self.validate_all(
+             "DATE_ADD('2020-01-01', 1)",
+             write={
+-                "": "TS_OR_DS_ADD('2020-01-01', 1, DAY)",
++                "": "TS_OR_DS_ADD('2020-01-01', 1, DAY) ",
+                 "bigquery": "DATE_ADD(CAST(CAST('2020-01-01' AS DATETIME) AS DATE), INTERVAL 1 DAY)",
+                 "duckdb": "CAST('2020-01-01' AS DATE) + INTERVAL 1 DAY",
+                 "hive": "DATE_ADD('2020-01-01', 1)",

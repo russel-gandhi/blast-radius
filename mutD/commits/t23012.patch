@@ -1,0 +1,9 @@
+diff --git a/tests/fixtures/optimizer/qualify_tables.sql b/tests/fixtures/optimizer/qualify_tables.sql
+--- a/tests/fixtures/optimizer/qualify_tables.sql
++++ b/tests/fixtures/optimizer/qualify_tables.sql
+@@ -1,4 +1,4 @@
+-# title: single table
++# title: single table x
+ SELECT 1 FROM z;
+ SELECT 1 FROM c.db.z AS z;
+ 

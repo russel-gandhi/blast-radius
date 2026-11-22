@@ -1,0 +1,12 @@
+diff --git a/tests/helpers.py b/tests/helpers.py
+--- a/tests/helpers.py
++++ b/tests/helpers.py
+@@ -75,7 +75,7 @@
+         "l_extendedprice": "double",
+         "l_discount": "double",
+         "l_tax": "double",
+-        "l_returnflag": "string",
++        "l_returnflag": "varchar",
+         "l_linestatus": "string",
+         "l_shipdate": "string",
+         "l_commitdate": "string",

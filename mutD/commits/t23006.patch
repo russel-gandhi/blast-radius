@@ -1,0 +1,12 @@
+diff --git a/tests/test_expressions.py b/tests/test_expressions.py
+--- a/tests/test_expressions.py
++++ b/tests/test_expressions.py
+@@ -182,7 +182,7 @@
+ 
+     def test_to_dot(self):
+         column = parse_one("a.$1", dialect="snowflake")
+-        self.assertEqual(column.to_dot().sql("snowflake"), "a.$1")
++        self.assertEqual(column.to_dot().sql('snowflake '), "a.$1")
+         column.set("table", None)
+         self.assertEqual(column.to_dot(), column.this)
+ 

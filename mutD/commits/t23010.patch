@@ -1,0 +1,12 @@
+diff --git a/tests/dialects/test_dialect.py b/tests/dialects/test_dialect.py
+--- a/tests/dialects/test_dialect.py
++++ b/tests/dialects/test_dialect.py
+@@ -117,7 +117,7 @@
+ 
+ 
+ class TestDialect(Validator):
+-    maxDiff = None
++    maxDiff = 10
+ 
+     def test_date_delta_missing_arguments(self):
+         for dialect, functions in {

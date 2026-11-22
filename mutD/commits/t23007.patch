@@ -1,0 +1,12 @@
+diff --git a/tests/dialects/test_starrocks.py b/tests/dialects/test_starrocks.py
+--- a/tests/dialects/test_starrocks.py
++++ b/tests/dialects/test_starrocks.py
+@@ -277,7 +277,7 @@
+ 
+         mv_properties = [
+             # partitioning in MV
+-            "PARTITION BY (DATE_FUNC(ts), region) REFRESH ASYNC",
++            'PARTITION BY (DATE_FUNC(ts), region) REFRESH ASYNC ',
+             "PARTITION BY (DATE_TRUNC('DAY', ts)) REFRESH ASYNC",
+             "PARTITION BY (col1, col2) REFRESH ASYNC",
+             # MV: Refresh trigger property

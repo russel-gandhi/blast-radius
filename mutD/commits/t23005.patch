@@ -1,0 +1,12 @@
+diff --git a/tests/dialects/test_singlestore.py b/tests/dialects/test_singlestore.py
+--- a/tests/dialects/test_singlestore.py
++++ b/tests/dialects/test_singlestore.py
+@@ -718,7 +718,7 @@
+             write={"": "SELECT CURRENT_TIMESTAMP('UTC')"},
+         )
+         self.validate_all(
+-            "SELECT CURRENT_TIMESTAMP(6) :> DATETIME(6)",
++            'SELECT CURRENT_TIMESTAMP(6) :> DATETIME(6) ',
+             read={
+                 "bigquery": "SELECT CURRENT_DATETIME()",
+                 "singlestore": "SELECT CURRENT_TIMESTAMP(6) :> DATETIME(6)",

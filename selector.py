@@ -652,7 +652,9 @@ class Selector:
                     reasons.append(f"def-header {path}:{line} -> {len(got)}")
                     continue
                 if is_test_file:
-                    got = set(self.by_file.get(path, []))
+                    # a test file: its own tests; a shared helper (tests/helpers.py): every test
+                    # file that uses it, since its values feed tests elsewhere
+                    got = set(self.by_file.get(path, [])) or self.helper_users(path)
                 else:
                     # a class-level value is used by whoever uses the class: tests that read any of
                     # its settings during the test (creating, validating or generating its nodes)
@@ -670,10 +672,18 @@ class Selector:
         self.touched_lines[path] = sorted(touched)
         return sel
 
+    def helper_users(self, path: str) -> set[int]:
+        """Tests in test files that refer to a shared test module (tests/helpers.py, ...)."""
+        stem = path.rsplit("/", 1)[-1][:-3]
+        if stem == "__init__":
+            return set(self.all)
+        got = self.tests_mentioning(stem)
+        return got or set(self.all)
+
     def import_reach(self, path: str) -> set[int]:
         """Tests that can depend on what this file computes while being imported."""
         if path.startswith("tests/"):
-            return set(self.by_file.get(path, []))
+            return set(self.by_file.get(path, [])) or self.helper_users(path)
         if self.dialect_file(path):
             return self.family_tests(path)
         return self.importers(path)

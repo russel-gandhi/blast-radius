@@ -1,0 +1,12 @@
+diff --git a/tests/test_schema.py b/tests/test_schema.py
+--- a/tests/test_schema.py
++++ b/tests/test_schema.py
+@@ -419,7 +419,7 @@
+                     schema = MappingSchema(
+                         {"items": {"id": "INT"}}, dialect="duckdb", normalize=normalize
+                     )
+-                    query = parse_one("SELECT id FROM items", dialect="duckdb")
++                    query = parse_one('SELECT id FROM items ', dialect="duckdb")
+                     table = query.find(exp.Table)
+                     marker = Marker()
+                     # Compiled expressions cannot be weakly referenced directly.

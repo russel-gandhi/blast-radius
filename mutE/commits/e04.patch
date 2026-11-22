@@ -1,0 +1,12 @@
+diff --git a/tests/helpers.py b/tests/helpers.py
+--- a/tests/helpers.py
++++ b/tests/helpers.py
+@@ -60,7 +60,7 @@
+         return False
+     if string in (True, False):
+         return string
+-    return string and string.lower() in ("true", "1")
++    return string and string.lower() in ("true",)
+ 
+ 
+ SKIP_INTEGRATION = string_to_bool(os.environ.get("SKIP_INTEGRATION", "0").lower())

@@ -1,0 +1,12 @@
+diff --git a/tests/fixtures/optimizer/unnest_subqueries.sql b/tests/fixtures/optimizer/unnest_subqueries.sql
+--- a/tests/fixtures/optimizer/unnest_subqueries.sql
++++ b/tests/fixtures/optimizer/unnest_subqueries.sql
+@@ -10,7 +10,7 @@
+ SELECT * FROM x WHERE x.a = ANY (SELECT y.a AS a FROM y);
+ SELECT * FROM x LEFT JOIN (SELECT y.a AS a FROM y GROUP BY y.a) AS _u_0 ON x.a = _u_0.a WHERE NOT _u_0.a IS NULL;
+ 
+-# title: projected IN preserves UNKNOWN
++# title: projected IN preserves UNKNOWN x
+ # execute: true
+ SELECT x.a, x.a IN (SELECT y.b AS b FROM y) AS r FROM x;
+ SELECT x.a, x.a IN (SELECT y.b AS b FROM y) AS r FROM x;

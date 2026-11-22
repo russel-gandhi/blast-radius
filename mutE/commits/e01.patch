@@ -1,0 +1,12 @@
+diff --git a/tests/helpers.py b/tests/helpers.py
+--- a/tests/helpers.py
++++ b/tests/helpers.py
+@@ -9,7 +9,7 @@
+ 
+ 
+ def _filter_comments(s):
+-    return "\n".join([line for line in s.splitlines() if line and not line.startswith("--")])
++    return "\n".join([line for line in s.splitlines() if line and not line.startswith("-")])
+ 
+ 
+ def _extract_meta(sql):

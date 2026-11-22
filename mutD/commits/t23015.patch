@@ -1,0 +1,12 @@
+diff --git a/tests/fixtures/optimizer/annotate_functions.sql b/tests/fixtures/optimizer/annotate_functions.sql
+--- a/tests/fixtures/optimizer/annotate_functions.sql
++++ b/tests/fixtures/optimizer/annotate_functions.sql
+@@ -127,7 +127,7 @@
+ LAST_DAY(tbl.timestamp_col);
+ DATE;
+ 
+-# dialect: snowflake
++# dialect: duckdb
+ NEXT_DAY(tbl.date_col, 'MONDAY');
+ DATE;
+ 

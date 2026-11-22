@@ -1,0 +1,12 @@
+diff --git a/tests/helpers.py b/tests/helpers.py
+--- a/tests/helpers.py
++++ b/tests/helpers.py
+@@ -51,7 +51,7 @@
+             if i + 1 < size:
+                 sql = statements[i].strip()
+                 sql, meta = _extract_meta(sql)
+-                expected = statements[i + 1].strip()
++                expected = statements[i + 1]
+                 yield meta, sql, expected
+ 
+ 
