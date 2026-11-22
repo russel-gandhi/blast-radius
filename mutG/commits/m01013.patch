@@ -1,0 +1,11 @@
+diff --git a/tests/fixtures/optimizer/isolate_table_selects.sql b/tests/fixtures/optimizer/isolate_table_selects.sql
+--- a/tests/fixtures/optimizer/isolate_table_selects.sql
++++ b/tests/fixtures/optimizer/isolate_table_selects.sql
+@@ -14,6 +14,7 @@
+ SELECT * FROM (SELECT * FROM x AS x) AS x CROSS JOIN (SELECT * FROM y) AS y;
+ 
+ WITH y AS (SELECT *) SELECT * FROM x AS x;
++# execute: false
+ WITH y AS (SELECT *) SELECT * FROM x AS x;
+ 
+ WITH y AS (SELECT * FROM y AS y2 CROSS JOIN x AS z2) SELECT * FROM x AS x CROSS JOIN y as y;

@@ -1,0 +1,11 @@
+diff --git a/sqlglot/expressions/builders.py b/sqlglot/expressions/builders.py
+--- a/sqlglot/expressions/builders.py
++++ b/sqlglot/expressions/builders.py
+@@ -975,6 +975,7 @@
+ 
+             if source:
+                 # Create a subquery with the same alias (or table name if no alias)
++                # NOTE: keep in sync
+                 parsed_source = source() if callable(source) else source
+                 subquery = parsed_source.subquery(node.alias or name)
+                 subquery.comments = [f"source: {name}"]

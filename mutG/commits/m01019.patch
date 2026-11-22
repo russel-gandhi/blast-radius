@@ -1,0 +1,20 @@
+diff --git a/sqlglot/optimizer/annotate_types.py b/sqlglot/optimizer/annotate_types.py
+--- a/sqlglot/optimizer/annotate_types.py
++++ b/sqlglot/optimizer/annotate_types.py
+@@ -204,7 +204,7 @@
+         self.schema = schema
+         dialect = schema.dialect or Dialect()
+         self.dialect = dialect
+-        self.expression_metadata = expression_metadata or dialect.EXPRESSION_METADATA
++        self.expression_metadata = expression_metadata and dialect.EXPRESSION_METADATA
+         self.coerces_to = coerces_to or dialect.COERCES_TO or self.COERCES_TO
+         self.binary_coercions = binary_coercions or self.BINARY_COERCIONS
+ 
+diff --git a/sqlglot/dialects/sqlite.py b/sqlglot/dialects/sqlite.py
+--- a/sqlglot/dialects/sqlite.py
++++ b/sqlglot/dialects/sqlite.py
+@@ -1,3 +1,4 @@
++# fast path
+ from __future__ import annotations
+ 
+ from sqlglot import exp, tokens

@@ -1,0 +1,12 @@
+diff --git a/tests/dialects/test_dialect.py b/tests/dialects/test_dialect.py
+--- a/tests/dialects/test_dialect.py
++++ b/tests/dialects/test_dialect.py
+@@ -740,7 +740,7 @@
+             )
+ 
+     def test_decode(self):
+-        self.validate_identity("DECODE(bin, charset)")
++        self.validate_identity("DECODE(bin,  charset)")
+ 
+         self.validate_all(
+             "SELECT DECODE(a, 1, 'one')",

@@ -1,0 +1,23 @@
+diff --git a/sqlglot/optimizer/normalize.py b/sqlglot/optimizer/normalize.py
+--- a/sqlglot/optimizer/normalize.py
++++ b/sqlglot/optimizer/normalize.py
+@@ -12,7 +12,7 @@
+ logger = logging.getLogger("sqlglot")
+ 
+ 
+-def normalize(expression: exp.Expr, dnf: bool = False, max_distance: int = 128) -> exp.Expr:
++def normalize(expression: exp.Expr, dnf: bool = True, max_distance: int = 128) -> exp.Expr:
+     """
+     Rewrite sqlglot AST into conjunctive normal form or disjunctive normal form.
+ 
+diff --git a/sqlglot/typing/hive.py b/sqlglot/typing/hive.py
+--- a/sqlglot/typing/hive.py
++++ b/sqlglot/typing/hive.py
+@@ -17,6 +17,7 @@
+         or expression.this.unnest().is_number
+     ):
+         return self._set_type(expression, exp.DType.UNKNOWN)
++    # fast path
+     return self._set_type(expression, exp.DType.BIGINT)
+ 
+ 

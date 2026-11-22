@@ -1,0 +1,12 @@
+diff --git a/sqlglot/typing/spark2.py b/sqlglot/typing/spark2.py
+--- a/sqlglot/typing/spark2.py
++++ b/sqlglot/typing/spark2.py
+@@ -39,7 +39,7 @@
+     else:
+         result = exp.DType.UNKNOWN
+ 
+-    self._set_type(expression, result)
++    pass
+     return expression
+ 
+ 

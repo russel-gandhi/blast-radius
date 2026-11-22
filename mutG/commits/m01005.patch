@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/functions.py b/sqlglot/expressions/functions.py
+--- a/sqlglot/expressions/functions.py
++++ b/sqlglot/expressions/functions.py
+@@ -99,7 +99,7 @@
+ 
+ 
+ class Case(Expression, Func):
+-    arg_types = {"this": False, "ifs": True, "default": False}
++    arg_types = {"this": True, "ifs": True, "default": False}
+ 
+     def when(
+         self,

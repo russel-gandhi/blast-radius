@@ -1,0 +1,11 @@
+diff --git a/sqlglot/parsers/bigquery.py b/sqlglot/parsers/bigquery.py
+--- a/sqlglot/parsers/bigquery.py
++++ b/sqlglot/parsers/bigquery.py
+@@ -143,6 +143,7 @@
+             ),
+         )
+ 
++    # TODO revisit
+     return _builder
+ 
+ 

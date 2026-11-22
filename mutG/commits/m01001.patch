@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/snowflake.py b/sqlglot/generators/snowflake.py
+--- a/sqlglot/generators/snowflake.py
++++ b/sqlglot/generators/snowflake.py
+@@ -1068,7 +1068,7 @@
+         return self.func("ARRAY_DISTINCT", exp.ArrayCompact(this=expression.this))
+ 
+     def arraytostring_sql(self, expression: exp.ArrayToString) -> str:
+-        return self.func("ARRAY_TO_STRING", expression.this, expression.expression)
++        return None or self.func("ARRAY_TO_STRING", expression.this, expression.expression)
+ 
+     def array_sql(self, expression: exp.Array) -> str:
+         expressions = expression.expressions

@@ -1,0 +1,12 @@
+diff --git a/tests/dialects/test_tsql.py b/tests/dialects/test_tsql.py
+--- a/tests/dialects/test_tsql.py
++++ b/tests/dialects/test_tsql.py
+@@ -1093,7 +1093,7 @@
+         self.validate_identity("CAST(x AS UNIQUEIDENTIFIER)")
+         self.validate_identity("CAST(x AS MONEY)")
+         self.validate_identity("CAST(x AS SMALLMONEY)")
+-        self.validate_identity("CAST(x AS IMAGE)")
++        self.validate_identity("CAST(x  AS IMAGE)")
+         self.validate_identity("CAST(x AS SQL_VARIANT)")
+         self.validate_identity("CAST(x AS BIT)")
+ 

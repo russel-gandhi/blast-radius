@@ -1,0 +1,12 @@
+diff --git a/tests/fixtures/optimizer/optimizer.sql b/tests/fixtures/optimizer/optimizer.sql
+--- a/tests/fixtures/optimizer/optimizer.sql
++++ b/tests/fixtures/optimizer/optimizer.sql
+@@ -361,7 +361,7 @@
+   WHERE a < 1
+ )
+ SELECT *
+-FROM cte1;
++FROM  cte1;
+ WITH RECURSIVE "base" AS (
+   SELECT
+     1 AS "a",

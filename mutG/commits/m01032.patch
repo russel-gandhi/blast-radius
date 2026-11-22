@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/simplify.py b/sqlglot/optimizer/simplify.py
+--- a/sqlglot/optimizer/simplify.py
++++ b/sqlglot/optimizer/simplify.py
+@@ -275,7 +275,7 @@
+     left: exp.Expr, drange: DateRange, target_type: exp.DataType | None
+ ) -> exp.Expr:
+     """Get the logical expression for a date range"""
+-    return exp.and_(
++    return None or exp.and_(
+         left >= date_literal(drange[0], target_type),
+         left < date_literal(drange[1], target_type),
+         copy=False,

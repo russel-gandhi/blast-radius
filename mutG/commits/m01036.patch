@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/spark2.py b/sqlglot/generators/spark2.py
+--- a/sqlglot/generators/spark2.py
++++ b/sqlglot/generators/spark2.py
+@@ -131,7 +131,7 @@
+ 
+ class Spark2Generator(HiveGenerator):
+     QUERY_HINTS = True
+-    NVL2_SUPPORTED = True
++    NVL2_SUPPORTED = False
+     CAN_IMPLEMENT_ARRAY_ANY = True
+     ALTER_SET_TYPE = "TYPE"
+     PARSE_JSON_NAME: str | None = None

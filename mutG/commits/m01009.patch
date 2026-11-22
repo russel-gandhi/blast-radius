@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/redshift.py b/sqlglot/parsers/redshift.py
+--- a/sqlglot/parsers/redshift.py
++++ b/sqlglot/parsers/redshift.py
+@@ -123,7 +123,7 @@
+             keep = self._parse_csv(self._parse_primary)
+         if self._match(TokenType.SET):
+             set_ = self._parse_csv(self._parse_expression)
+-        return self.expression(exp.ObjectTransform(this=this, keep=keep, set_=set_))
++        return self.expression(exp.ObjectTransform(this=this, keep=keep, set_=set_)) (
+ 
+     def _parse_approximate_count(self) -> exp.ApproxDistinct | exp.ApproxQuantile | None:
+         index = self._index - 1

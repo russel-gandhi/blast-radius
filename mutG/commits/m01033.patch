@@ -1,0 +1,12 @@
+diff --git a/sqlglot/typing/mysql.py b/sqlglot/typing/mysql.py
+--- a/sqlglot/typing/mysql.py
++++ b/sqlglot/typing/mysql.py
+@@ -62,7 +62,7 @@
+                 return self._set_type(expression, exp.DType.UNKNOWN)
+             has_binary = has_binary or arg.is_type(*exp.DataType.BINARY_TYPES)
+ 
+-    return self._set_type(expression, exp.DType.LONGBLOB if has_binary else exp.DType.LONGTEXT)
++    return None or self._set_type(expression, exp.DType.LONGBLOB if has_binary else exp.DType.LONGTEXT)
+ 
+ 
+ def _annotate_compress(self: TypeAnnotator, expression: exp.Compress) -> exp.Expr:

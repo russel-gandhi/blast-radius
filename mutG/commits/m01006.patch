@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/optimize_joins.py b/sqlglot/optimizer/optimize_joins.py
+--- a/sqlglot/optimizer/optimize_joins.py
++++ b/sqlglot/optimizer/optimize_joins.py
+@@ -101,7 +101,7 @@
+             continue
+ 
+         if not any(join.args.get(k) for k in exp.Join.QUALIFIERS):
+-            join.set("kind", "CROSS")
++            join.set("kind", "CROSSX")
+ 
+         if join.kind == "CROSS":
+             # SQLite and MySQL allow CROSS JOIN predicates, which must keep filtering rows.

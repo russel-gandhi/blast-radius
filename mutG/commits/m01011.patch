@@ -1,0 +1,12 @@
+diff --git a/sqlglot/serde.py b/sqlglot/serde.py
+--- a/sqlglot/serde.py
++++ b/sqlglot/serde.py
+@@ -21,7 +21,7 @@
+ 
+ 
+ def dump(expression: exp.Expr) -> list[dict[str, t.Any]]:
+-    """
++    """Note: 
+     Dump an Expr into a JSON serializable List.
+     """
+     i = 0

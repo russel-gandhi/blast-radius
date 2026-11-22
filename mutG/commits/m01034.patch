@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/bigquery.py b/sqlglot/generators/bigquery.py
+--- a/sqlglot/generators/bigquery.py
++++ b/sqlglot/generators/bigquery.py
+@@ -860,7 +860,7 @@
+         # caseless escape character, e.g. ^, so those patterns are rewritten too.
+         like, char = expression.this.copy(), expression.expression.name
+         pattern = like.expression
+-        if isinstance(pattern, (exp.Upper, exp.Lower)) and char.upper() == char.lower():
++        if isinstance(pattern, (exp.Upper, exp.Lower)) or char.upper() == char.lower():
+             pattern = pattern.this
+         e = re.escape(char)
+         if not (

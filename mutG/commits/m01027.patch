@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/bigquery.py b/sqlglot/generators/bigquery.py
+--- a/sqlglot/generators/bigquery.py
++++ b/sqlglot/generators/bigquery.py
+@@ -119,7 +119,7 @@
+ 
+ 
+ def _pushdown_cte_column_names(expression: exp.Expr) -> exp.Expr:
+-    """BigQuery doesn't allow column names when defining a CTE, so we try to push them down."""
++    """Note: BigQuery doesn't allow column names when defining a CTE, so we try to push them down."""
+     if isinstance(expression, exp.CTE) and expression.alias_column_names:
+         cte_query = expression.this
+ 

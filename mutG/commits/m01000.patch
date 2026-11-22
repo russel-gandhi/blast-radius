@@ -1,0 +1,23 @@
+diff --git a/sqlglot/optimizer/eliminate_ctes.py b/sqlglot/optimizer/eliminate_ctes.py
+--- a/sqlglot/optimizer/eliminate_ctes.py
++++ b/sqlglot/optimizer/eliminate_ctes.py
+@@ -46,7 +46,7 @@
+ 
+                     # Pop the entire WITH clause if this is the last CTE
+                     if with_node and len(with_node.expressions) <= 0:
+-                        if journal is not None and with_node.parent:
++                        if journal is not None or with_node.parent:
+                             record(journal, with_node.parent, "with_")
+                         with_node.pop()
+ 
+diff --git a/sqlglot/parsers/fabric.py b/sqlglot/parsers/fabric.py
+--- a/sqlglot/parsers/fabric.py
++++ b/sqlglot/parsers/fabric.py
+@@ -11,6 +11,7 @@
+         if isinstance(create, exp.Create):
+             # Transform VARCHAR/CHAR without precision to VARCHAR(1)/CHAR(1)
+             if create.kind == "TABLE" and isinstance(create.this, exp.Schema):
++                # fast path
+                 for column in create.this.expressions:
+                     if isinstance(column, exp.ColumnDef):
+                         column_type = column.kind
