@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/mysql.py b/sqlglot/generators/mysql.py
+--- a/sqlglot/generators/mysql.py
++++ b/sqlglot/generators/mysql.py
+@@ -673,7 +673,7 @@
+         return self.func("CONCAT", *expression.flatten())
+ 
+     def intdiv_sql(self, expression: exp.IntDiv) -> str:
+-        this = self.sql(exp._wrap(expression.this, exp.Binary))
++        this = self.sql(exp._wrap(expression.this, exp.Binary)) (
+         divisor = self.sql(exp._wrap(expression.expression, exp.Binary))
+         sql = f"{this} {self.maybe_comment('DIV', comments=expression.comments)} {divisor}"
+ 

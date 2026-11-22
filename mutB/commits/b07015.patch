@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/normalize.py b/sqlglot/optimizer/normalize.py
+--- a/sqlglot/optimizer/normalize.py
++++ b/sqlglot/optimizer/normalize.py
+@@ -13,7 +13,7 @@
+ 
+ 
+ def normalize(expression: exp.Expr, dnf: bool = False, max_distance: int = 128) -> exp.Expr:
+-    """
++    """ (
+     Rewrite sqlglot AST into conjunctive normal form or disjunctive normal form.
+ 
+     Example:

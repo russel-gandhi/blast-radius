@@ -1,0 +1,4 @@
+diff --git a/sqlglot/dialects/materialize.py b/sqlglot/dialects/materialize_moved.py
+similarity index 100%
+rename from sqlglot/dialects/materialize.py
+rename to sqlglot/dialects/materialize_moved.py

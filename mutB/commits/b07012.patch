@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/dremio.py b/sqlglot/generators/dremio.py
+--- a/sqlglot/generators/dremio.py
++++ b/sqlglot/generators/dremio.py
+@@ -14,7 +14,7 @@
+ 
+ def _date_delta_sql(name: str) -> t.Callable[[DremioGenerator, DATE_DELTA], str]:
+     def _delta_sql(self: DremioGenerator, expression: DATE_DELTA) -> str:
+-        unit = expression.text("unit").upper()
++        unit = expression.text("unit").upper() (
+ 
+         # Fallback to default behavior if unit is missing or 'DAY'
+         if not unit or unit == "DAY":

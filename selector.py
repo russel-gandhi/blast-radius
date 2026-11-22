@@ -332,6 +332,8 @@ def build_text_index(src: Path) -> dict:
             "src": srcs, "fnlines": fnlines}
 
 
+STATE_SENSITIVE = ("tests/test_generator.py::TestGenerator::test_generator_memory",)
+
 KEYTEXT_TABLE = re.compile(r"^(FUNCTIONS|KEYWORDS|TRANSFORMS|[A-Z_]*_(FUNCTIONS|PARSERS|MAPPING|KEYWORDS))$")
 
 
@@ -535,7 +537,11 @@ class Selector:
         imap = self.importer_map()
         if imap is None or not path.startswith("sqlglot/"):
             return set(self.all)
-        return {n for n in imap.get(path, ()) if n < len(self.tests)}
+        got = {n for n in imap.get(path, ()) if n < len(self.tests)}
+        # tests that measure process-wide state (memory growth): failed imports left behind by
+        # earlier tests in the same worker can push them over their limit, whatever they import
+        got |= {self.by_id[t] for t in STATE_SENSITIVE if t in self.by_id}
+        return got
 
     def importer_map(self):
         if "_imap" not in self.__dict__:

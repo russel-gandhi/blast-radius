@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/athena.py b/sqlglot/dialects/athena.py
+--- a/sqlglot/dialects/athena.py
++++ b/sqlglot/dialects/athena.py
+@@ -120,7 +120,7 @@
+ 
+ 
+ def _may_be_hive(tokens: list[Token]) -> bool:
+-    return bool(tokens) and (
++    return bool(tokens) and ( (
+         tokens[0].token_type in _MAYBE_HIVE_TOKENS or tokens[0].text.upper() == "MSCK"
+     )
+ 

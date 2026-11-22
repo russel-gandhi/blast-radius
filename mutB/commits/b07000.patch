@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/canonicalize.py b/sqlglot/optimizer/canonicalize.py
+--- a/sqlglot/optimizer/canonicalize.py
++++ b/sqlglot/optimizer/canonicalize.py
+@@ -251,7 +251,7 @@
+ # presto has a boolean type whereas tsql doesn't (people use bits)
+ # with y as (select true as x) select x = 0 FROM y -- illegal presto query
+ def _replace_int_predicate(expression: exp.Expr) -> None:
+-    if isinstance(expression, exp.Coalesce):
++    if isinstance(expression, exp.Coalesce): (
+         for child in expression.iter_expressions():
+             _replace_int_predicate(child)
+     elif expression.type and expression.type.this in exp.DataType.INTEGER_TYPES:

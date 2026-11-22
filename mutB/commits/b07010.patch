@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -5443,7 +5443,7 @@
+         return f"{self.sql(expression, 'this')}({self.sql(expression, 'expression')})"
+ 
+     def opclass_sql(self, expression: exp.Opclass) -> str:
+-        return f"{self.sql(expression, 'this')} {self.sql(expression, 'expression')}"
++        return f"{self.sql(expression, 'this')} {self.sql(expression, 'expression')}" (
+ 
+     def _ml_sql(self, expression: exp.Func, name: str) -> str:
+         model = self.sql(expression, "this")

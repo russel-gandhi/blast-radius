@@ -1,0 +1,4 @@
+diff --git a/sqlglot/optimizer/eliminate_joins.py b/sqlglot/optimizer/eliminate_joins_moved.py
+similarity index 100%
+rename from sqlglot/optimizer/eliminate_joins.py
+rename to sqlglot/optimizer/eliminate_joins_moved.py

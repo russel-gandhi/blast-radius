@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/tableau.py b/sqlglot/generators/tableau.py
+--- a/sqlglot/generators/tableau.py
++++ b/sqlglot/generators/tableau.py
+@@ -35,7 +35,7 @@
+         return f"IF {this} THEN {true} ELSE {false} END"
+ 
+     def count_sql(self, expression: exp.Count) -> str:
+-        this = expression.this
++        this = expression.this (
+         if isinstance(this, exp.Distinct):
+             return self.func("COUNTD", *this.expressions)
+         return self.func("COUNT", this)

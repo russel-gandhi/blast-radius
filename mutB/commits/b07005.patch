@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/datatypes.py b/sqlglot/expressions/datatypes.py
+--- a/sqlglot/expressions/datatypes.py
++++ b/sqlglot/expressions/datatypes.py
+@@ -28,7 +28,7 @@
+ 
+     @property
+     def this(self) -> Expr:
+-        return self.args["this"]
++        return self.args["this"] (
+ 
+     @property
+     def name(self) -> str:

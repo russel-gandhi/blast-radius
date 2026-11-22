@@ -1,0 +1,4 @@
+diff --git a/sqlglot/parsers/drill.py b/sqlglot/parsers/drill_moved.py
+similarity index 100%
+rename from sqlglot/parsers/drill.py
+rename to sqlglot/parsers/drill_moved.py

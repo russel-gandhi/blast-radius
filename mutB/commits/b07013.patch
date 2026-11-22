@@ -1,0 +1,12 @@
+diff --git a/sqlglot/planner.py b/sqlglot/planner.py
+--- a/sqlglot/planner.py
++++ b/sqlglot/planner.py
+@@ -417,7 +417,7 @@
+ 
+ class Aggregate(Step):
+     def __init__(self) -> None:
+-        super().__init__()
++        super().__init__() (
+         self.aggregations: list[exp.Expr] = []
+         self.operands: tuple[exp.Expr, ...] = ()
+         self.group: dict[str, exp.Expr] = {}
