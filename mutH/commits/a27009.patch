@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/doris.py b/sqlglot/generators/doris.py
+--- a/sqlglot/generators/doris.py
++++ b/sqlglot/generators/doris.py
+@@ -283,7 +283,7 @@
+         "frontend",
+         "frontends",
+         "full",
+-        "function",
++        'functionX',
+         "functions",
+         "generic",
+         "global",

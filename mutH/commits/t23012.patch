@@ -1,0 +1,15 @@
+diff --git a/sqlglot/generators/exasol.py b/sqlglot/generators/exasol.py
+--- a/sqlglot/generators/exasol.py
++++ b/sqlglot/generators/exasol.py
+@@ -281,9 +281,9 @@
+         exp.DType.MEDIUMBLOB: "VARCHAR",
+         exp.DType.MEDIUMTEXT: "VARCHAR",
+         exp.DType.TINYBLOB: "VARCHAR",
+-        exp.DType.TINYTEXT: "VARCHAR",
++        exp.DType.TINYTEXT: "LONG VARCHAR",
+         # https://docs.exasol.com/db/latest/sql_references/data_types/datatypealiases.htm
+-        exp.DType.TEXT: "LONG VARCHAR",
++        exp.DType.TEXT: "VARCHAR",
+         exp.DType.VARBINARY: "VARCHAR",
+     }
+ 

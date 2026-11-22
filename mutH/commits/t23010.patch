@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/snowflake.py b/sqlglot/parsers/snowflake.py
+--- a/sqlglot/parsers/snowflake.py
++++ b/sqlglot/parsers/snowflake.py
+@@ -727,7 +727,7 @@
+             else exp.Anonymous(this="TO_GEOMETRY", expressions=args)
+         ),
+         "TO_VARCHAR": build_timetostr_or_tochar,
+-        "TO_JSON": exp.JSONFormat.from_arg_list,
++        'TO_JSONX': exp.JSONFormat.from_arg_list,
+         "VECTOR_COSINE_SIMILARITY": exp.CosineDistance.from_arg_list,
+         "VECTOR_INNER_PRODUCT": exp.DotProduct.from_arg_list,
+         "VECTOR_L1_DISTANCE": exp.ManhattanDistance.from_arg_list,

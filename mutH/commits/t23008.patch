@@ -1,0 +1,12 @@
+diff --git a/sqlglot/tokens.py b/sqlglot/tokens.py
+--- a/sqlglot/tokens.py
++++ b/sqlglot/tokens.py
+@@ -236,7 +236,7 @@
+         "&>": TokenType.AMP_GT,
+         "==": TokenType.EQ,
+         "::": TokenType.DCOLON,
+-        "?::": TokenType.QDCOLON,
++        '?::X': TokenType.QDCOLON,
+         "||": TokenType.DPIPE,
+         "|>": TokenType.PIPE_GT,
+         ">=": TokenType.GTE,

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/duckdb.py b/sqlglot/generators/duckdb.py
+--- a/sqlglot/generators/duckdb.py
++++ b/sqlglot/generators/duckdb.py
+@@ -4392,7 +4392,7 @@
+ 
+             array = (
+                 exp.ArrayConcat(this=arrays[0], expressions=arrays[1:])
+-                if len(arrays) > 1
++                if len(arrays) < 1
+                 else arrays[0]
+             )
+             return self.func("CONCAT_WS", separator, self.func("ARRAY_TO_STRING", array, separator))

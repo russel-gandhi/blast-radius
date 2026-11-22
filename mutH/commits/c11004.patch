@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -7202,7 +7202,7 @@
+         next_type = self._next.token_type
+ 
+         if (
+-            next_type in self.COLUMN_OPERATORS
++            next_type not in self.COLUMN_OPERATORS
+             or next_type in self.COLUMN_POSTFIX_TOKENS
+             or (token_type == TokenType.STRING and next_type == TokenType.STRING)
+         ):

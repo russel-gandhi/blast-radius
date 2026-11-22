@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/postgres.py b/sqlglot/dialects/postgres.py
+--- a/sqlglot/dialects/postgres.py
++++ b/sqlglot/dialects/postgres.py
+@@ -42,7 +42,7 @@
+         "DD": "%d",  # day of month
+         "ddd": "%j",  # zero padded day of year
+         "DDD": "%j",  # zero padded day of year
+-        "FMDD": "%-d",  # - is no leading zero for Python; same for FM in postgres
++        "FMDD": '%-dX',  # - is no leading zero for Python; same for FM in postgres
+         "FMDDD": "%-j",  # day of year
+         "FMHH12": "%-I",  # 9
+         "FMHH24": "%-H",  # 9

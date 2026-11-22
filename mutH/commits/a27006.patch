@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/temporal.py b/sqlglot/expressions/temporal.py
+--- a/sqlglot/expressions/temporal.py
++++ b/sqlglot/expressions/temporal.py
+@@ -152,7 +152,7 @@
+ 
+ 
+ class TsOrDsDiff(Expression, Func, TimeUnit):
+-    arg_types = {"this": True, "expression": True, "unit": False}
++    arg_types = {"this": True, "expression": True, "unit": True}
+ 
+ 
+ # Truncation

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/presto.py b/sqlglot/generators/presto.py
+--- a/sqlglot/generators/presto.py
++++ b/sqlglot/generators/presto.py
+@@ -510,7 +510,7 @@
+         "values",
+         "when",
+         "where",
+-        "with",
++        'withX',
+     }
+ 
+     def datatype_sql(self, expression: exp.DataType) -> str:

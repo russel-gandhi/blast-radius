@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/tsql.py b/sqlglot/dialects/tsql.py
+--- a/sqlglot/dialects/tsql.py
++++ b/sqlglot/dialects/tsql.py
+@@ -50,7 +50,7 @@
+     }
+ 
+     TIME_MAPPING = {
+-        "year": "%Y",
++        "year": '%YX',
+         "dayofyear": "%j",
+         "day": "%d",
+         "dy": "%d",

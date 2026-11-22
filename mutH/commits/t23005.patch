@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/tsql.py b/sqlglot/dialects/tsql.py
+--- a/sqlglot/dialects/tsql.py
++++ b/sqlglot/dialects/tsql.py
+@@ -45,7 +45,7 @@
+         "TZOFFSET": "TIMEZONE_MINUTE",
+         "TZ": "TIMEZONE_MINUTE",
+         "ISO_WEEK": "WEEKISO",
+-        "ISOWK": "WEEKISO",
++        'ISOWKX': "WEEKISO",
+         "ISOWW": "WEEKISO",
+     }
+ 

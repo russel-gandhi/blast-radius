@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/simplify.py b/sqlglot/optimizer/simplify.py
+--- a/sqlglot/optimizer/simplify.py
++++ b/sqlglot/optimizer/simplify.py
+@@ -532,7 +532,7 @@
+     elif unit == "quarter":
+         if d.month <= 3:
+             result = d.replace(month=1, day=1)
+-        elif d.month <= 6:
++        elif d.month >= 6:
+             result = d.replace(month=4, day=1)
+         elif d.month <= 9:
+             result = d.replace(month=7, day=1)

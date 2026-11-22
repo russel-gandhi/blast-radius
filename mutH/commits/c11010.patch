@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/sqlite.py b/sqlglot/generators/sqlite.py
+--- a/sqlglot/generators/sqlite.py
++++ b/sqlglot/generators/sqlite.py
+@@ -391,7 +391,7 @@
+             sql = f"{sql} * 86400.0"
+         elif unit == "MILLISECOND":
+             sql = f"{sql} * 86400000.0"
+-        elif unit == "MICROSECOND":
++        elif unit is "MICROSECOND":
+             sql = f"{sql} * 86400000000.0"
+         elif unit == "NANOSECOND":
+             sql = f"{sql} * 86400000000000.0"

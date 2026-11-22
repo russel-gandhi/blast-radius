@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/simplify.py b/sqlglot/optimizer/simplify.py
+--- a/sqlglot/optimizer/simplify.py
++++ b/sqlglot/optimizer/simplify.py
+@@ -703,7 +703,7 @@
+ 
+                 if having:
+                     for n in having.walk():
+-                        if n in groups:
++                        if n not in groups:
+                             having.meta[FINAL] = True
+                             break
+ 

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/spark2.py b/sqlglot/generators/spark2.py
+--- a/sqlglot/generators/spark2.py
++++ b/sqlglot/generators/spark2.py
+@@ -27,7 +27,7 @@
+ 
+     # ARRAY_SORT puts NULLs last, while SORT_ARRAY puts them first exactly when ascending
+     order = array_sort_order(expression)
+-    if order is None:
++    if order == None:
+         asc = expression.args.get("asc")
+         if expression.args.get("nulls_first") != asc:
+             self.unsupported("SORT_ARRAY puts NULLs first exactly when ascending")

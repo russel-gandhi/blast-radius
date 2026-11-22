@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/oracle.py b/sqlglot/generators/oracle.py
+--- a/sqlglot/generators/oracle.py
++++ b/sqlglot/generators/oracle.py
+@@ -33,7 +33,7 @@
+     CAST_TO_INT_ROUNDS = True
+     JOIN_HINTS = False
+     TABLE_HINTS = False
+-    DATA_TYPE_SPECIFIERS_ALLOWED = True
++    DATA_TYPE_SPECIFIERS_ALLOWED = False
+     ALTER_TABLE_INCLUDE_COLUMN_KEYWORD = False
+     LIMIT_FETCH = "FETCH"
+     TABLESAMPLE_KEYWORDS = "SAMPLE"

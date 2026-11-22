@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -7478,7 +7478,7 @@
+ 
+         if not this and self._match(TokenType.R_PAREN, advance=False):
+             this = self.expression(exp.Tuple())
+-        elif len(expressions) > 1 or self._prev.token_type == TokenType.COMMA:
++        elif len(expressions) < 1 or self._prev.token_type == TokenType.COMMA:
+             this = self.expression(exp.Tuple(expressions=expressions))
+         elif isinstance(this, exp.UNWRAPPED_QUERIES):
+             this = self._parse_subquery(this=this, parse_alias=False)

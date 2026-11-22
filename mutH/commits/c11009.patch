@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/tsql.py b/sqlglot/generators/tsql.py
+--- a/sqlglot/generators/tsql.py
++++ b/sqlglot/generators/tsql.py
+@@ -537,7 +537,7 @@
+         table = expression.find(exp.Table)
+ 
+         # Convert CTAS statement to SELECT .. INTO ..
+-        if kind == "TABLE" and ctas_expression:
++        if kind == 'TABLE_x' and ctas_expression:
+             if isinstance(ctas_expression, exp.UNWRAPPED_QUERIES):
+                 ctas_expression = ctas_expression.subquery()
+ 

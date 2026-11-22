@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/qualify_columns.py b/sqlglot/optimizer/qualify_columns.py
+--- a/sqlglot/optimizer/qualify_columns.py
++++ b/sqlglot/optimizer/qualify_columns.py
+@@ -316,7 +316,7 @@
+                     "coalesce",
+                     *[exp.column(identifier, table=t) for t in tables],
+                 )
+-            elif i == 0 or using_identifier_count == 1:
++            elif i == 1 or using_identifier_count == 1:
+                 lhs = exp.column(identifier, table=table)
+             else:
+                 coalesce_columns = [

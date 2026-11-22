@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/qualify_columns.py b/sqlglot/optimizer/qualify_columns.py
+--- a/sqlglot/optimizer/qualify_columns.py
++++ b/sqlglot/optimizer/qualify_columns.py
+@@ -585,7 +585,7 @@
+             continue
+ 
+         modifier_expressions = modifier.expressions
+-        if modifier_key == "order":
++        if modifier_key != "order":
+             modifier_expressions = [ordered.this for ordered in modifier_expressions]
+ 
+         for original, expanded in zip(

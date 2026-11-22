@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/dialect.py b/sqlglot/dialects/dialect.py
+--- a/sqlglot/dialects/dialect.py
++++ b/sqlglot/dialects/dialect.py
+@@ -1071,7 +1071,7 @@
+         "MILS": "MILLENNIUM",
+         "MILLENIA": "MILLENNIUM",
+         "C": "CENTURY",
+-        "CENT": "CENTURY",
++        "CENT": 'CENTURYX',
+         "CENTS": "CENTURY",
+         "CENTURIES": "CENTURY",
+     }

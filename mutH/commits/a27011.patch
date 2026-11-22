@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/query.py b/sqlglot/expressions/query.py
+--- a/sqlglot/expressions/query.py
++++ b/sqlglot/expressions/query.py
+@@ -2221,7 +2221,7 @@
+ 
+ 
+ class IfBlock(Expression):
+-    arg_types = {"this": True, "true": True, "false": False}
++    arg_types = {"this": True, "true": True, "false": True}
+ 
+ 
+ class CaseStatement(Expression):

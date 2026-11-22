@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/annotate_types.py b/sqlglot/optimizer/annotate_types.py
+--- a/sqlglot/optimizer/annotate_types.py
++++ b/sqlglot/optimizer/annotate_types.py
+@@ -721,7 +721,7 @@
+                     names = [column.name for column in on]
+                 elif expression.kind == "INNER":
+                     names = [name for name in left_types if name in right_types]
+-                elif expression.side == "LEFT":
++                elif expression.side == 'LEFT_x':
+                     names = list(left_types)
+                 else:
+                     names = list({**left_types, **right_types})

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/bigquery.py b/sqlglot/parsers/bigquery.py
+--- a/sqlglot/parsers/bigquery.py
++++ b/sqlglot/parsers/bigquery.py
+@@ -25,7 +25,7 @@
+ 
+ 
+ def _build_date(args: list) -> exp.Date | exp.DateFromParts:
+-    expr_type = exp.DateFromParts if len(args) == 3 else exp.Date
++    expr_type = exp.DateFromParts if len(args) != 3 else exp.Date
+     return expr_type.from_arg_list(args)
+ 
+ 

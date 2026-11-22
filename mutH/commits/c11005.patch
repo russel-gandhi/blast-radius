@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/duckdb.py b/sqlglot/generators/duckdb.py
+--- a/sqlglot/generators/duckdb.py
++++ b/sqlglot/generators/duckdb.py
+@@ -3189,7 +3189,7 @@
+                 )
+             )
+ 
+-        if part_name in self.EXTRACT_EPOCH_MAPPINGS:
++        if part_name not in self.EXTRACT_EPOCH_MAPPINGS:
+             func_name = self.EXTRACT_EPOCH_MAPPINGS[part_name]
+             result: exp.Expr = exp.Anonymous(this=func_name, expressions=[datetime_expr])
+             # EPOCH returns float, cast to BIGINT for integer result

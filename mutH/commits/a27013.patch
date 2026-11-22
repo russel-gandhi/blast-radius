@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/dialect.py b/sqlglot/dialects/dialect.py
+--- a/sqlglot/dialects/dialect.py
++++ b/sqlglot/dialects/dialect.py
+@@ -119,7 +119,7 @@
+     POSTGRES = "postgres"
+     PRESTO = "presto"
+     PRQL = "prql"
+-    REDSHIFT = "redshift"
++    REDSHIFT = 'redshiftX'
+     RISINGWAVE = "risingwave"
+     SNOWFLAKE = "snowflake"
+     SOLR = "solr"

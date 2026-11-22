@@ -334,6 +334,27 @@ def build_text_index(src: Path) -> dict:
 
 STATE_SENSITIVE = ("tests/test_generator.py::TestGenerator::test_generator_memory",)
 
+def uses_name_at_import(tree, name: str, own_stmt) -> bool:
+    """Is `name` loaded by bare name in any class or module body statement other than own_stmt?
+
+    Function bodies are skipped (they run later, where the class's attribute is read through
+    self/cls and traced); class and module bodies run at import and copy the value.
+    """
+    def visit(node):
+        if node is own_stmt:
+            return False
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)):
+            # defaults and decorators run at import; the body does not
+            parts = list(getattr(node.args, "defaults", [])) + list(getattr(node.args, "kw_defaults", []) or [])
+            parts += list(getattr(node, "decorator_list", []))
+            return any(p is not None and visit(p) for p in parts)
+        if isinstance(node, ast.Name) and node.id == name and isinstance(node.ctx, ast.Load):
+            return True
+        return any(visit(c) for c in ast.iter_child_nodes(node))
+
+    return visit(tree)
+
+
 KEYTEXT_TABLE = re.compile(r"^(FUNCTIONS|KEYWORDS|TRANSFORMS|[A-Z_]*_(FUNCTIONS|PARSERS|MAPPING|KEYWORDS))$")
 
 
@@ -960,6 +981,10 @@ class Selector:
             if got is not None:
                 self.refine_intersect.add(path)
                 return got
+        if uses_name_at_import(old_tree, name, stmt):
+            # used by bare name in a class or module body (e.g. TYPE_MAPPING = {**STRING_TYPE_MAPPING}):
+            # its value feeds other values while the module loads, which reads do not show
+            return None
         if name in am["dynamic"] or name.startswith("__"):
             return None  # read by name somewhere, or used by Python itself (__slots__, ...)
         module = path[:-3].replace("/", ".")

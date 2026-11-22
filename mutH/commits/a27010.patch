@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/mysql.py b/sqlglot/generators/mysql.py
+--- a/sqlglot/generators/mysql.py
++++ b/sqlglot/generators/mysql.py
+@@ -606,7 +606,7 @@
+         "where",
+         "while",
+         "window",
+-        "with",
++        'withX',
+         "write",
+         "xor",
+         "year_month",

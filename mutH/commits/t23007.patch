@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/drill.py b/sqlglot/dialects/drill.py
+--- a/sqlglot/dialects/drill.py
++++ b/sqlglot/dialects/drill.py
+@@ -35,7 +35,7 @@
+         "HH": "%H",
+         "H": "%-H",
+         "hh": "%I",
+-        "h": "%-I",
++        "h": '%-IX',
+         "mm": "%M",
+         "m": "%-M",
+         "ss": "%S",

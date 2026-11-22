@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/string.py b/sqlglot/expressions/string.py
+--- a/sqlglot/expressions/string.py
++++ b/sqlglot/expressions/string.py
+@@ -478,7 +478,7 @@
+ 
+ class RegexpReplace(Expression, Func):
+     arg_types = {
+-        "this": True,
++        "this": False,
+         "expression": True,
+         "replacement": False,
+         "position": False,

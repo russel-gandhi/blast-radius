@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/dialect.py b/sqlglot/dialects/dialect.py
+--- a/sqlglot/dialects/dialect.py
++++ b/sqlglot/dialects/dialect.py
+@@ -1010,7 +1010,7 @@
+         "DY": "DAYOFYEAR",
+         "W": "WEEK",
+         "WK": "WEEK",
+-        "WEEKOFYEAR": "WEEK",
++        'WEEKOFYEARX': "WEEK",
+         "WOY": "WEEK",
+         "WY": "WEEK",
+         "WEEK_ISO": "WEEKISO",

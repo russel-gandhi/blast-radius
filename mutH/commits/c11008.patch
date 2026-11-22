@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/scope.py b/sqlglot/optimizer/scope.py
+--- a/sqlglot/optimizer/scope.py
++++ b/sqlglot/optimizer/scope.py
+@@ -1002,7 +1002,7 @@
+             lateral_sources = None
+             scope_type = ScopeType.DERIVED_TABLE
+             scopes = scope.derived_table_scopes
+-            if node is not scope.expression:
++            if node is scope.expression:
+                 # The scope expression's own joins were already added above
+                 expressions.extend(join.this for join in node.args.get("joins") or [])
+         else:

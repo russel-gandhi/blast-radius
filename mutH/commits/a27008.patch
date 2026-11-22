@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/bigquery.py b/sqlglot/generators/bigquery.py
+--- a/sqlglot/generators/bigquery.py
++++ b/sqlglot/generators/bigquery.py
+@@ -676,7 +676,7 @@
+         "proto",
+         "qualify",
+         "range",
+-        "recursive",
++        'recursiveX',
+         "respect",
+         "right",
+         "rollup",

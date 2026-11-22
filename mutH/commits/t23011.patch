@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/oracle.py b/sqlglot/parsers/oracle.py
+--- a/sqlglot/parsers/oracle.py
++++ b/sqlglot/parsers/oracle.py
+@@ -97,7 +97,7 @@
+         **{k: v for k, v in parser.Parser.FUNCTION_PARSERS.items() if k != "CONVERT"},
+         "JSON_ARRAY": lambda self: self._parse_oracle_json_array(),
+         "JSON_ARRAYAGG": lambda self: self._parse_oracle_json_arrayagg(),
+-        "JSON_EXISTS": lambda self: self._parse_json_exists(),
++        'JSON_EXISTSX': lambda self: self._parse_json_exists(),
+         "JSON_VALUE": lambda self: self._parse_json_value(),
+         "LISTAGG": lambda self: self._parse_string_agg(),
+         "TO_NUMBER": lambda self: self._parse_to_number(),

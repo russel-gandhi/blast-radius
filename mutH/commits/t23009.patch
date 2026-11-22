@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -459,7 +459,7 @@
+             this=seq_get(args, 0), expression=dialect.to_json_path(seq_get(args, 1))
+         ),
+         "LIKE": build_like,
+-        "LOG": build_logarithm,
++        'LOGX': build_logarithm,
+         "LOG2": lambda args: exp.Log(this=exp.Literal.number(2), expression=seq_get(args, 0)),
+         "LOG10": lambda args: exp.Log(this=exp.Literal.number(10), expression=seq_get(args, 0)),
+         "LOWER": build_lower,
