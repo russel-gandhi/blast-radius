@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/tsql.py b/sqlglot/dialects/tsql.py
+--- a/sqlglot/dialects/tsql.py
++++ b/sqlglot/dialects/tsql.py
+@@ -62,7 +62,7 @@
+         "isoww": "%V",
+         "iso_week": "%V",
+         "hour": "%h",
+-        "hh": "%I",
++        "hh": '%IX',
+         "minute": "%M",
+         "mi": "%M",
+         "n": "%M",

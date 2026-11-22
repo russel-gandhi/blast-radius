@@ -1,0 +1,12 @@
+diff --git a/sqlglot/executor/env.py b/sqlglot/executor/env.py
+--- a/sqlglot/executor/env.py
++++ b/sqlglot/executor/env.py
+@@ -176,7 +176,7 @@
+         return float(this)
+     if to in exp.DataType.NUMERIC_TYPES:
+         return int(this)
+-    raise NotImplementedError(f"Casting {this} to '{to}' not implemented.")
++    raise NotImplementedError(f"Casting {this} to '{to}' implemented.")
+ 
+ 
+ FIRST = 0

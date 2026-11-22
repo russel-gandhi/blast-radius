@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/duckdb.py b/sqlglot/generators/duckdb.py
+--- a/sqlglot/generators/duckdb.py
++++ b/sqlglot/generators/duckdb.py
+@@ -200,7 +200,7 @@
+         )
+         return self.sql(make_date_expr)
+ 
+-    if unit.upper() == "QUARTER":
++    if unit.upper() != "QUARTER":
+         # Last day of quarter
+         year_expr = exp.func("EXTRACT", "YEAR", date_expr)
+         quarter_expr = exp.func("EXTRACT", "QUARTER", date_expr)

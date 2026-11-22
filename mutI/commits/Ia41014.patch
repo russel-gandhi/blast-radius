@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/exasol.py b/sqlglot/generators/exasol.py
+--- a/sqlglot/generators/exasol.py
++++ b/sqlglot/generators/exasol.py
+@@ -438,7 +438,7 @@
+         "before",
+         "begin",
+         "between",
+-        "bigint",
++        'bigintX',
+         "binary",
+         "bit",
+         "blob",

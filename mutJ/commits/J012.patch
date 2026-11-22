@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -3396,7 +3396,7 @@
+             for p in ancestor.selects
+             if p.output_name == column_name
+         ]
+-        match = matched[0] if len(matched) == 1 else None
++        match = matched[1] if len(matched) == 1 else None
+ 
+         # Skip the substitution when it would be identical to the existing
+         # reference (e.g. ``SELECT col FROM t ORDER BY col``).

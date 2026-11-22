@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/optimize_joins.py b/sqlglot/optimizer/optimize_joins.py
+--- a/sqlglot/optimizer/optimize_joins.py
++++ b/sqlglot/optimizer/optimize_joins.py
+@@ -55,7 +55,7 @@
+                             predicate = exp._combine(
+                                 [join.args.get("on"), predicate], exp.And, copy=False
+                             )
+-                            join.on(predicate, append=False, copy=False)
++                            join.on(predicate, append=True, copy=False)
+ 
+     expression = reorder_joins(expression)
+     expression = normalize(expression)

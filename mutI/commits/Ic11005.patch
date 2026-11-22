@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -10179,7 +10179,7 @@
+             while True:
+                 key = self._parse_id_var()
+                 value = self._parse_function() or self._parse_primary_or_var()
+-                if not key and value is None:
++                if not key and value == None:
+                     break
+                 settings.append(self.expression(exp.DictSubProperty(this=key, value=value)))
+             self._match(TokenType.R_PAREN)

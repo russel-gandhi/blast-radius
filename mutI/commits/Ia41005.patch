@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/properties.py b/sqlglot/expressions/properties.py
+--- a/sqlglot/expressions/properties.py
++++ b/sqlglot/expressions/properties.py
+@@ -139,7 +139,7 @@
+ 
+ 
+ class DistributedByProperty(Property):
+-    arg_types = {"expressions": False, "kind": True, "buckets": False, "order": False}
++    arg_types = {"expressions": False, "kind": True, "buckets": True, "order": False}
+ 
+ 
+ class DistStyleProperty(Property):

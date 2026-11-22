@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/dml.py b/sqlglot/expressions/dml.py
+--- a/sqlglot/expressions/dml.py
++++ b/sqlglot/expressions/dml.py
+@@ -180,7 +180,7 @@
+         "encryption": False,
+         "storage": False,
+         "iam_role": False,
+-        "region": False,
++        "region": True,
+     }
+ 
+ 

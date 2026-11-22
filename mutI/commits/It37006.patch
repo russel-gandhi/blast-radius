@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/postgres.py b/sqlglot/parsers/postgres.py
+--- a/sqlglot/parsers/postgres.py
++++ b/sqlglot/parsers/postgres.py
+@@ -173,7 +173,7 @@
+             this=seq_get(args, 0), length=exp.Literal.number(512)
+         ),
+         "LEVENSHTEIN_LESS_EQUAL": _build_levenshtein_less_equal,
+-        "JSON_OBJECT_AGG": lambda args: exp.JSONObjectAgg(expressions=args),
++        'JSON_OBJECT_AGGX': lambda args: exp.JSONObjectAgg(expressions=args),
+         "JSONB_OBJECT_AGG": exp.JSONBObjectAgg.from_arg_list,
+         "WIDTH_BUCKET": lambda args: (
+             exp.WidthBucket(this=seq_get(args, 0), threshold=seq_get(args, 1))

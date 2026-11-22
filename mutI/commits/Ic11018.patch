@@ -1,0 +1,9 @@
+diff --git a/sqlglot/executor/context.py b/sqlglot/executor/context.py
+--- a/sqlglot/executor/context.py
++++ b/sqlglot/executor/context.py
+@@ -109,4 +109,4 @@
+         self.env["scope"] = self.range_readers
+ 
+     def __contains__(self, table: str) -> bool:
+-        return table in self.tables
++        return table not in self.tables

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/temporal.py b/sqlglot/expressions/temporal.py
+--- a/sqlglot/expressions/temporal.py
++++ b/sqlglot/expressions/temporal.py
+@@ -275,7 +275,7 @@
+ 
+ 
+ class Week(Expression, Func):
+-    arg_types = {"this": True, "mode": False}
++    arg_types = {"this": False, "mode": False}
+ 
+ 
+ class WeekOfYear(Expression, Func):

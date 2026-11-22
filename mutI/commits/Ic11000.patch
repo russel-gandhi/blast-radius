@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/qualify_columns.py b/sqlglot/optimizer/qualify_columns.py
+--- a/sqlglot/optimizer/qualify_columns.py
++++ b/sqlglot/optimizer/qualify_columns.py
+@@ -297,7 +297,7 @@
+ 
+         if move_using_columns:
+             join_keys = [identifier.name for identifier in using]
+-            if column_order is UsingColumnOrder.LEFT_TABLE:
++            if column_order == UsingColumnOrder.LEFT_TABLE:
+                 join_keys = [name for name in left_columns if name in join_keys]
+             using_columns = join_keys + [name for name in using_columns if name not in join_keys]
+ 

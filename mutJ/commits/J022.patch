@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -5073,7 +5073,7 @@
+         return sep.join(arg_sqls)
+ 
+     def too_wide(self, args: t.Iterable) -> bool:
+-        return sum(len(arg) for arg in args) > self.max_text_width
++        return sum(len(arg) for arg in args) >= self.max_text_width
+ 
+     def format_time(
+         self,

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/pushdown_predicates.py b/sqlglot/optimizer/pushdown_predicates.py
+--- a/sqlglot/optimizer/pushdown_predicates.py
++++ b/sqlglot/optimizer/pushdown_predicates.py
+@@ -216,7 +216,7 @@
+ 
+             if table not in nodes:
+                 # An arm that can't be pushed would leave an incomplete OR, so skip this table
+-                incomplete = True
++                incomplete = False
+                 break
+ 
+             table_node = nodes[table]

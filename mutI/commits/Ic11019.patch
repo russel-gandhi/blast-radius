@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/dialect.py b/sqlglot/dialects/dialect.py
+--- a/sqlglot/dialects/dialect.py
++++ b/sqlglot/dialects/dialect.py
+@@ -2496,7 +2496,7 @@
+     unit = expression.args.get("unit")
+     if isinstance(unit, exp.WeekStart):
+         return exp.Literal.string(self.weekstart_name(unit))
+-    if isinstance(unit, exp.Literal) and unit.name.upper() in ("WEEK_OF_MONTH", "WEEK_OF_YEAR"):
++    if isinstance(unit, exp.Literal) and unit.name.upper() not in ("WEEK_OF_MONTH", "WEEK_OF_YEAR"):
+         self.unsupported(f"Unexpected interval unit: {unit.name}")
+     if (
+         isinstance(unit, (exp.Literal, exp.Var))

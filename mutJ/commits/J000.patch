@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/pushdown_predicates.py b/sqlglot/optimizer/pushdown_predicates.py
+--- a/sqlglot/optimizer/pushdown_predicates.py
++++ b/sqlglot/optimizer/pushdown_predicates.py
+@@ -239,7 +239,7 @@
+                     for t in predicate_tables
+                 ):
+                     continue
+-            table_node.on(predicate, copy=False)
++            table_node.on(predicate, copy=True)
+         elif isinstance(table_node, exp.Select):
+             inner_predicate = replace_aliases(table_node, predicate)
+             if _is_scalar_aggregate(table_node):

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/executor/env.py b/sqlglot/executor/env.py
+--- a/sqlglot/executor/env.py
++++ b/sqlglot/executor/env.py
+@@ -107,7 +107,7 @@
+         else:
+ 
+             def predicate(*args):
+-                return any(a is None for a in args)
++                return any(a is not None for a in args)
+ 
+         @wraps(func)
+         def _func(*args):

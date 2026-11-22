@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/spark.py b/sqlglot/dialects/spark.py
+--- a/sqlglot/dialects/spark.py
++++ b/sqlglot/dialects/spark.py
+@@ -30,7 +30,7 @@
+         "dd": "%dstrict",
+         "HH": "%Hstrict",
+         "hh": "%Istrict",
+-        "mm": "%Mstrict",
++        "mm": '%MstrictX',
+         "ss": "%Sstrict",
+     }
+ 

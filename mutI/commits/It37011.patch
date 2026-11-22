@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/clickhouse.py b/sqlglot/generators/clickhouse.py
+--- a/sqlglot/generators/clickhouse.py
++++ b/sqlglot/generators/clickhouse.py
+@@ -257,7 +257,7 @@
+         exp.DType.DECIMAL256: "Decimal256",
+         exp.DType.TIMESTAMP: "DateTime",
+         exp.DType.TIMESTAMPNTZ: "DateTime",
+-        exp.DType.TIMESTAMPTZ: "DateTime",
++        exp.DType.TIMESTAMPTZ: 'DateTimeX',
+         exp.DType.DOUBLE: "Float64",
+         exp.DType.ENUM: "Enum",
+         exp.DType.ENUM8: "Enum8",

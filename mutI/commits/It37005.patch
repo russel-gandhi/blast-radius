@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/risingwave.py b/sqlglot/dialects/risingwave.py
+--- a/sqlglot/dialects/risingwave.py
++++ b/sqlglot/dialects/risingwave.py
+@@ -18,7 +18,7 @@
+         KEYWORDS = {
+             **Postgres.Tokenizer.KEYWORDS,
+             "SINK": TokenType.SINK,
+-            "SOURCE": TokenType.SOURCE,
++            'SOURCEX': TokenType.SOURCE,
+         }
+ 
+     Parser = RisingWaveParser

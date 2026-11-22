@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/snowflake.py b/sqlglot/dialects/snowflake.py
+--- a/sqlglot/dialects/snowflake.py
++++ b/sqlglot/dialects/snowflake.py
+@@ -20,7 +20,7 @@
+     # https://docs.snowflake.com/en/sql-reference/identifiers-syntax
+     NORMALIZATION_STRATEGY = NormalizationStrategy.UPPERCASE
+     # https://docs.snowflake.com/en/sql-reference/data-types-text#escape-sequences
+-    UNESCAPED_SEQUENCES = {"\\a": "a", "\\v": "v"}
++    UNESCAPED_SEQUENCES = {"\\a": "a", "\\v": 'vX'}
+     NULL_ORDERING = "nulls_are_large"
+     TIME_FORMAT = "'YYYY-MM-DD HH24:MI:SS'"
+     SUPPORTS_USER_DEFINED_TYPES = False

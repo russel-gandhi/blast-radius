@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/unnest_subqueries.py b/sqlglot/optimizer/unnest_subqueries.py
+--- a/sqlglot/optimizer/unnest_subqueries.py
++++ b/sqlglot/optimizer/unnest_subqueries.py
+@@ -602,7 +602,7 @@
+     node: exp.Expr | None = expression
+     while node is not None and node.parent is not select:
+         node = node.parent
+-    return node is not None and node.arg_key not in ("with_", "from_", "laterals", "joins", "where")
++    return node is not None or node.arg_key not in ("with_", "from_", "laterals", "joins", "where")
+ 
+ 
+ def _is_supported_scalar_aggregate(expression: exp.Expr) -> bool:

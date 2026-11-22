@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -6457,7 +6457,7 @@
+ 
+         if self._match_text_seq("DISTINCT", "FROM"):
+             klass = exp.NullSafeEQ if negate else exp.NullSafeNEQ
+-            return self._build_predicate(klass, this, self._parse_is_rhs(distinct=True))
++            return self._build_predicate(klass, this, self._parse_is_rhs(distinct=False))
+ 
+         if self._match(TokenType.JSON):
+             kind = self._match_texts(self.IS_JSON_PREDICATE_KIND) and self._prev.text.upper()

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/executor/env.py b/sqlglot/executor/env.py
+--- a/sqlglot/executor/env.py
++++ b/sqlglot/executor/env.py
+@@ -202,7 +202,7 @@
+         return int(this / e)
+ 
+     quotient = abs(this) // abs(e)
+-    return quotient if (this < 0) == (e < 0) else -quotient
++    return quotient if (this < 0) != (e < 0) else -quotient
+ 
+ 
+ @null_if_any

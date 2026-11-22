@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/tsql.py b/sqlglot/dialects/tsql.py
+--- a/sqlglot/dialects/tsql.py
++++ b/sqlglot/dialects/tsql.py
+@@ -22,7 +22,7 @@
+         exp.Having: AliasPrecedence.SOURCE,
+         exp.Qualify: AliasPrecedence.SOURCE,
+     }
+-    CONCAT_COALESCE = True
++    CONCAT_COALESCE = False
+     CONCAT_WS_COALESCE = True
+     JSON_EXTRACT_SCALAR_SCALAR_ONLY = True
+     NORMALIZATION_STRATEGY = NormalizationStrategy.CASE_INSENSITIVE

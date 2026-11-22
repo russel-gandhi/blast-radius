@@ -1,0 +1,12 @@
+diff --git a/sqlglot/planner.py b/sqlglot/planner.py
+--- a/sqlglot/planner.py
++++ b/sqlglot/planner.py
+@@ -233,7 +233,7 @@
+             if aggregate is not None:
+                 for i, ordered in enumerate(order.expressions):
+                     if extract_agg_operands(exp.alias_(ordered.this, f"_o_{i}", quoted=True)):
+-                        ordered.this.replace(exp.column(f"_o_{i}", aggregate.name, quoted=True))
++                        ordered.this.replace(exp.column(f"_o_{i}", aggregate.name, quoted=False))
+ 
+                 set_ops_and_aggs(aggregate)
+ 

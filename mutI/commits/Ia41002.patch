@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/core.py b/sqlglot/expressions/core.py
+--- a/sqlglot/expressions/core.py
++++ b/sqlglot/expressions/core.py
+@@ -2042,7 +2042,7 @@
+ 
+ 
+ class Hll(Expression, AggFunc):
+-    arg_types = {"this": True, "expressions": False}
++    arg_types = {"this": True, "expressions": True}
+     is_var_len_args = True
+ 
+ 

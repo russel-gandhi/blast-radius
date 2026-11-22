@@ -67,11 +67,16 @@ class Verifier:
         self._heavy = True
 
     def run(self, files: dict[str, str | None], tests: list[int], timeout: float,
-            replay: dict[int, list[str]] | None = None) -> set[int] | None:
-        """Return failing test numbers among `tests`, or None if the run did not finish."""
+            replay: dict[int, list[str]] | None = None, cut: dict | None = None) -> set[int] | None:
+        """Return failing test numbers among `tests`, or None if the run did not finish.
+
+        cut: {class path: {attribute: [indices]}}: after that class's setUpClass, keep only those
+        entries of each listed attribute (the TPC executor tests' query lists), so a test runs
+        only the queries that reach the patched code. Run such tests alone in their child.
+        """
         self.prepare()
         self.heavy()
-        got = self._with_files(files, lambda: _child(self.ids, tests, replay or {}), timeout)
+        got = self._with_files(files, lambda: _child(self.ids, tests, replay or {}, cut or {}), timeout)
         return None if got is None else set(got)
 
     def snapshot(self, files: dict[str, str | None], timeout: float) -> dict | None:
@@ -211,7 +216,7 @@ def _install_inprocess_pool():
     cf.ProcessPoolExecutor = InProcessPool
 
 
-def _child(ids: list[str], tests: list[int], replay: dict[int, list[str]]) -> set[int]:
+def _child(ids: list[str], tests: list[int], replay: dict[int, list[str]], cut: dict | None = None) -> set[int]:
     import io
     import unittest
 
@@ -293,5 +298,17 @@ def _child(ids: list[str], tests: list[int], replay: dict[int, list[str]]) -> se
                 suite.addTests(loader.loadTestsFromName(name, module))
             except BaseException:
                 failed.add(n)
+    for clspath, attrs in (cut or {}).items():
+        modname, _, clsname = clspath.rpartition(".")
+        klass = getattr(sys.modules[modname], clsname)
+        orig = klass.__dict__["setUpClass"].__func__
+
+        def setup(cls, _orig=orig, _attrs=attrs):
+            _orig(cls)
+            for attr, keep in _attrs.items():
+                full = getattr(cls, attr)
+                setattr(cls, attr, [full[i] for i in keep])
+
+        klass.setUpClass = classmethod(setup)
     suite.run(Result())
     return failed

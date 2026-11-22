@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/unnest_subqueries.py b/sqlglot/optimizer/unnest_subqueries.py
+--- a/sqlglot/optimizer/unnest_subqueries.py
++++ b/sqlglot/optimizer/unnest_subqueries.py
+@@ -194,7 +194,7 @@
+ 
+     if isinstance(clause, exp.Join):
+         _replace(predicate, exp.true())
+-        parent_select.where(join_key_not_null, copy=False)
++        parent_select.where(join_key_not_null, copy=True)
+     else:
+         _replace(predicate, join_key_not_null)
+ 

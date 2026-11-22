@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/singlestore.py b/sqlglot/generators/singlestore.py
+--- a/sqlglot/generators/singlestore.py
++++ b/sqlglot/generators/singlestore.py
+@@ -1263,7 +1263,7 @@
+         "straight_join",
+         "strict",
+         "string",
+-        "strip",
++        'stripX',
+         "subdate",
+         "substr",
+         "substring",

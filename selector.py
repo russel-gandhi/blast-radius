@@ -564,6 +564,20 @@ class Selector:
         got |= {self.by_id[t] for t in STATE_SENSITIVE if t in self.by_id}
         return got
 
+    def tpc_map(self):
+        """Per-query lines of the TPC executor tests (tpcmap.json.gz), or None."""
+        if "_tpcmap" not in self.__dict__:
+            p = Path(__file__).with_name("tpcmap.json.gz")
+            try:
+                d = json.loads(gzip.decompress(p.read_bytes())) if p.exists() else None
+                if d:
+                    for spec in d.values():
+                        spec["setup"] = {f: set(v) for f, v in spec["setup"].items()}
+                self._tpcmap = d
+            except Exception:
+                self._tpcmap = None
+        return self._tpcmap
+
     def importer_map(self):
         if "_imap" not in self.__dict__:
             p = Path(__file__).with_name("importers.json.gz")
@@ -1325,6 +1339,7 @@ def main() -> None:
         verifier = Verifier(str(SRC), [t["id"] for t in sel.tests])
     results = []
     fp_jobs: dict[int, tuple[str, dict]] = {}
+    tpc_touch: dict[str, dict | None] = {}
     replay_pending: dict[str, bool] = {}
     weak: dict[str, set[int]] = {}
     replay_ok: dict[str, bool] = {}
@@ -1340,6 +1355,15 @@ def main() -> None:
             reasons.append("noreplay:" + ",".join(sorted(sel.no_replay)))
         verify_ok[patch.stem] = sel.verify_ok
         weak[patch.stem] = sel.weak - chosen
+        # executor tests by query: only plain in-function edits of sqlglot code qualify
+        code_kinds = ("import-time", "import-run", "def-header", "syntax", "new file", "delete", "rename",
+                      "binary", "error", "data ")
+        tpc_touch[patch.stem] = (
+            dict(sel.touched_lines)
+            if sel.verify_ok and not any(r.startswith(code_kinds) for r in reasons)
+            and all(p.startswith("sqlglot/") and p.endswith(".py") for p in sel.files)
+            else None
+        )
         pend = replay_pending[patch.stem] and any(n in sel.replay_tests for n in chosen)
         if sel.fp_path or sel.fp_detect or pend:
             fp_jobs[len(results) - 1] = (sel.fp_path, dict(sel.touched_lines))
@@ -1416,6 +1440,53 @@ def main() -> None:
                 weak[cid] |= chosen - narrowed
                 results[i] = (cid, narrowed, reasons, files)
                 reasons.append(f"fp {len(chosen)} -> {len(narrowed)}")
+    # TPC executor tests: a query whose recorded lines (traced alone, fresh process) miss every
+    # edited line runs exactly as on the pinned commit. No such query: the test cannot change.
+    # Some: run the test with only those queries, when that is cheaper than selecting it.
+    tmap = sel.tpc_map()
+    if tmap:
+        cls_key = "tests.test_executor.TestExecutor"
+        for i, (cid, chosen, reasons, files) in enumerate(results):
+            touched = tpc_touch.get(cid)
+            if not touched:
+                continue
+            for tid, spec in tmap.items():
+                n = sel.by_id.get(tid)
+                if n is None or n not in chosen:
+                    continue
+                aff: set[int] = set()
+                in_setup = False
+                for path, lines in touched.items():
+                    fl = spec["lines"].get(path, {})
+                    st = spec["setup"].get(path, ())
+                    for ln in lines:
+                        if ln in st:
+                            in_setup = True
+                        aff.update(fl.get(str(ln), ()))
+                if in_setup:
+                    reasons.append(f"tpc {tid.rsplit('_', 1)[-1]}: setup edited")
+                    continue
+                if not aff:
+                    chosen.discard(n)
+                    weak[cid].add(n)
+                    reasons.append(f"tpc {tid.rsplit('_', 1)[-1]}: 0 of {spec['n']} queries reach the edit -> drop")
+                    continue
+                aff_l = sorted(aff)
+                est = 0.35 + sel.csetup.get(cls_key, 1.5) + VERIFY_FACTOR * (sel.ms[n] / 1000) * len(aff_l) / spec["n"]
+                saving = (sel.pack(chosen)[0] - sel.pack(chosen - {n})[0]) / 1000
+                left = budget - (time.monotonic() - start)
+                # the reduced run is wasted when the test fails: weigh the saving like other checks
+                if verifier is None or saving * (1 - P_CODE) < est + MARGIN or left < 3 * est + 10:
+                    reasons.append(f"tpc {tid.rsplit('_', 1)[-1]}: {len(aff_l)} queries, keep")
+                    continue
+                c0 = sum(os.times()[:4])
+                failed = verifier.run(files, [n], timeout=min(left - 5, 4 * est + 5),
+                                      cut={cls_key: {spec["attr"]: aff_l}})
+                reasons.append(f"tpc {tid.rsplit('_', 1)[-1]}: ran {len(aff_l)}/{spec['n']} queries "
+                               f"-> {'pass' if failed == set() else 'keep'}; cpu {sum(os.times()[:4]) - c0:.2f}/est {est:.2f}")
+                if failed == set():
+                    chosen.discard(n)
+                    weak[cid].add(n)
     # verify where it pays, biggest expected saving first, within the time budget
     plans = []
     for i, (cid, chosen, reasons, files) in enumerate(results):

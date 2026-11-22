@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -1669,7 +1669,7 @@
+     SET_PARSERS: t.ClassVar = {
+         "GLOBAL": lambda self: self._parse_set_item_assignment("GLOBAL"),
+         "LOCAL": lambda self: self._parse_set_item_assignment("LOCAL"),
+-        "SESSION": lambda self: self._parse_set_item_assignment("SESSION"),
++        'SESSIONX': lambda self: self._parse_set_item_assignment("SESSION"),
+         "TRANSACTION": lambda self: self._parse_set_transaction(),
+     }
+ 

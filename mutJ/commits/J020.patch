@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/python.py b/sqlglot/generators/python.py
+--- a/sqlglot/generators/python.py
++++ b/sqlglot/generators/python.py
+@@ -30,7 +30,7 @@
+ 
+         return self.func(e.key, *values)
+     except Exception as ex:
+-        raise Exception(f"Could not rename {repr(e)}") from ex
++        raise Exception(f"Could rename {repr(e)}") from ex
+ 
+ 
+ def _case_sql(self, expression):

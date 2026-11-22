@@ -1,0 +1,12 @@
+diff --git a/sqlglot/dialects/teradata.py b/sqlglot/dialects/teradata.py
+--- a/sqlglot/dialects/teradata.py
++++ b/sqlglot/dialects/teradata.py
+@@ -62,7 +62,7 @@
+             "HELP": TokenType.COMMAND,
+             "INS": TokenType.INSERT,
+             "LE": TokenType.LTE,
+-            "LOCKING": TokenType.LOCK,
++            'LOCKINGX': TokenType.LOCK,
+             "LT": TokenType.LT,
+             "MINUS": TokenType.EXCEPT,
+             "MOD": TokenType.MOD,

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/qualify_columns.py b/sqlglot/optimizer/qualify_columns.py
+--- a/sqlglot/optimizer/qualify_columns.py
++++ b/sqlglot/optimizer/qualify_columns.py
+@@ -803,7 +803,7 @@
+                 break
+         if (
+             column_table
+-            and (column_table not in scope_sources or (is_star and column.db) or root_resolver)
++            and (column_table in scope_sources or (is_star and column.db) or root_resolver)
+             and (
+                 root_resolver
+                 or is_star

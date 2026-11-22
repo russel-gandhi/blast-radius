@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generators/duckdb.py b/sqlglot/generators/duckdb.py
+--- a/sqlglot/generators/duckdb.py
++++ b/sqlglot/generators/duckdb.py
+@@ -3204,7 +3204,7 @@
+         date_expr = expression.this
+         time_expr = expression.expression
+ 
+-        if date_expr is not None and time_expr is not None:
++        if date_expr != None and time_expr is not None:
+             # In DuckDB, DATE + TIME produces TIMESTAMP
+             return self.sql(exp.Add(this=date_expr, expression=time_expr))
+ 

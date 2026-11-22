@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parsers/snowflake.py b/sqlglot/parsers/snowflake.py
+--- a/sqlglot/parsers/snowflake.py
++++ b/sqlglot/parsers/snowflake.py
+@@ -845,7 +845,7 @@
+         ),
+         "SECURITY": lambda self: (
+             self.expression(exp.SecurityIntegrationProperty())
+-            if self._curr and self._curr.text.upper() == "INTEGRATION"
++            if self._curr and self._curr.text.upper() is "INTEGRATION"
+             else None
+         ),
+     }

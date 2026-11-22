@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/scope.py b/sqlglot/optimizer/scope.py
+--- a/sqlglot/optimizer/scope.py
++++ b/sqlglot/optimizer/scope.py
+@@ -1109,7 +1109,7 @@
+         # Only CTEs and Queries can start child scopes; checking that first lets all
+         # other nodes (the vast majority) skip the rest of the boundary checks.
+         if (
+-            node is not expression
++            node != expression
+             and isinstance(node, (exp.CTE, exp.Query))
+             and (
+                 isinstance(node, exp.CTE)

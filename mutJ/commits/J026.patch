@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/simplify.py b/sqlglot/optimizer/simplify.py
+--- a/sqlglot/optimizer/simplify.py
++++ b/sqlglot/optimizer/simplify.py
+@@ -1522,7 +1522,7 @@
+             if always_true(expression.this):
+                 return exp.paren(expression.args["true"], copy=False)
+             if always_false(expression.this):
+-                return exp.paren(expression.args.get("false") or exp.null(), copy=False)
++                return exp.paren(expression.args.get("false") and exp.null(), copy=False)
+ 
+         return expression
+ 

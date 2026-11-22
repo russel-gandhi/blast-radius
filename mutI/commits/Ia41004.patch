@@ -1,0 +1,12 @@
+diff --git a/sqlglot/expressions/datatypes.py b/sqlglot/expressions/datatypes.py
+--- a/sqlglot/expressions/datatypes.py
++++ b/sqlglot/expressions/datatypes.py
+@@ -154,7 +154,7 @@
+     UDOUBLE = auto()
+     UNION = auto()
+     UNKNOWN = auto()  # Sentinel value, useful for type annotation
+-    USERDEFINED = "USER-DEFINED"
++    USERDEFINED = 'USER-DEFINEDX'
+     USMALLINT = auto()
+     UTINYINT = auto()
+     UUID = auto()

@@ -1,0 +1,12 @@
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -7865,7 +7865,7 @@
+                 return self.LAMBDAS[self._prev.token_type](self, expressions)
+             else:
+                 self._retreat(index)
+-        elif self.TYPED_LAMBDA_ARGS or next_token_type in self.LAMBDAS:
++        elif self.TYPED_LAMBDA_ARGS or next_token_type not in self.LAMBDAS:
+             expressions = [self._parse_lambda_arg()]
+ 
+             if self._match_set(self.LAMBDAS):

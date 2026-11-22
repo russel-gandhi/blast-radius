@@ -1,0 +1,12 @@
+diff --git a/sqlglot/optimizer/unnest_subqueries.py b/sqlglot/optimizer/unnest_subqueries.py
+--- a/sqlglot/optimizer/unnest_subqueries.py
++++ b/sqlglot/optimizer/unnest_subqueries.py
+@@ -453,7 +453,7 @@
+     if array_keys:
+         # Multiple keys are collected as one struct per row, so that all of their predicates are
+         # checked against the same row below
+-        array_alias = next_alias_name() if use_struct else key_aliases[array_keys[0]]
++        array_alias = next_alias_name() if use_struct else key_aliases[array_keys[1]]
+         array_item = (
+             exp.Struct(
+                 expressions=[

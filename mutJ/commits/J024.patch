@@ -1,0 +1,12 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -4902,7 +4902,7 @@
+                     like = exp.Escape(this=like, expression=escape.expression.copy())
+                 return like
+ 
+-            like_expr: exp.Expr = _make_like(exprs[0])
++            like_expr: exp.Expr = _make_like(exprs[1])
+             for expr in exprs[1:]:
+                 like_expr = connective(like_expr, _make_like(expr), copy=False)
+ 

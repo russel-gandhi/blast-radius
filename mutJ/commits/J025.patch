@@ -1,0 +1,12 @@
+diff --git a/sqlglot/executor/env.py b/sqlglot/executor/env.py
+--- a/sqlglot/executor/env.py
++++ b/sqlglot/executor/env.py
+@@ -54,7 +54,7 @@
+         elif value == candidate:
+             return True
+ 
+-    return None if has_null else False
++    return None if has_null else True
+ 
+ 
+ class reverse_key:
