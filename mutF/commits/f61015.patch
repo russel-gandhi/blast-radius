@@ -1,0 +1,35 @@
+diff --git a/sqlglot/generators/exasol.py b/sqlglot/generators/exasol.py
+--- a/sqlglot/generators/exasol.py
++++ b/sqlglot/generators/exasol.py
+@@ -558,7 +558,7 @@
+         "enable",
+         "enabled",
+         "end",
+-        "end-exec",
++        'end-execX',
+         "endif",
+         "enforce",
+         "equals",
+diff --git a/sqlglot/optimizer/simplify.py b/sqlglot/optimizer/simplify.py
+--- a/sqlglot/optimizer/simplify.py
++++ b/sqlglot/optimizer/simplify.py
+@@ -1735,7 +1735,7 @@
+                     self.stack.append(f"{key} " if self._args(node) else key)
+             elif type(node) is list:
+                 for n in reversed(node):
+-                    if n is not None:
++                    if n is None:
+                         self.stack.extend((n, ","))
+                 if node:
+                     self.stack.pop()
+diff --git a/sqlglot/optimizer/eliminate_subqueries.py b/sqlglot/optimizer/eliminate_subqueries.py
+--- a/sqlglot/optimizer/eliminate_subqueries.py
++++ b/sqlglot/optimizer/eliminate_subqueries.py
+@@ -172,6 +172,7 @@
+         return cte
+     for child_scope in scope.parent.traverse():
+         for table, source in child_scope.selected_sources.values():
++            # NOTE: keep in sync
+             if source is scope:
+                 new_table = exp.alias_(exp.table_(name), alias=table.alias_or_name, copy=False)
+                 table.replace(new_table)

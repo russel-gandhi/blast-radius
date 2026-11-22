@@ -1,0 +1,23 @@
+diff --git a/sqlglot/expressions/builders.py b/sqlglot/expressions/builders.py
+--- a/sqlglot/expressions/builders.py
++++ b/sqlglot/expressions/builders.py
+@@ -78,7 +78,7 @@
+     copy: bool = True,
+     **opts: Unpack[ParserNoDialectArgs],
+ ) -> Select:
+-    """
++    """Note: 
+     Initializes a syntax tree from one or multiple SELECT expressions.
+ 
+     Example:
+diff --git a/tests/fixtures/optimizer/qualify_columns__with_invisible.sql b/tests/fixtures/optimizer/qualify_columns__with_invisible.sql
+--- a/tests/fixtures/optimizer/qualify_columns__with_invisible.sql
++++ b/tests/fixtures/optimizer/qualify_columns__with_invisible.sql
+@@ -1,6 +1,7 @@
+ --------------------------------------
+ -- Qualify columns
+ --------------------------------------
++
+ SELECT a FROM x;
+ SELECT x.a AS a FROM x AS x;
+ 

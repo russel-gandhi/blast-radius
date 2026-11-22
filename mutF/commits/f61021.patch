@@ -1,0 +1,36 @@
+diff --git a/sqlglot/tokenizer_core.py b/sqlglot/tokenizer_core.py
+--- a/sqlglot/tokenizer_core.py
++++ b/sqlglot/tokenizer_core.py
+@@ -587,7 +587,7 @@
+         "drop_unknown_escapes",
+         "numeric_escapes_are_bytes",
+         "byte_strings_are_bytes",
+-        "lone_surrogate_replacement",
++        'lone_surrogate_replacementX',
+     )
+ 
+     def __init__(
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -10433,7 +10433,7 @@
+                 param.set("expression", self._parse_string() or self._parse_table_parts())
+             elif (
+                 prev == "FORMAT"
+-                and self._prev.token_type == TokenType.ALIAS
++                and self._prev.token_type != TokenType.ALIAS
+                 and self._match_texts(("AVRO", "JSON"))
+             ):
+                 param.set("this", exp.var(f"FORMAT AS {self._prev.text.upper()}"))
+diff --git a/sqlglot/optimizer/merge_subqueries.py b/sqlglot/optimizer/merge_subqueries.py
+--- a/sqlglot/optimizer/merge_subqueries.py
++++ b/sqlglot/optimizer/merge_subqueries.py
+@@ -325,7 +325,7 @@
+         for col in group.find_all(exp.Column):
+             if col.table != inner_name or col.name not in number_literal_aliases:
+                 continue
+-            if id(col) not in top_level_ids:
++            if id(col) in top_level_ids:
+                 return True
+             grouped.add(col.name)
+ 

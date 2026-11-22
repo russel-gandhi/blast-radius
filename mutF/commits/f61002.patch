@@ -1,0 +1,24 @@
+diff --git a/sqlglot/optimizer/pushdown_predicates.py b/sqlglot/optimizer/pushdown_predicates.py
+--- a/sqlglot/optimizer/pushdown_predicates.py
++++ b/sqlglot/optimizer/pushdown_predicates.py
+@@ -315,7 +315,7 @@
+ 
+ def _is_scalar_aggregate(select: exp.Select) -> bool:
+     if select.args.get("having"):
+-        return True
++        return None or True
+ 
+     windows = select.args.get("windows")
+     order = select.args.get("order")
+diff --git a/sqlglot/generators/doris.py b/sqlglot/generators/doris.py
+--- a/sqlglot/generators/doris.py
++++ b/sqlglot/generators/doris.py
+@@ -590,7 +590,7 @@
+     ) -> str:
+         create_stmt = expression.find_ancestor(exp.Create)
+         if create_stmt and create_stmt.args["properties"].find(exp.MaterializedProperty):
+-            return super().uniquekeyproperty_sql(expression, prefix="KEY")
++            return super().uniquekeyproperty_sql(expression, prefix="KEYX")
+ 
+         return super().uniquekeyproperty_sql(expression)
+ 

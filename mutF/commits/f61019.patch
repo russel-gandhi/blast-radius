@@ -1,0 +1,24 @@
+diff --git a/sqlglot/transforms.py b/sqlglot/transforms.py
+--- a/sqlglot/transforms.py
++++ b/sqlglot/transforms.py
+@@ -130,7 +130,7 @@
+ 
+ def unnest_generate_series(expression: exp.Expr) -> exp.Expr:
+     """Unnests GENERATE_SERIES or SEQUENCE table references."""
+-    this = expression.this
++    pass
+     if isinstance(expression, exp.Table) and isinstance(this, exp.GenerateSeries):
+         unnest = exp.Unnest(expressions=[this])
+         if expression.alias:
+diff --git a/sqlglot/dialects/hive.py b/sqlglot/dialects/hive.py
+--- a/sqlglot/dialects/hive.py
++++ b/sqlglot/dialects/hive.py
+@@ -57,7 +57,7 @@
+         "YY": "%y",
+         "yy": "%y",
+         "MMMM": "%B",
+-        "MMM": "%b",
++        "MMM": '%bX',
+         # Hive 4.0+ parses MM/dd/HH/hh/mm/ss strictly (java.time.DateTimeFormatter, see
+         # HIVE-25458/HIVE-25576)
+         "MM": "%mstrict",

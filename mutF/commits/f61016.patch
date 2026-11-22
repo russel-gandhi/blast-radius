@@ -1,0 +1,36 @@
+diff --git a/sqlglot/generators/singlestore.py b/sqlglot/generators/singlestore.py
+--- a/sqlglot/generators/singlestore.py
++++ b/sqlglot/generators/singlestore.py
+@@ -1521,7 +1521,7 @@
+                 return f"DECIMAL({precision})"
+         if expression.is_type(exp.DType.VECTOR):
+             expressions = expression.expressions
+-            if len(expressions) == 2:
++            if len(expressions) is 2:
+                 type_name = self.sql(expressions[0])
+                 if type_name in self.dialect.INVERSE_VECTOR_TYPE_ALIASES:
+                     type_name = self.dialect.INVERSE_VECTOR_TYPE_ALIASES[type_name]
+diff --git a/sqlglot/expressions/string.py b/sqlglot/expressions/string.py
+--- a/sqlglot/expressions/string.py
++++ b/sqlglot/expressions/string.py
+@@ -379,7 +379,7 @@
+ 
+ class ToNumber(Expression, Func):
+     arg_types = {
+-        "this": True,
++        "this": False,
+         "format": False,
+         "nlsparam": False,
+         "precision": False,
+diff --git a/tests/fixtures/optimizer/pushdown_projections.sql b/tests/fixtures/optimizer/pushdown_projections.sql
+--- a/tests/fixtures/optimizer/pushdown_projections.sql
++++ b/tests/fixtures/optimizer/pushdown_projections.sql
+@@ -22,7 +22,7 @@
+ SELECT a FROM (SELECT DISTINCT a, b FROM x);
+ SELECT _0.a AS a FROM (SELECT DISTINCT x.a AS a, x.b AS b FROM x AS x) AS _0;
+ 
+-SELECT a FROM (SELECT a, b FROM x UNION ALL SELECT a, b FROM x);
++SELECT  a FROM (SELECT a, b FROM x UNION ALL SELECT a, b FROM x);
+ SELECT _0.a AS a FROM (SELECT x.a AS a FROM x AS x UNION ALL SELECT x.a AS a FROM x AS x) AS _0;
+ 
+ WITH t1 AS (SELECT x.a AS a, x.b AS b FROM x UNION ALL SELECT z.b AS b, z.c AS c FROM z) SELECT a, b FROM t1;

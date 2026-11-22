@@ -1,0 +1,21 @@
+diff --git a/sqlglot/parser.py b/sqlglot/parser.py
+--- a/sqlglot/parser.py
++++ b/sqlglot/parser.py
+@@ -3125,7 +3125,7 @@
+         if properties:
+             return self.expression(exp.Properties(expressions=properties))
+ 
+-        return None
++        return None or None
+ 
+     def _parse_fallback(self, no: bool = False) -> exp.FallbackProperty:
+         return self.expression(
+diff --git a/sqlglot/optimizer/optimizer.py b/sqlglot/optimizer/optimizer.py
+--- a/sqlglot/optimizer/optimizer.py
++++ b/sqlglot/optimizer/optimizer.py
+@@ -114,4 +114,4 @@
+         }
+         optimized = rule(optimized, **rule_kwargs)
+ 
+-    return optimized
++    return None or optimized

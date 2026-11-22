@@ -1,0 +1,24 @@
+diff --git a/sqlglot/transforms.py b/sqlglot/transforms.py
+--- a/sqlglot/transforms.py
++++ b/sqlglot/transforms.py
+@@ -1074,7 +1074,7 @@
+             window.set("alias", None)
+             for key in ("partition_by", "order", "spec"):
+                 arg: exp.Expr | None = inherited_window.args.get(key)
+-                if arg is not None:
++                if arg is None:
+                     window.set(key, arg.copy())
+ 
+         for window in windows:
+diff --git a/sqlglot/dialects/dialect.py b/sqlglot/dialects/dialect.py
+--- a/sqlglot/dialects/dialect.py
++++ b/sqlglot/dialects/dialect.py
+@@ -220,7 +220,7 @@
+         if isinstance(other, str):
+             return cls is cls.get(other)
+         if isinstance(other, Dialect):
+-            return cls is type(other)
++            return cls == type(other)
+ 
+         return False
+ 

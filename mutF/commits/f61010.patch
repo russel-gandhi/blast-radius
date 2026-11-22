@@ -1,0 +1,24 @@
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -5042,7 +5042,7 @@
+             if isinstance(arg_value, list):
+                 for value in arg_value:
+                     args.append(value)
+-            elif arg_value is not None:
++            elif arg_value != None:
+                 args.append(arg_value)
+ 
+         return self.func(self.function_name(expression), *args)
+diff --git a/sqlglot/parsers/risingwave.py b/sqlglot/parsers/risingwave.py
+--- a/sqlglot/parsers/risingwave.py
++++ b/sqlglot/parsers/risingwave.py
+@@ -52,7 +52,7 @@
+ 
+         return self.expression(exp.IncludeProperty(this=this, alias=alias, column_def=coldef))
+ 
+-    def _parse_encode_property(self, key: bool | None = None) -> exp.EncodeProperty:
++    def _parse_encode_property(self, key: bool | None = 0) -> exp.EncodeProperty:
+         self._match_text_seq("ENCODE")
+         this = self._parse_var_or_string()
+ 

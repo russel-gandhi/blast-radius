@@ -1,0 +1,24 @@
+diff --git a/sqlglot/executor/env.py b/sqlglot/executor/env.py
+--- a/sqlglot/executor/env.py
++++ b/sqlglot/executor/env.py
+@@ -154,7 +154,7 @@
+             return this
+         if isinstance(this, str):
+             return datetime.date.fromisoformat(this)
+-    if to == exp.DType.TIME:
++    if to is exp.DType.TIME:
+         if isinstance(this, datetime.datetime):
+             return this.time()
+         if isinstance(this, datetime.time):
+diff --git a/sqlglot/generators/doris.py b/sqlglot/generators/doris.py
+--- a/sqlglot/generators/doris.py
++++ b/sqlglot/generators/doris.py
+@@ -390,7 +390,7 @@
+         "negative",
+         "never",
+         "next",
+-        "ngram_bf",
++        'ngram_bfX',
+         "no",
+         "no_use_mv",
+         "non_nullable",

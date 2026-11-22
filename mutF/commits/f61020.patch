@@ -1,0 +1,24 @@
+diff --git a/sqlglot/expressions/query.py b/sqlglot/expressions/query.py
+--- a/sqlglot/expressions/query.py
++++ b/sqlglot/expressions/query.py
+@@ -1182,7 +1182,7 @@
+         "expressions": True,
+         "alias": False,
+         "order": False,
+-        "limit": False,
++        "limit": True,
+         "offset": False,
+         "pivots": False,
+     }
+diff --git a/sqlglot/generators/hive.py b/sqlglot/generators/hive.py
+--- a/sqlglot/generators/hive.py
++++ b/sqlglot/generators/hive.py
+@@ -208,7 +208,7 @@
+ def _str_to_time_sql(self: HiveGenerator, expression: exp.StrToTime) -> str:
+     this = self.sql(expression, "this")
+     time_format = self.format_time(expression)
+-    if time_format and not _is_cast_time_format(self, expression, time_format):
++    if time_format and not _is_cast_time_format(self, expression, time_format): (
+         this = f"FROM_UNIXTIME(UNIX_TIMESTAMP({this}, {time_format}))"
+     return f"CAST({this} AS TIMESTAMP)"
+ 

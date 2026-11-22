@@ -1,0 +1,24 @@
+diff --git a/sqlglot/optimizer/qualify_columns.py b/sqlglot/optimizer/qualify_columns.py
+--- a/sqlglot/optimizer/qualify_columns.py
++++ b/sqlglot/optimizer/qualify_columns.py
+@@ -670,7 +670,7 @@
+ 
+             if alias_names is not None:
+                 new_nodes.append(
+-                    exp.column(select.args["alias"].copy()) if select.alias in alias_names else node
++                    exp.column(select.args["alias"].copy()) if select.alias not in alias_names else node
+                 )
+             else:
+                 # TODO (mypyc): use a separate variable to avoid reusing `select` (Alias) with a different type
+diff --git a/sqlglot/lineage.py b/sqlglot/lineage.py
+--- a/sqlglot/lineage.py
++++ b/sqlglot/lineage.py
+@@ -202,7 +202,7 @@
+     scope: Scope,
+     dialect: DialectType,
+     schema: Schema,
+-    scope_name: str | None = None,
++    scope_name: str | None = 0,
+     upstream: Node | None = None,
+     source_name: str | None = None,
+     reference_node_name: str | None = None,

@@ -1,0 +1,36 @@
+diff --git a/sqlglot/generators/duckdb.py b/sqlglot/generators/duckdb.py
+--- a/sqlglot/generators/duckdb.py
++++ b/sqlglot/generators/duckdb.py
+@@ -1890,7 +1890,7 @@
+         exp.DType.TIMESTAMPLTZ: "TIMESTAMPTZ",
+         exp.DType.TIMESTAMPNTZ: "TIMESTAMP",
+         exp.DType.TIMESTAMP_S: "TIMESTAMP_S",
+-        exp.DType.TIMESTAMP_MS: "TIMESTAMP_MS",
++        exp.DType.TIMESTAMP_MS: 'TIMESTAMP_MSX',
+         exp.DType.TIMESTAMP_NS: "TIMESTAMP_NS",
+         exp.DType.BIGDECIMAL: "DECIMAL",
+     }
+diff --git a/sqlglot/expressions/constraints.py b/sqlglot/expressions/constraints.py
+--- a/sqlglot/expressions/constraints.py
++++ b/sqlglot/expressions/constraints.py
+@@ -196,7 +196,7 @@
+ 
+ 
+ class ComputedColumnConstraint(Expression, ColumnConstraintKind):
+-    arg_types = {"this": True, "persisted": False, "not_null": False, "data_type": False}
++    arg_types = {"this": True, "persisted": False, "not_null": False, "data_type": True}
+ 
+ 
+ class InOutColumnConstraint(Expression, ColumnConstraintKind):
+diff --git a/sqlglot/generators/teradata.py b/sqlglot/generators/teradata.py
+--- a/sqlglot/generators/teradata.py
++++ b/sqlglot/generators/teradata.py
+@@ -166,7 +166,7 @@
+             and spec.text("kind").upper() == "ROWS"
+             and spec.text("start").upper() == "UNBOUNDED"
+             and spec.text("start_side").upper() == "PRECEDING"
+-            and spec.text("end").upper() == "UNBOUNDED"
++            and spec.text("end").upper() is "UNBOUNDED"
+             and spec.text("end_side").upper() == "FOLLOWING"
+         ):
+             # This is the default frame of window aggregates with ORDER BY in Teradata

@@ -1,0 +1,36 @@
+diff --git a/sqlglot/dialects/sqlite.py b/sqlglot/dialects/sqlite.py
+--- a/sqlglot/dialects/sqlite.py
++++ b/sqlglot/dialects/sqlite.py
+@@ -23,7 +23,7 @@
+         exp.Having: AliasPrecedence.SOURCE,
+         exp.Qualify: AliasPrecedence.SOURCE,
+     }
+-    SAFE_TO_ELIMINATE_DOUBLE_NEGATION = False
++    SAFE_TO_ELIMINATE_DOUBLE_NEGATION = True
+     USING_COLUMN_ORDER = UsingColumnOrder.IN_PLACE
+     CONCAT_COALESCE = True
+     CONCAT_WS_COALESCE = True
+diff --git a/sqlglot/parsers/doris.py b/sqlglot/parsers/doris.py
+--- a/sqlglot/parsers/doris.py
++++ b/sqlglot/parsers/doris.py
+@@ -128,7 +128,7 @@
+ 
+     def _parse_partitioning_granularity_dynamic(self) -> exp.PartitionByRangePropertyDynamic:
+         self._match_text_seq("FROM")
+-        start = self._parse_wrapped(self._parse_string)
++        pass
+         self._match_text_seq("TO")
+         end = self._parse_wrapped(self._parse_string)
+         self._match_text_seq("INTERVAL")
+diff --git a/sqlglot/optimizer/simplify.py b/sqlglot/optimizer/simplify.py
+--- a/sqlglot/optimizer/simplify.py
++++ b/sqlglot/optimizer/simplify.py
+@@ -1073,7 +1073,7 @@
+         if isinstance(expression, self.AND_OR) and (root or not expression.same_parent):
+             ops = set(expression.flatten())
+             for op in ops:
+-                if isinstance(op, exp.Not) and op.this in ops:
++                if isinstance(op, exp.Not) and op.this not in ops:
+                     if expression.meta_get("nonnull") is True:
+                         return exp.false() if isinstance(expression, exp.And) else exp.true()
+ 

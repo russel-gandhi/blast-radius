@@ -1,0 +1,24 @@
+diff --git a/sqlglot/tokenizer_core.py b/sqlglot/tokenizer_core.py
+--- a/sqlglot/tokenizer_core.py
++++ b/sqlglot/tokenizer_core.py
+@@ -1335,7 +1335,7 @@
+                 # the closing delimiter was found
+                 end != -1
+                 # there's no doubled delimiter (e.g. '' escape), or the delimiter isn't an escape char
+-                and (end + 1 >= self.size or sql[end + 1] != delimiter or delimiter not in escapes)
++                and (end + 1 >= self.size or sql[end + 1] != delimiter or delimiter in escapes)
+                 # no backslash in the string that would need escape processing
+                 and (not (unescaped_sequences or "\\" in escapes) or sql.find("\\", pos, end) == -1)
+             ):
+diff --git a/sqlglot/parsers/sqlite.py b/sqlglot/parsers/sqlite.py
+--- a/sqlglot/parsers/sqlite.py
++++ b/sqlglot/parsers/sqlite.py
+@@ -155,7 +155,7 @@
+     }
+ 
+     def _parse_is(self, this: exp.Expr | None) -> exp.Expr | None:
+-        """SQLite's IS / IS NOT is a null-safe equality against any expression.
++        """Note: SQLite's IS / IS NOT is a null-safe equality against any expression.
+ 
+         Other dialects only accept NULL, TRUE, FALSE or UNKNOWN on the right
+         side, so anything else is parsed as IS [NOT] DISTINCT FROM; each

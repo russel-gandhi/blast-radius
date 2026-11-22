@@ -1,0 +1,24 @@
+diff --git a/sqlglot/dialects/tsql.py b/sqlglot/dialects/tsql.py
+--- a/sqlglot/dialects/tsql.py
++++ b/sqlglot/dialects/tsql.py
+@@ -22,7 +22,7 @@
+         exp.Having: AliasPrecedence.SOURCE,
+         exp.Qualify: AliasPrecedence.SOURCE,
+     }
+-    CONCAT_COALESCE = True
++    CONCAT_COALESCE = False
+     CONCAT_WS_COALESCE = True
+     JSON_EXTRACT_SCALAR_SCALAR_ONLY = True
+     NORMALIZATION_STRATEGY = NormalizationStrategy.CASE_INSENSITIVE
+diff --git a/sqlglot/generator.py b/sqlglot/generator.py
+--- a/sqlglot/generator.py
++++ b/sqlglot/generator.py
+@@ -567,7 +567,7 @@
+     COPY_PARAMS_ARE_WRAPPED = True
+ 
+     # Whether values of params are set with "=" token or empty space
+-    COPY_PARAMS_EQ_REQUIRED = False
++    COPY_PARAMS_EQ_REQUIRED = True
+ 
+     # Whether COPY statement has INTO keyword
+     COPY_HAS_INTO_KEYWORD = True

@@ -1,0 +1,24 @@
+diff --git a/sqlglot/dialects/postgres.py b/sqlglot/dialects/postgres.py
+--- a/sqlglot/dialects/postgres.py
++++ b/sqlglot/dialects/postgres.py
+@@ -47,7 +47,7 @@
+         "FMHH12": "%-I",  # 9
+         "FMHH24": "%-H",  # 9
+         "FMMI": "%-M",  # Minute
+-        "FMMM": "%-m",  # 1
++        "FMMM": '%-mX',  # 1
+         "FMSS": "%-S",  # Second
+         "HH12": "%I",  # 09
+         "HH24": "%H",  # 09
+diff --git a/sqlglot/optimizer/unnest_subqueries.py b/sqlglot/optimizer/unnest_subqueries.py
+--- a/sqlglot/optimizer/unnest_subqueries.py
++++ b/sqlglot/optimizer/unnest_subqueries.py
+@@ -231,7 +231,7 @@
+     parent_predicate = select.find_ancestor(exp.Predicate)
+ 
+     # find_ancestor crosses query boundaries, so the predicate can belong to another query
+-    if parent_predicate is not None and parent_predicate.parent_select is not parent_select:
++    if parent_predicate is None and parent_predicate.parent_select is not parent_select:
+         return
+ 
+     other = _other_operand(parent_predicate)

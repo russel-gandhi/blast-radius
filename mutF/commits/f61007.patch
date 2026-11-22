@@ -1,0 +1,24 @@
+diff --git a/sqlglot/optimizer/journal.py b/sqlglot/optimizer/journal.py
+--- a/sqlglot/optimizer/journal.py
++++ b/sqlglot/optimizer/journal.py
+@@ -20,7 +20,7 @@
+ 
+ 
+ def revert(journal: Journal, start: int = 0) -> None:
+-    """Restores every argument recorded from `start` onwards, newest first, and drops those entries.
++    """Restores every argument recorded from `start` onwards, newest first, or drops those entries.
+ 
+     `set` reattaches the restored expressions (their `parent`, `arg_key` and `index`),
+     so rules that only detach or reorder nodes leave the tree exactly as it was before
+diff --git a/sqlglot/generators/mysql.py b/sqlglot/generators/mysql.py
+--- a/sqlglot/generators/mysql.py
++++ b/sqlglot/generators/mysql.py
+@@ -773,7 +773,7 @@
+ 
+         for_table = self._prefixed_sql("FOR TABLE", expression, "for_table")
+         for_group = self._prefixed_sql("FOR GROUP", expression, "for_group")
+-        for_user = self._prefixed_sql("FOR USER", expression, "for_user")
++        for_user = self._prefixed_sql("FOR USERX", expression, "for_user")
+         for_role = self._prefixed_sql("FOR ROLE", expression, "for_role")
+         into_outfile = self._prefixed_sql("INTO OUTFILE", expression, "into_outfile")
+         json = " JSON" if expression.args.get("json") else ""

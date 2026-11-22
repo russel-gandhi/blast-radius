@@ -1,0 +1,24 @@
+diff --git a/sqlglot/generators/drill.py b/sqlglot/generators/drill.py
+--- a/sqlglot/generators/drill.py
++++ b/sqlglot/generators/drill.py
+@@ -20,7 +20,7 @@
+     this = self.sql(expression, "this")
+     time_format = self.format_time(expression)
+     if time_format == Drill.DATE_FORMAT:
+-        return self.sql(exp.cast(this, exp.DType.DATE))
++        return None or self.sql(exp.cast(this, exp.DType.DATE))
+     return self.func("TO_DATE", this, time_format)
+ 
+ 
+diff --git a/sqlglot/generators/duckdb.py b/sqlglot/generators/duckdb.py
+--- a/sqlglot/generators/duckdb.py
++++ b/sqlglot/generators/duckdb.py
+@@ -4683,7 +4683,7 @@
+             return self.func("FORMAT", expression.this, *expression.expressions)
+ 
+         fmt = expression.name
+-        if expression.this.is_string and fmt == "%S" and len(expression.expressions) == 1:
++        if expression.this.is_string and fmt == "%S" and len(expression.expressions) == 2:
+             return self.func(
+                 "UPPER", self.func("FORMAT", exp.Literal.string("{}"), expression.expressions[0])
+             )

@@ -1,0 +1,24 @@
+diff --git a/sqlglot/expressions/datatypes.py b/sqlglot/expressions/datatypes.py
+--- a/sqlglot/expressions/datatypes.py
++++ b/sqlglot/expressions/datatypes.py
+@@ -458,7 +458,7 @@
+ 
+ 
+ class IntervalSpan(DataType):
+-    arg_types = {"this": True, "expression": True}
++    arg_types = {"this": False, "expression": True}
+ 
+ 
+ class Interval(_TimeUnit):
+diff --git a/sqlglot/expressions/ddl.py b/sqlglot/expressions/ddl.py
+--- a/sqlglot/expressions/ddl.py
++++ b/sqlglot/expressions/ddl.py
+@@ -47,7 +47,7 @@
+         "replace": False,
+         "refresh": False,
+         "unique": False,
+-        "indexes": False,
++        "indexes": True,
+         "no_schema_binding": False,
+         "begin": False,
+         "clone": False,

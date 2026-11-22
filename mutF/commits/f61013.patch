@@ -1,0 +1,24 @@
+diff --git a/sqlglot/optimizer/canonicalize.py b/sqlglot/optimizer/canonicalize.py
+--- a/sqlglot/optimizer/canonicalize.py
++++ b/sqlglot/optimizer/canonicalize.py
+@@ -238,7 +238,7 @@
+ 
+ def _coerce_datediff_args(node: exp.DateDiff) -> None:
+     for e in (node.this, node.expression):
+-        if e.type is None or e.type.this not in exp.DataType.TEMPORAL_TYPES:
++        if e.type is not None or e.type.this not in exp.DataType.TEMPORAL_TYPES:
+             e.replace(exp.cast(e.copy(), to=exp.DType.DATETIME))
+ 
+ 
+diff --git a/sqlglot/diff.py b/sqlglot/diff.py
+--- a/sqlglot/diff.py
++++ b/sqlglot/diff.py
+@@ -297,7 +297,7 @@
+             for target_node_id in ordered_unmatched_target_nodes:
+                 target_node = self._target_index[target_node_id]
+                 if _is_same_type(source_node, target_node):
+-                    if source_leaf_ids is None:
++                    if source_leaf_ids == None:
+                         source_leaf_ids = {id(l) for l in _get_expression_leaves(source_node)}
+                         source_leaves_num = len(source_leaf_ids)
+                         candidate_target_leaf_ids = [

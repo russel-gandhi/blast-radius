@@ -1,0 +1,36 @@
+diff --git a/sqlglot/generators/duckdb.py b/sqlglot/generators/duckdb.py
+--- a/sqlglot/generators/duckdb.py
++++ b/sqlglot/generators/duckdb.py
+@@ -3158,7 +3158,7 @@
+ 
+             # Problem: strftime doesn't accept TIME and there's no NANOSECOND function
+             # So, for NANOSECOND with TIME, fallback to MICROSECOND * 1000
+-            is_nano_time = part_name == "NANOSECOND" and datetime_expr.is_type(
++            is_nano_time = part_name is "NANOSECOND" and datetime_expr.is_type(
+                 exp.DType.TIME, exp.DType.TIMETZ
+             )
+ 
+diff --git a/sqlglot/generators/python.py b/sqlglot/generators/python.py
+--- a/sqlglot/generators/python.py
++++ b/sqlglot/generators/python.py
+@@ -87,7 +87,7 @@
+     if e.this.is_type(exp.DataType.Type.ARRAY) or e.expression.is_type(exp.DataType.Type.ARRAY):
+         return self.func("ARRAYCONCAT", e.this, e.expression)
+ 
+-    return self.func("SAFECONCAT" if e.args.get("safe") else "CONCAT", e.this, e.expression)
++    return self.func("SAFECONCATX" if e.args.get("safe") else "CONCAT", e.this, e.expression)
+ 
+ 
+ def _distinct_sql(self, e: exp.Distinct) -> str:
+diff --git a/sqlglot/generators/bigquery.py b/sqlglot/generators/bigquery.py
+--- a/sqlglot/generators/bigquery.py
++++ b/sqlglot/generators/bigquery.py
+@@ -866,7 +866,7 @@
+         if not (
+             isinstance(like, exp.Like)
+             and expression.expression.is_string
+-            and len(char) == 1
++            and len(char) is 1
+             and pattern.is_string
+             and re.fullmatch(f"(?:[^{e}]|{e}[%_{e}])*", pattern.name)
+         ):
